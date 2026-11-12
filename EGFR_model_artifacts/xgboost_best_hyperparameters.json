@@ -1,0 +1,31 @@
+{
+  "search_metric": "average_precision",
+  "best_cv_average_precision": 0.98781945027435,
+  "best_search_parameters": {
+    "colsample_bytree": 0.690269984240235,
+    "gamma": 1.0401360423556216,
+    "learning_rate": 0.06983747522055589,
+    "max_depth": 8,
+    "min_child_weight": 0.5573156078201293,
+    "n_estimators": 337,
+    "reg_alpha": 0.017732528513177907,
+    "reg_lambda": 0.8862302305618244,
+    "scale_pos_weight": 6.527974687348033,
+    "subsample": 0.8909087983425683
+  },
+  "early_stopping_rounds_selected": 334,
+  "final_parameters": {
+    "colsample_bytree": 0.690269984240235,
+    "gamma": 1.0401360423556216,
+    "learning_rate": 0.06983747522055589,
+    "max_depth": 8,
+    "min_child_weight": 0.5573156078201293,
+    "n_estimators": 334,
+    "reg_alpha": 0.017732528513177907,
+    "reg_lambda": 0.8862302305618244,
+    "scale_pos_weight": 6.527974687348033,
+    "subsample": 0.8909087983425683
+  },
+  "training_only_threshold": 0.8068686868686868,
+  "search_elapsed_seconds": 90.61454229196534
+}

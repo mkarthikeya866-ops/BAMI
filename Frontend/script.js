@@ -2,9 +2,16 @@
     XGBIOACTIVE — XGBOOST BIOACTIVITY PREDICTION
     HTML + CSS + VANILLA JAVASCRIPT
     ========================================================= */
+/* =========================================================
+    PAGE CONFIGURATION
+   ========================================================= */
+
 const API_HOST = window.location.hostname || "127.0.0.1";
-const API_URL = `http://${API_HOST}:8000/api/v1/predict-xgb`;
-const CHEMBL_API_URL = "https://www.ebi.ac.uk/chembl/api/data";
+const API_BASE_URL = `http://${API_HOST}:8000/api/v1`;
+const PREDICTION_API_URLS = {
+    "COX-2": `${API_BASE_URL}/predict-xgb`,
+    "EGFR": `${API_BASE_URL}/predict-egfr-xgb`
+};
 const PUBCHEM_API_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug";
 const PUBCHEM_AUTOCOMPLETE_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/autocomplete";
 
@@ -14,6 +21,7 @@ const smilesInput = document.getElementById("smiles-input");
 const exampleBtn = document.getElementById("example-btn");
 const clearBtn = document.getElementById("clear-btn");
 const predictBtn = document.getElementById("predict-btn");
+const targetSelect = document.getElementById("target-select");
 
 const predictionMessage = document.getElementById("prediction-message");
 const resultSection = document.getElementById("result-section");
@@ -325,7 +333,13 @@ clearBtn.addEventListener("click", function() {
 
 });
 
-/* Optional use lookup: the SMILES is sent to ChEMBL only after this button is clicked. */
+smilesInput.addEventListener("input", function() {
+    resetResults();
+    predictionMessage.textContent = "";
+    predictionMessage.className = "prediction-message";
+});
+
+/* Look up source records only after the user requests them. */
 
 knownUsesButton.addEventListener("click", async function() {
     if (!lastPredictedSmiles) {
@@ -334,26 +348,24 @@ knownUsesButton.addEventListener("click", async function() {
 
     const requestId = ++knownUsesRequestId;
     knownUsesButton.disabled = true;
-    knownUsesContent.textContent = "Searching ChEMBL for exact structure matches and Phase-IV indications...";
+    knownUsesContent.textContent = "Looking up source-documented uses...";
     knownUsesSource.hidden = true;
 
     try {
-        const moleculeQuery = new URLSearchParams({
-            "molecule_structures__canonical_smiles__exact": lastPredictedSmiles,
-            limit: "5"
+        const response = await fetch(`${API_BASE_URL}/clinical-uses`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ smiles: lastPredictedSmiles })
         });
-        const moleculeResponse = await fetch(
-            `${CHEMBL_API_URL}/molecule.json?${moleculeQuery}`
-        );
-
-        if (!moleculeResponse.ok) {
-            throw new Error("ChEMBL could not be reached. Try again later.");
+        const data = await response.json().catch(() => null);
+        if (!response.ok) {
+            const detail = data?.detail;
+            throw new Error(
+                typeof detail === "string"
+                    ? detail
+                    : "The clinical-use lookup could not be completed. Try again later."
+            );
         }
-
-        const moleculeData = await moleculeResponse.json();
-        const matchedMolecule = (moleculeData.molecules || []).find(function (item) {
-            return item.molecule_structures?.canonical_smiles === lastPredictedSmiles;
-        });
 
         if (requestId !== knownUsesRequestId) {
             return;
@@ -361,48 +373,27 @@ knownUsesButton.addEventListener("click", async function() {
 
         knownUsesContent.replaceChildren();
 
-        if (!matchedMolecule) {
+        if (!data.matched) {
             knownUsesContent.textContent =
-                "No exact ChEMBL structure match was found, so no clinical uses are listed.";
+                "No matching clinical-use record was found for this structure.";
             return;
         }
 
-        const chemblId = matchedMolecule.molecule_chembl_id;
-        const compoundName = matchedMolecule.pref_name || chemblId;
         const compoundLabel = document.createElement("p");
         compoundLabel.className = "known-uses-compound";
-        compoundLabel.textContent = `${compoundName} (${chemblId})`;
+        compoundLabel.textContent = data.compound_name;
         knownUsesContent.appendChild(compoundLabel);
 
-        const indicationQuery = new URLSearchParams({
-            molecule_chembl_id: chemblId,
-            limit: "1000"
-        });
-        const indicationResponse = await fetch(
-            `${CHEMBL_API_URL}/drug_indication.json?${indicationQuery}`
-        );
-
-        if (!indicationResponse.ok) {
-            throw new Error("ChEMBL indications could not be loaded. Try again later.");
-        }
-
-        const indicationData = await indicationResponse.json();
-        const indications = new Map();
-        (indicationData.drug_indications || []).forEach(function (item) {
-            if (Number(item.max_phase_for_ind) < 4) {
-                return;
-            }
-
-            const name = item.mesh_heading || item.efo_term;
-            if (name) {
-                indications.set(name.toLocaleLowerCase(), name);
-            }
-        });
-
-        const sortedIndications = [...indications.values()].sort();
-        if (sortedIndications.length > 0) {
+        const indications = Array.isArray(data.indications)
+            ? data.indications
+            : [];
+        if (indications.length > 0) {
+            const heading = document.createElement("p");
+            heading.className = "known-uses-section-title";
+            heading.textContent = "Clinical indications";
+            knownUsesContent.appendChild(heading);
             const indicationList = document.createElement("ul");
-            sortedIndications.forEach(function (name) {
+            indications.forEach(function (name) {
                 const item = document.createElement("li");
                 item.textContent = name;
                 indicationList.appendChild(item);
@@ -411,12 +402,28 @@ knownUsesButton.addEventListener("click", async function() {
         } else {
             const noIndications = document.createElement("p");
             noIndications.textContent =
-                "No Phase-IV clinical indication records were found for this exact ChEMBL structure.";
+                "No clinical indications were listed in the sources checked.";
             knownUsesContent.appendChild(noIndications);
         }
 
-        knownUsesSource.href =
-            `https://www.ebi.ac.uk/chembl/compound_report_card/${chemblId}/`;
+        const otherUses = Array.isArray(data.other_uses)
+            ? data.other_uses
+            : [];
+        if (otherUses.length > 0) {
+            const heading = document.createElement("p");
+            heading.className = "known-uses-section-title";
+            heading.textContent = "Other documented uses (not clinical indications)";
+            knownUsesContent.appendChild(heading);
+            const useList = document.createElement("ul");
+            otherUses.forEach(function (use) {
+                const item = document.createElement("li");
+                item.textContent = use;
+                useList.appendChild(item);
+            });
+            knownUsesContent.appendChild(useList);
+        }
+
+        knownUsesSource.href = data.source_url;
         knownUsesSource.hidden = false;
     } catch (error) {
         if (requestId === knownUsesRequestId) {
@@ -462,8 +469,18 @@ predictBtn.addEventListener("click", async function() {
         "<span>Predicting Bioactivity...</span>";
 
 
+    const selectedTarget = targetSelect.value;
+    const predictionApiUrl = PREDICTION_API_URLS[selectedTarget];
+    if (!predictionApiUrl) {
+        predictBtn.disabled = false;
+        predictBtn.innerHTML = "<span>Predict Bioactivity</span><span>→</span>";
+        predictionMessage.textContent = "Select a supported prediction target.";
+        predictionMessage.className = "prediction-message error";
+        return;
+    }
+
     predictionMessage.textContent =
-        "Running the final XGBoost Morgan-fingerprint model...";
+        `Running the ${selectedTarget} XGBoost Morgan-fingerprint model...`;
 
     predictionMessage.className =
         "prediction-message";
@@ -479,7 +496,7 @@ predictBtn.addEventListener("click", async function() {
 
         await renderMolecule(smiles);
 
-        const response = await fetch(API_URL, {
+        const response = await fetch(predictionApiUrl, {
 
             method: "POST",
 
@@ -500,7 +517,9 @@ predictBtn.addEventListener("click", async function() {
         });
 
 
-        const data = await response.json();
+        const data = await response.json().catch(function () {
+            return {};
+        });
 
 
         if (!response.ok) {
@@ -516,6 +535,9 @@ predictBtn.addEventListener("click", async function() {
 
         }
 
+        if (smilesInput.value.trim() !== enteredInput) {
+            return;
+        }
 
         displayPrediction(data, resolvedCompound);
 
@@ -567,9 +589,10 @@ function displayPrediction(data, resolvedCompound = {}) {
                 : "Unknown";
 
     const prediction = predictionText.toLowerCase();
+    const targetName = data.target || targetSelect.value;
     lastPredictedSmiles = data.canonical_smiles || data.smiles || smilesInput.value.trim();
     knownUsesButton.disabled = true;
-    knownUsesContent.innerHTML = "<p>Click to search ChEMBL for Phase-IV clinical indications for this exact structure.</p>";
+    knownUsesContent.innerHTML = "<p>Click to see reported clinical uses for this structure.</p>";
     knownUsesSource.hidden = true;
     const descriptors =
         data.molecular_descriptors && typeof data.molecular_descriptors === "object"
@@ -597,16 +620,16 @@ function displayPrediction(data, resolvedCompound = {}) {
 
     classificationDescription.textContent =
         formattedPrediction === "Active"
-            ? "The XGBoost model predicts this molecule as Active against COX-2."
+            ? `The XGBoost model predicts this molecule as Active against ${targetName}.`
             : formattedPrediction === "Inactive"
-                ? "The model did not classify this molecule as Active against COX-2. This does not mean it has no other medical uses."
+                ? `The model did not classify this molecule as Active against ${targetName}. This does not mean it has no other medical uses.`
                 : "The XGBoost model returned an unknown prediction class.";
 
     researchGuidance.textContent =
         formattedPrediction === "Active"
-            ? "Treat this as a research lead: prioritize confirmatory COX-2 testing, then assess selectivity, safety, and ADME properties. This result does not show that the molecule is a medicine or treatment."
+            ? `Treat this as a research lead: prioritize confirmatory ${targetName} testing, then assess selectivity, safety, and ADME properties. This result does not show that the molecule is a medicine or treatment.`
             : formattedPrediction === "Inactive"
-                ? "Do not discard a compound solely because of this result. It only describes this model's COX-2 prediction; the compound may still be useful for other targets or conditions that this model does not assess. This is not advice to start, stop, or avoid a medicine."
+                ? `Do not discard a compound solely because of this result. It only describes this model's ${targetName} prediction; the compound may still be useful for other targets or conditions that this model does not assess. This is not advice to start, stop, or avoid a medicine.`
                 : "Check the molecule input and prediction response before deciding on follow-up testing.";
 
     const descriptorMap = {
@@ -643,11 +666,35 @@ function displayPrediction(data, resolvedCompound = {}) {
 
         <div class="model-results-table">
             <p><strong>Model:</strong> ${data.model || "XGBoost"}</p>
-            <p><strong>Target:</strong> ${data.target || "COX-2"}</p>
+            <p><strong>Target:</strong> ${targetName}</p>
             <p><strong>SMILES:</strong> ${data.smiles || "Not available"}</p>
             <p><strong>Predicted Class:</strong> ${formattedPrediction}</p>
         </div>
     `;
+
+    if (Number.isFinite(Number(data.probability_active))) {
+        const probability = document.createElement("p");
+        const probabilityLabel = document.createElement("strong");
+        probabilityLabel.textContent = data.probability_type === "calibrated_probability"
+            ? "Calibrated probability of Active: "
+            : "Model score for Active: ";
+        probability.append(
+            probabilityLabel,
+            document.createTextNode(`${(Number(data.probability_active) * 100).toFixed(1)}%`)
+        );
+        modelInfoContainer.querySelector(".model-results-table").appendChild(probability);
+    }
+
+    if (Number.isFinite(Number(data.classification_threshold))) {
+        const threshold = document.createElement("p");
+        const thresholdLabel = document.createElement("strong");
+        thresholdLabel.textContent = "Classification threshold: ";
+        threshold.append(
+            thresholdLabel,
+            document.createTextNode(`${(Number(data.classification_threshold) * 100).toFixed(1)}%`)
+        );
+        modelInfoContainer.querySelector(".model-results-table").appendChild(threshold);
+    }
 
     if (resolvedCompound.compoundName) {
         const resolvedName = document.createElement("p");
@@ -689,8 +736,8 @@ document.addEventListener("DOMContentLoaded", function() {
     );
 
     console.log(
-        "XGBoost prediction API:",
-        API_URL
+        "XGBoost prediction APIs:",
+        PREDICTION_API_URLS
     );
 
 });

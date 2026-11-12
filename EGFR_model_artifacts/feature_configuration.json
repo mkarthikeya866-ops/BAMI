@@ -1,0 +1,13 @@
+{
+  "type": "RDKit Morgan fingerprint",
+  "radius": 2,
+  "n_bits": 2048,
+  "binary": true,
+  "use_chirality": true,
+  "target": "EGFR",
+  "target_uniprot": "P00533",
+  "label_mapping": {
+    "Inactive": 0,
+    "Active": 1
+  }
+}

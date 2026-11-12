@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Document metadata and shared styles. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Analyze molecular descriptors and Lipinski Rule of Five properties from a SMILES string.">
+    <title>XGBioactive | Drug-Likeness Analysis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Primary navigation between prediction and drug-likeness tools. -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="index.html#prediction" class="logo">
+                <span class="logo-icon">✦</span>
+                <span>XGBioactive</span>
+            </a>
+            <nav class="site-navigation" aria-label="Main navigation">
+                <a href="index.html#prediction" class="nav-button nav-button-secondary">
+                    Predict
+                </a>
+                <a href="drug-likeness.html" class="nav-button" aria-current="page">
+                    Drug-Likeness
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Drug-likeness input and analysis results. -->
+        <section class="section drug-likeness-section">
+            <div class="section-heading">
+                <div class="section-badge">Molecular Analysis</div>
+                <h2>Drug-Likeness <span>Analysis</span></h2>
+                <p>
+                    Enter a SMILES string to calculate molecular descriptors and
+                    check the Lipinski Rule of Five.
+                </p>
+            </div>
+
+            <div class="drug-likeness-layout">
+                <!-- Molecule name or SMILES input and request status. -->
+                <form class="input-card drug-likeness-form" id="drug-likeness-form">
+                    <div class="card-heading">
+                        <div>
+                            <span class="card-number">01</span>
+                            <h3>Molecule Input</h3>
+                        </div>
+                        <span class="input-tag">NAME OR SMILES</span>
+                    </div>
+
+                    <label for="drug-smiles-input">Enter a molecule name or SMILES</label>
+                    <textarea
+                        id="drug-smiles-input"
+                        name="smiles"
+                        placeholder="Example: aspirin or CC(=O)Oc1ccccc1C(=O)O"
+                        rows="4"
+                        required
+                        spellcheck="false"
+                    ></textarea>
+                    <p class="input-helper">
+                        Enter a molecule name or paste a valid SMILES. Names are resolved through PubChem.
+                    </p>
+
+                    <button class="primary-button drug-analyze-button" id="drug-analyze-button" type="submit">
+                        <span id="drug-analyze-label">Analyze Drug-Likeness</span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+                    <p class="drug-status" id="drug-status" role="status" aria-live="polite"></p>
+                    <div class="drug-error" id="drug-error" role="alert" hidden></div>
+                </form>
+
+                <!-- Calculated descriptors and individual Lipinski rules. -->
+                <section class="drug-results" id="drug-results" aria-labelledby="drug-results-heading" hidden>
+                    <!-- Molecular descriptor results. -->
+                    <div class="descriptors-card">
+                        <div class="descriptor-heading">
+                            <div>
+                                <h3 id="drug-results-heading">Molecular Descriptors</h3>
+                                <p>Calculated properties for the submitted molecule.</p>
+                            </div>
+                            <span class="descriptor-tag">6 Features</span>
+                        </div>
+
+                        <div class="descriptor-grid">
+                            <div class="descriptor-item">
+                                <span class="descriptor-icon">⚖</span>
+                                <p>Molecular Weight</p>
+                                <h4 id="drug-mw">--</h4>
+                                <span>g/mol</span>
+                            </div>
+                            <div class="descriptor-item">
+                                <span class="descriptor-icon">◈</span>
+                                <p>LogP</p>
+                                <h4 id="drug-logp">--</h4>
+                                <span>Lipophilicity</span>
+                            </div>
+                            <div class="descriptor-item">
+                                <span class="descriptor-icon">H</span>
+                                <p>H-Bond Donors</p>
+                                <h4 id="drug-hbd">--</h4>
+                                <span>Count</span>
+                            </div>
+                            <div class="descriptor-item">
+                                <span class="descriptor-icon">N</span>
+                                <p>H-Bond Acceptors</p>
+                                <h4 id="drug-hba">--</h4>
+                                <span>Count</span>
+                            </div>
+                            <div class="descriptor-item">
+                                <span class="descriptor-icon">◇</span>
+                                <p>TPSA</p>
+                                <h4 id="drug-tpsa">--</h4>
+                                <span>Å²</span>
+                            </div>
+                            <div class="descriptor-item">
+                                <span class="descriptor-icon">↻</span>
+                                <p>Rotatable Bonds</p>
+                                <h4 id="drug-rotatable">--</h4>
+                                <span>Count</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overall and per-rule Lipinski results. -->
+                    <div class="descriptors-card lipinski-card">
+                        <div class="descriptor-heading">
+                            <div>
+                                <h3>Lipinski Rule of Five</h3>
+                                <p>Each rule is shown separately; zero violations is a pass.</p>
+                            </div>
+                        </div>
+                        <div class="lipinski-overall" id="lipinski-overall" aria-live="polite"></div>
+                        <ul class="lipinski-rules" id="lipinski-rules"></ul>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <!-- Project footer. -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-bottom">
+                <span>XGBioactive · Molecular drug-likeness analysis</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Drug-likeness page behavior. -->
+    <script src="drug-likeness.js"></script>
+</body>
+</html>

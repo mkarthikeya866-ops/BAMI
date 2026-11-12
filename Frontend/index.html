@@ -7,7 +7,7 @@
 
     <title>XGBioactive | Bioactivity Prediction</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20">
 </head>
 
 <body>
@@ -22,9 +22,13 @@
                 <span>XGBioactive</span>
             </a>
 
-            <a href="#prediction" class="nav-button">
-                Predict
-            </a>
+            <nav class="site-navigation" aria-label="Main navigation">
+                <a href="#prediction" class="nav-button">Predict</a>
+                <a href="#batch-screening" class="nav-button">Batch Screen</a>
+                <a href="drug-likeness.html" class="nav-button nav-button-secondary">
+                    Drug-Likeness
+                </a>
+            </nav>
 
         </div>
     </header>
@@ -46,8 +50,8 @@
             </h2>
 
             <p>
-                Enter a compound name or SMILES to predict its potential
-                COX-2 bioactivity.
+                Select a biological target, then enter a compound name or SMILES
+                to predict its bioactivity.
             </p>
 
         </div>
@@ -70,6 +74,14 @@
                 <label for="smiles-input">
                     Enter compound name or SMILES
                 </label>
+
+                <label for="target-select">
+                    Prediction target
+                </label>
+                <select id="target-select" name="target">
+                    <option value="COX-2" selected>COX-2</option>
+                    <option value="EGFR">EGFR</option>
+                </select>
 
                 <textarea
                     id="smiles-input"
@@ -202,10 +214,11 @@
                         </p>
                     </div>
 
+                    <!-- Clinical indications and other source-reported uses. -->
                     <div class="clinical-uses" id="clinical-uses-panel" hidden>
-                        <h4>Established clinical indications</h4>
+                        <h4>Clinical indications &amp; other uses</h4>
                         <p class="clinical-uses-note">
-                            Optional ChEMBL lookup. Clicking sends this SMILES to ChEMBL; the records may not cover every country's product labels and are not personal medical advice.
+                            Clinical indications and other uses are shown separately from source records. Other uses may include non-medical or historical reports; this is not medical advice.
                         </p>
                         <button
                             type="button"
@@ -213,7 +226,7 @@
                             id="lookup-known-uses-btn"
                             disabled
                         >
-                            Look up clinical uses
+                            Look up documented uses
                         </button>
                         <div id="known-uses-content" class="known-uses-content" aria-live="polite">
                             <p>Run a prediction, then look up matching Phase-IV records.</p>
@@ -226,7 +239,7 @@
                             rel="noopener noreferrer"
                             hidden
                         >
-                            View ChEMBL source record
+                            View source record
                         </a>
                     </div>
 
@@ -304,6 +317,89 @@
         </div>
 
     </section>
+
+    <!-- Batch screening UI: batch-screening.js handles input, results, and CSV export. -->
+    <section class="section batch-screening-section" id="batch-screening">
+        <div class="section-heading">
+            <div class="section-badge">High-throughput Analysis</div>
+            <h2>Batch Molecule <span>Screening</span></h2>
+            <p>Screen up to 500 SMILES with the trained COX-2 and EGFR models.</p>
+        </div>
+
+        <div class="batch-screening-card">
+            <div class="batch-controls">
+                <div class="batch-target-control">
+                    <label for="batch-target-select">Prediction target</label>
+                    <select id="batch-target-select" name="batch-target">
+                        <option value="COX-2" selected>COX-2</option>
+                        <option value="EGFR">EGFR</option>
+                        <option value="Both">Both targets</option>
+                    </select>
+                </div>
+                <div class="batch-file-control">
+                    <label for="batch-csv-file">Upload a CSV with a SMILES column</label>
+                    <input id="batch-csv-file" type="file" accept=".csv,text/csv">
+                </div>
+            </div>
+
+            <label for="batch-smiles-input">SMILES strings (one molecule per line)</label>
+            <textarea
+                id="batch-smiles-input"
+                rows="8"
+                spellcheck="false"
+                placeholder="CCO&#10;CC(=O)Oc1ccccc1C(=O)O"
+            ></textarea>
+            <p class="batch-input-note">Blank lines are ignored. Maximum: 500 molecules per batch.</p>
+
+            <div class="batch-actions">
+                <button type="button" class="primary-button" id="batch-screen-btn">
+                    <span>Screen Molecules</span>
+                    <span aria-hidden="true">→</span>
+                </button>
+                <button type="button" class="secondary-button" id="batch-clear-btn">
+                    Clear Results
+                </button>
+                <button type="button" class="secondary-button" id="batch-download-btn" disabled>
+                    Download Results CSV
+                </button>
+            </div>
+
+            <div id="batch-message" class="batch-message" role="status" aria-live="polite"></div>
+            <div id="batch-loading" class="batch-loading" role="status" aria-live="polite" hidden>
+                <span class="batch-spinner" aria-hidden="true"></span>
+                <span>Screening molecules with the selected trained model(s)…</span>
+            </div>
+
+            <div id="batch-results" class="batch-results" hidden>
+                <div class="batch-summary" aria-label="Batch summary">
+                    <div class="batch-stat"><span>Total</span><strong id="batch-total-count">0</strong></div>
+                    <div class="batch-stat"><span>Valid</span><strong id="batch-valid-count">0</strong></div>
+                    <div class="batch-stat"><span>Invalid</span><strong id="batch-invalid-count">0</strong></div>
+                    <div class="batch-stat"><span>Active</span><strong id="batch-active-count">0</strong></div>
+                    <div class="batch-stat"><span>Inactive</span><strong id="batch-inactive-count">0</strong></div>
+                </div>
+                <p class="batch-count-note">
+                    For Both targets, a molecule is counted Active if either target predicts Active; it is Inactive only when both predictions are Inactive.
+                </p>
+                <div class="batch-table-wrap">
+                    <table class="batch-results-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Index</th>
+                                <th scope="col">SMILES</th>
+                                <th scope="col">Prediction(s)</th>
+                                <th scope="col">Probability(ies)</th>
+                                <th scope="col">Validation</th>
+                                <th scope="col">Error message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batch-results-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer UI: small project and target label. -->
 
     <footer class="footer">
@@ -326,7 +422,8 @@
 <script src="https://unpkg.com/@rdkit/rdkit/dist/RDKit_minimal.js"></script>
 
 <!-- Main JavaScript -->
-<script src="script.js?v=12"></script>
+<script src="script.js?v=19"></script>
+<script src="batch-screening.js?v=3"></script>
 
 </body>
 </html>

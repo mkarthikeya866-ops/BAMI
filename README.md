@@ -77,6 +77,20 @@ curl -X POST http://127.0.0.1:8000/api/v1/predict \
 
 Both endpoints accept a JSON object with a `smiles` string. Invalid SMILES return HTTP `422`.
 
+## Batch molecule screening
+
+The web app's **Batch Screen** section accepts one SMILES per line or a CSV with a `SMILES` header. Select COX-2, EGFR, or Both; batches are limited to 500 molecules. Invalid SMILES are reported per row and do not stop the rest of the batch. Results can be downloaded directly as an Excel-friendly CSV.
+
+The batch endpoint reuses the same trained COX-2 and EGFR inference routes as single-molecule predictions, including the EGFR probability calibration and stored classification threshold:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/batch-predict \
+  -H 'Content-Type: application/json' \
+  -d '{"target":"Both","smiles":["CCO","not-a-smiles"]}'
+```
+
+The response preserves input order and reports validation status, per-target predictions and probabilities, and row-level errors.
+
 ## Project layout
 
 ```text

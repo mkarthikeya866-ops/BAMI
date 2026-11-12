@@ -18,8 +18,15 @@ Inactive = Class 0
 
 import os
 import csv
+import json
+import re
+import ssl
+import xml.etree.ElementTree as ET
 import numpy as np
 import joblib
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote, urlencode
+from urllib.request import Request, urlopen
 from rdkit.Chem import rdFingerprintGenerator
 from xgboost import XGBClassifier
 
@@ -30,6 +37,7 @@ from pydantic import BaseModel
 
 from rdkit import Chem
 from rdkit.Chem import Descriptors, Lipinski, Crippen
+from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit import RDLogger
 
 RDLogger.DisableLog("rdApp.*")
@@ -41,6 +49,7 @@ RDLogger.DisableLog("rdApp.*")
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+REPOSITORY_ROOT = os.path.dirname(PROJECT_ROOT)
 
 MODEL_ROOT = os.path.join(CURRENT_DIR, "models")
 MODEL_DIR = os.path.join(MODEL_ROOT, "comparison")
@@ -52,6 +61,22 @@ FINAL_XGB_MODEL_PATH = os.path.join(
     "models",
     "xgb_cox2_model.json"
 )
+EGFR_XGB_BUNDLE_PATH = os.path.join(
+    REPOSITORY_ROOT,
+    "EGFR_model_artifacts",
+    "models",
+    "egfr_xgboost_model.pkl",
+)
+EGFR_FEATURE_CONFIG = {
+    "type": "RDKit Morgan fingerprint",
+    "radius": 2,
+    "n_bits": 2048,
+    "binary": True,
+    "use_chirality": True,
+    "target": "EGFR",
+    "target_uniprot": "P00533",
+    "label_mapping": {"Inactive": 0, "Active": 1},
+}
 RESULTS_DIR = os.path.join(
     PROJECT_ROOT,
     "result"
@@ -113,6 +138,11 @@ app.add_middleware(
 
 class PredictRequest(BaseModel):
     smiles: str
+
+
+class BatchPredictRequest(BaseModel):
+    smiles: list[str]
+    target: str
 
 
 # ==================================================
@@ -243,6 +273,735 @@ def calculate_molecular_descriptors(mol):
     }
 
     return descriptors
+
+
+# ==================================================
+# DRUG-LIKENESS ENDPOINT
+# ==================================================
+
+@app.post("/drug-likeness")
+@app.post("/api/v1/drug-likeness")
+def analyze_drug_likeness(request: PredictRequest):
+    smiles = request.smiles.strip()
+
+    if not smiles:
+        raise HTTPException(
+            status_code=422,
+            detail="SMILES string cannot be empty."
+        )
+
+    molecule = Chem.MolFromSmiles(smiles)
+    if molecule is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Invalid SMILES string. Chemistry parser could not resolve structure."
+        )
+
+    try:
+        descriptors = calculate_molecular_descriptors(molecule)
+        rule_results = {
+            "molecular_weight": {
+                "value": float(Descriptors.MolWt(molecule)),
+                "threshold": "<= 500",
+                "passed": Descriptors.MolWt(molecule) <= 500,
+            },
+            "logp": {
+                "value": float(Crippen.MolLogP(molecule)),
+                "threshold": "<= 5",
+                "passed": Crippen.MolLogP(molecule) <= 5,
+            },
+            "hydrogen_bond_donors": {
+                "value": int(Lipinski.NumHDonors(molecule)),
+                "threshold": "<= 5",
+                "passed": Lipinski.NumHDonors(molecule) <= 5,
+            },
+            "hydrogen_bond_acceptors": {
+                "value": int(Lipinski.NumHAcceptors(molecule)),
+                "threshold": "<= 10",
+                "passed": Lipinski.NumHAcceptors(molecule) <= 10,
+            },
+        }
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Descriptor calculation error: {error}"
+        ) from error
+
+    violations = sum(not rule["passed"] for rule in rule_results.values())
+    return {
+        "smiles": smiles,
+        "descriptors": descriptors,
+        "lipinski": {
+            "rules": rule_results,
+            "violations": violations,
+            "passed": violations == 0,
+        },
+    }
+
+
+# ==================================================
+# EXTERNAL SOURCE REQUEST HELPERS
+# ==================================================
+
+def request_external_json(
+    url: str, source: str, timeout_seconds: int = 20
+) -> dict:
+    request = Request(
+        url,
+        headers={
+            "Accept": "application/json",
+            "User-Agent": "XGBioactive/1.0 (clinical indication lookup)",
+        },
+    )
+
+    try:
+        with urlopen(
+            request,
+            timeout=timeout_seconds,
+            context=create_external_ssl_context(),
+        ) as response:
+            response_body = response.read().decode("utf-8")
+    except HTTPError as error:
+        if error.code == 404:
+            raise HTTPException(
+                status_code=404,
+                detail=f"{source} has no record for this request.",
+            ) from error
+        raise HTTPException(
+            status_code=502,
+            detail=f"{source} returned an upstream HTTP {error.code} error.",
+        ) from error
+    except (TimeoutError, URLError) as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Could not connect to {source}.",
+        ) from error
+
+    try:
+        return json.loads(response_body)
+    except (json.JSONDecodeError, UnicodeDecodeError) as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"{source} returned an unreadable response.",
+        ) from error
+
+
+def request_pubchem_json(url: str) -> dict:
+    return request_external_json(url, "PubChem")
+
+
+def request_external_text(url: str, source: str) -> str:
+    request = Request(
+        url,
+        headers={
+            "Accept": "application/xml, text/xml, */*",
+            "User-Agent": "XGBioactive/1.0 (clinical indication lookup)",
+        },
+    )
+    try:
+        with urlopen(
+            request,
+            timeout=15,
+            context=create_external_ssl_context(),
+        ) as response:
+            return response.read().decode("utf-8")
+    except HTTPError as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"{source} returned an upstream HTTP {error.code} error.",
+        ) from error
+    except (TimeoutError, URLError) as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Could not connect to {source}.",
+        ) from error
+
+
+def create_external_ssl_context() -> ssl.SSLContext:
+    default_paths = ssl.get_default_verify_paths()
+    if default_paths.cafile and os.path.isfile(default_paths.cafile):
+        return ssl.create_default_context()
+
+    system_ca_bundles = (
+        "/etc/ssl/cert.pem",
+        "/etc/ssl/certs/ca-certificates.crt",
+        "/etc/pki/tls/certs/ca-bundle.crt",
+    )
+    for ca_bundle in system_ca_bundles:
+        if os.path.isfile(ca_bundle):
+            return ssl.create_default_context(cafile=ca_bundle)
+
+    return ssl.create_default_context()
+
+
+# ==================================================
+# CHEMBL CLINICAL INDICATION LOOKUP
+# ==================================================
+
+def get_chembl_indications(canonical_smiles: str) -> dict | None:
+    input_molecule = Chem.MolFromSmiles(canonical_smiles)
+    if input_molecule is None:
+        return None
+    input_structure = canonical_isomeric_smiles(input_molecule)
+    molecule_url = (
+        "https://www.ebi.ac.uk/chembl/api/data/molecule.json?"
+        + urlencode(
+            {
+                "molecule_structures__canonical_smiles__exact": input_structure,
+                "limit": "10",
+            }
+        )
+    )
+    molecule_data = request_external_json(
+        molecule_url, "ChEMBL", timeout_seconds=8
+    )
+    matched_molecule = None
+    for candidate in molecule_data.get("molecules", []):
+        candidate_smiles = (candidate.get("molecule_structures") or {}).get(
+            "canonical_smiles"
+        )
+        candidate_molecule = (
+            Chem.MolFromSmiles(candidate_smiles) if candidate_smiles else None
+        )
+        if (
+            candidate_molecule
+            and canonical_isomeric_smiles(candidate_molecule) == input_structure
+        ):
+            matched_molecule = candidate
+            break
+
+    if matched_molecule is None:
+        return None
+
+    chembl_id = matched_molecule.get("molecule_chembl_id")
+    if not chembl_id:
+        return None
+
+    indication_url = (
+        "https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?"
+        + urlencode({"molecule_chembl_id": chembl_id, "limit": "1000"})
+    )
+    indication_data = request_external_json(
+        indication_url, "ChEMBL", timeout_seconds=8
+    )
+    indications = {
+        name
+        for item in indication_data.get("drug_indications", [])
+        if float(item.get("max_phase_for_ind") or 0) >= 4
+        if (name := item.get("mesh_heading") or item.get("efo_term"))
+    }
+    if not indications:
+        return None
+
+    return {
+        "matched": True,
+        "compound_name": matched_molecule.get("pref_name") or chembl_id,
+        "indications": sorted(indications, key=str.casefold),
+        "other_uses": [],
+        "source": "ChEMBL",
+        "source_url": f"https://www.ebi.ac.uk/chembl/compound_report_card/{chembl_id}/",
+    }
+
+
+# ==================================================
+# PUBCHEM SOURCE-RECORD EXTRACTION
+# ==================================================
+
+def collect_pubchem_indication_text(sections: list[dict]) -> list[str]:
+    annotations = []
+    for section in sections:
+        if section.get("TOCHeading") == "Drug Indication":
+            for information in section.get("Information", []):
+                for entry in (information.get("Value") or {}).get(
+                    "StringWithMarkup", []
+                ):
+                    text = entry.get("String", "").strip()
+                    if (
+                        text
+                        and text.casefold() != "fda label"
+                        and not text.startswith("For more Therapeutic Uses")
+                        and not text.startswith("/CLINICAL TRIALS/")
+                    ):
+                        annotations.append(text)
+        annotations.extend(
+            collect_pubchem_indication_text(section.get("Section", []))
+        )
+    return annotations
+
+
+def collect_pubchem_other_uses(sections: list[dict]) -> list[str]:
+    uses = []
+
+    def add_use(value: str, category: str) -> None:
+        for item in re.split(r"[;|]", value):
+            term = re.sub(r"\s+", " ", item).strip(" .;:-")
+            term = re.sub(r"^(?:a|an|the)\s+", "", term, flags=re.IGNORECASE)
+            if (
+                term
+                and len(term) <= 120
+                and "not known or reasonably ascertainable" not in term.casefold()
+            ):
+                uses.append(f"{category}: {term}")
+
+    def visit(items: list[dict], path: tuple[str, ...] = ()) -> None:
+        for section in items:
+            heading = section.get("TOCHeading", "")
+            current_path = (*path, heading)
+            in_use_record = "Use and Manufacturing" in current_path
+            in_use_branch = in_use_record and "Uses" in current_path
+
+            if in_use_branch and heading in {
+                "Uses",
+                "Use Classification",
+                "Industry Uses",
+                "Consumer Uses",
+            }:
+                for information in section.get("Information", []):
+                    entries = (information.get("Value") or {}).get(
+                        "StringWithMarkup", []
+                    )
+                    for entry in entries:
+                        text = entry.get("String", "").strip()
+                        if not text:
+                            continue
+                        if heading == "Use Classification":
+                            if "Safer Chemical Classes" in text:
+                                continue
+                            classification = text.split("->", 1)
+                            category = (
+                                classification[0].strip().split("->")[-1]
+                                if len(classification) == 2
+                                else "Use classification"
+                            )
+                            add_use(
+                                classification[-1],
+                                category or "Use classification",
+                            )
+                        elif heading == "Uses":
+                            for match in re.finditer(
+                                r"\bused\s+(?:as|for|in)\s+([^.;]+)",
+                                text,
+                                flags=re.IGNORECASE,
+                            ):
+                                add_use(match.group(1), "Reported use")
+                        else:
+                            add_use(
+                                text,
+                                "Industry use"
+                                if heading == "Industry Uses"
+                                else "Consumer use",
+                            )
+
+            if (
+                heading == "Therapeutic Uses"
+                and "Drug and Medication Information" in current_path
+            ):
+                annotations = []
+                for information in section.get("Information", []):
+                    annotations.extend(
+                        entry.get("String", "").strip()
+                        for entry in (information.get("Value") or {}).get(
+                            "StringWithMarkup", []
+                        )
+                        if entry.get("String", "").strip()
+                    )
+                uses.extend(
+                    f"Reported therapeutic use: {term}"
+                    for term in format_indication_annotations(annotations)
+                )
+
+            visit(section.get("Section", []), current_path)
+
+    visit(sections)
+    unique_uses = []
+    seen = set()
+    for use in uses:
+        key = use.casefold()
+        if key not in seen:
+            seen.add(key)
+            unique_uses.append(use)
+    return unique_uses
+
+
+# ==================================================
+# INDICATION TEXT FORMATTING
+# ==================================================
+
+def format_indication_annotations(annotations: list[str]) -> list[str]:
+    indications = []
+
+    def split_terms(value: str) -> list[str]:
+        value = re.sub(r"\s+", " ", value).strip(" .;")
+        value = re.sub(r",\s*and\s+", ", ", value, flags=re.IGNORECASE)
+        terms = re.split(r",\s*", value)
+        return [
+            re.sub(r"^and\s+", "", term.strip(), flags=re.IGNORECASE)
+            .strip(" .;:")
+            for term in terms
+            if term.strip(" .;:")
+        ]
+
+    def add_list_terms(value: str) -> list[str]:
+        value = re.sub(
+            r"^(?:many conditions,\s+including|the following)\s+",
+            "",
+            value.strip(),
+            flags=re.IGNORECASE,
+        )
+        value = re.sub(
+            r"\s+and\s+(?=(?:the\s+)?(?:treatment|management|prevention|reduction)\s+of\b)",
+            ", ",
+            value,
+            flags=re.IGNORECASE,
+        )
+        extracted = []
+        for term in split_terms(value):
+            term = re.sub(
+                r"^(?:the\s+)?(?:treatment|management|relief|prevention|reduction|control)\s+of\s+",
+                "",
+                term,
+                flags=re.IGNORECASE,
+            )
+            term = re.sub(r"^(?:to\s+)?(?:treat|prevent|relieve|reduce|manage)\s+", "", term, flags=re.IGNORECASE)
+            term = re.split(
+                r"\b(?:related to|associated with|due to|in patients with)\b",
+                term,
+                maxsplit=1,
+                flags=re.IGNORECASE,
+            )[0].strip(" .;:")
+            if 2 <= len(term) <= 100:
+                extracted.append(term)
+        return extracted
+
+    def extract_indications(text: str) -> None:
+        text = re.sub(r"\s+", " ", text)
+        label_categories = re.findall(r"\bLabel category:\s*([^.;]+)", text)
+        indications.extend(category.strip(" .;:") for category in label_categories)
+        patterns = (
+            r"\b(?:including|include|such as)\s+(.+?)(?:[.;]|$)",
+            r"\b(?:treatment|management|relief|prevention|reduction|control)\s+of\s+"
+            r"(.+?)(?:[.;]|$)",
+            r"\b(?:indicated|approved|used)\s+for\s+"
+            r"(?:(?:the\s+)?(?:treatment|management|relief|prevention|reduction|control)\s+of\s+)?"
+            r"(.+?)(?:[.;]|$)",
+            r"\b(?:indicated|approved|used)\s+to\s+"
+            r"(?:treat|prevent|relieve|reduce|manage)\s+(.+?)(?:[.;]|$)",
+            r"\bwith\s+((?:type\s+\d+\s+)?[A-Za-z][A-Za-z -]{2,60}"
+            r"(?:disease|disorder|syndrome|diabetes|infection|ulcer|condition))\b",
+        )
+        for pattern in patterns:
+            for match in re.finditer(pattern, text, flags=re.IGNORECASE):
+                indications.extend(add_list_terms(match.group(1)))
+
+    for annotation in annotations:
+        extract_indications(annotation)
+
+        parts = re.split(r"\*\*([^*]+)\*\*", annotation)
+        if len(parts) > 1:
+            for index in range(1, len(parts), 2):
+                heading = parts[index].strip()
+                body = parts[index + 1] if index + 1 < len(parts) else ""
+                if heading.casefold() not in {
+                    "other indications",
+                    "important note regarding use of the extended-release formulation",
+                } and not re.search(
+                    r"\b(?:formulations?|tablets?|combination products)\b",
+                    heading,
+                    flags=re.IGNORECASE,
+                ):
+                    indications.extend(add_list_terms(heading))
+
+                reported_use = re.search(
+                    r"\bused for the management of\s+(.+?)(?:\.|$)",
+                    body,
+                    flags=re.IGNORECASE,
+                )
+                if reported_use:
+                    indications.extend(
+                        f"{term} (reported use; not in US product labeling)"
+                        for term in split_terms(reported_use.group(1))
+                    )
+
+    formatted = []
+    seen = set()
+    for indication in indications:
+        indication = re.sub(r"\s+", " ", indication).strip(" .;")
+        key = indication.casefold()
+        if indication and key not in seen:
+            seen.add(key)
+            formatted.append(indication[0].upper() + indication[1:])
+    return formatted
+
+
+# ==================================================
+# MOLECULE STRUCTURE NORMALIZATION
+# ==================================================
+
+def canonical_connectivity_smiles(molecule: Chem.Mol) -> str:
+    connectivity = Chem.Mol(molecule)
+    Chem.RemoveStereochemistry(connectivity)
+    canonical_tautomer = rdMolStandardize.TautomerEnumerator().Canonicalize(
+        connectivity
+    )
+    return Chem.MolToSmiles(canonical_tautomer, canonical=True)
+
+
+def canonical_isomeric_smiles(molecule: Chem.Mol) -> str:
+    return Chem.MolToSmiles(
+        Chem.Mol(molecule),
+        canonical=True,
+        isomericSmiles=True,
+    )
+
+
+# ==================================================
+# DAILYMED LABEL LOOKUP
+# ==================================================
+
+def get_dailymed_indications(compound_name: str) -> dict | None:
+    generic_name = re.sub(r",.*$", "", compound_name).strip()
+    if not generic_name or not re.fullmatch(r"[A-Za-z0-9 -]+", generic_name):
+        return None
+
+    search_url = (
+        "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?"
+        + urlencode(
+            {
+                "drug_name": generic_name,
+                "name_type": "generic",
+                "pagesize": "20",
+            }
+        )
+    )
+    search_result = request_external_json(
+        search_url, "DailyMed", timeout_seconds=12
+    )
+    expected_title = re.compile(
+        rf"^{re.escape(generic_name)}(?:\s|\[|\()",
+        flags=re.IGNORECASE,
+    )
+
+    for label in search_result.get("data", []):
+        title = label.get("title", "")
+        set_id = label.get("setid")
+        combination_in_ingredient_list = any(
+            "," in ingredient_list
+            for ingredient_list in re.findall(r"\(([^()]*)\)", title)
+        )
+        if (
+            not set_id
+            or not expected_title.search(title)
+            or combination_in_ingredient_list
+            or re.search(
+                r"\b(?:AND|WITH|PLUS)\b|[/+&]",
+                title,
+                flags=re.IGNORECASE,
+            )
+        ):
+            continue
+
+        document = request_external_text(
+            "https://dailymed.nlm.nih.gov/dailymed/services/v2/"
+            f"spls/{quote(set_id, safe='')}.xml",
+            "DailyMed",
+        )
+        try:
+            root = ET.fromstring(document)
+        except ET.ParseError as error:
+            raise HTTPException(
+                status_code=502,
+                detail="DailyMed returned an unreadable label.",
+            ) from error
+
+        indication_texts = []
+        listed_indications = []
+        for section in root.iter():
+            if section.tag.rsplit("}", 1)[-1] != "section":
+                continue
+            section_code = next(
+                (
+                    child
+                    for child in section
+                    if child.tag.rsplit("}", 1)[-1] == "code"
+                ),
+                None,
+            )
+            section_title = (
+                section_code.attrib.get("displayName", "")
+                if section_code is not None
+                else ""
+            )
+            normalized_section_title = section_title.upper()
+            if (
+                "INDICATIONS" not in normalized_section_title
+                or "CONTRAINDICATION" in normalized_section_title
+            ):
+                continue
+            text_node = next(
+                (
+                    child
+                    for child in section
+                    if child.tag.rsplit("}", 1)[-1] == "text"
+                ),
+                None,
+            )
+            if text_node is not None:
+                section_text = " ".join(text_node.itertext())
+                indication_texts.append(section_text)
+                for item in text_node.iter():
+                    if item.tag.rsplit("}", 1)[-1] != "item":
+                        continue
+                    item_text = " ".join(item.itertext()).strip()
+                    item_text = re.sub(r"\s+", " ", item_text).strip()
+                    item_text = re.split(
+                        r"\[\s*see\b",
+                        item_text,
+                        maxsplit=1,
+                        flags=re.IGNORECASE,
+                    )[0].strip(" []")
+                    if item_text:
+                        listed_indications.append(item_text)
+
+        indications = list(
+            dict.fromkeys(
+                format_indication_annotations(indication_texts)
+                + listed_indications
+            )
+        )
+        if indications:
+            return {
+                "matched": True,
+                "compound_name": generic_name,
+                "indications": indications,
+                "other_uses": [],
+                "source": "DailyMed",
+                "source_url": (
+                    "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?"
+                    f"setid={quote(set_id, safe='')}"
+                ),
+            }
+
+    return None
+
+
+# ==================================================
+# CLINICAL USES API ENDPOINT
+# ==================================================
+
+@app.post("/api/v1/clinical-uses")
+def lookup_clinical_uses(request: PredictRequest):
+    smiles = request.smiles.strip()
+    molecule = Chem.MolFromSmiles(smiles) if smiles else None
+    if molecule is None:
+        raise HTTPException(
+            status_code=422,
+            detail="A valid SMILES string is required for the clinical-uses lookup.",
+        )
+
+    canonical_smiles = canonical_isomeric_smiles(molecule)
+    connectivity_smiles = canonical_connectivity_smiles(molecule)
+    try:
+        chembl_result = get_chembl_indications(canonical_smiles)
+    except HTTPException as error:
+        if error.status_code not in {404, 502}:
+            raise
+        chembl_result = None
+    if chembl_result:
+        return chembl_result
+
+    candidate_cids = []
+    for query_smiles in dict.fromkeys((canonical_smiles, connectivity_smiles)):
+        encoded_smiles = quote(query_smiles, safe="")
+        try:
+            identifier_data = request_pubchem_json(
+                "https://pubchem.ncbi.nlm.nih.gov/rest/pug/"
+                f"compound/smiles/{encoded_smiles}/cids/JSON"
+            )
+        except HTTPException as error:
+            if error.status_code == 404:
+                continue
+            raise
+        candidate_cids.extend(
+            identifier_data.get("IdentifierList", {}).get("CID", [])
+        )
+
+    best_candidate = None
+    checked_cids = set()
+    for cid in candidate_cids:
+        if cid in checked_cids:
+            continue
+        checked_cids.add(cid)
+        properties = request_pubchem_json(
+            "https://pubchem.ncbi.nlm.nih.gov/rest/pug/"
+            f"compound/cid/{cid}/property/SMILES,ConnectivitySMILES/JSON"
+        ).get("PropertyTable", {}).get("Properties", [])
+        if not any(
+            (candidate := Chem.MolFromSmiles(item.get("SMILES", "")))
+            and canonical_isomeric_smiles(candidate)
+            == canonical_smiles
+            for item in properties
+        ):
+            continue
+
+        try:
+            pubchem_record = request_pubchem_json(
+                "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/"
+                f"compound/{cid}/JSON"
+            )
+        except HTTPException as error:
+            if error.status_code == 404:
+                continue
+            raise
+
+        compound_name = (
+            pubchem_record.get("Record", {}).get("RecordTitle")
+            or f"PubChem CID {cid}"
+        )
+        annotations = collect_pubchem_indication_text(
+            pubchem_record.get("Record", {}).get("Section", [])
+        )
+        indications = format_indication_annotations(annotations)
+        other_uses = collect_pubchem_other_uses(
+            pubchem_record.get("Record", {}).get("Section", [])
+        )
+        candidate_result = {
+            "matched": True,
+            "compound_name": compound_name,
+            "indications": indications,
+            "other_uses": other_uses,
+            "source": "PubChem",
+            "source_url": f"https://pubchem.ncbi.nlm.nih.gov/compound/{cid}",
+        }
+        if best_candidate is None or len(indications) + len(other_uses) > len(
+            best_candidate["indications"] + best_candidate.get("other_uses", [])
+        ):
+            best_candidate = candidate_result
+        if indications:
+            break
+
+    if best_candidate is None:
+        return {
+            "matched": False,
+            "indications": [],
+            "other_uses": [],
+            "source": "PubChem",
+        }
+
+    if not best_candidate["indications"]:
+        try:
+            dailymed_result = get_dailymed_indications(
+                best_candidate["compound_name"]
+            )
+        except HTTPException as error:
+            if error.status_code not in {404, 502}:
+                raise
+            dailymed_result = None
+        if dailymed_result:
+            return dailymed_result
+
+    return {
+        **best_candidate,
+    }
 
 
 # ==================================================
@@ -674,11 +1433,14 @@ def get_model_image(filename: str):
 
 # ==================================================
 # FRONTEND MOUNT
-# ==================================================# ==================================================
+# ==================================================
+
+# ==================================================
 # FINAL XGBOOST MODEL
 # ==================================================
 
 final_xgb_model = None
+egfr_xgb_bundle = None
 
 
 def load_final_xgb_model():
@@ -725,6 +1487,53 @@ def smiles_to_morgan_fingerprint(smiles):
     return fingerprint_array.reshape(1, -1)
 
 
+def smiles_to_egfr_morgan_fingerprint(smiles: str):
+    molecule = Chem.MolFromSmiles(smiles)
+    if molecule is None:
+        raise ValueError("Invalid SMILES representation.")
+
+    generator = rdFingerprintGenerator.GetMorganGenerator(
+        radius=EGFR_FEATURE_CONFIG["radius"],
+        fpSize=EGFR_FEATURE_CONFIG["n_bits"],
+        includeChirality=EGFR_FEATURE_CONFIG["use_chirality"],
+    )
+    fingerprint = generator.GetFingerprint(molecule)
+    fingerprint_array = np.zeros(
+        (EGFR_FEATURE_CONFIG["n_bits"],),
+        dtype=np.uint8,
+    )
+    Chem.DataStructs.ConvertToNumpyArray(fingerprint, fingerprint_array)
+    return fingerprint_array.reshape(1, -1)
+
+
+def load_egfr_xgb_bundle():
+    global egfr_xgb_bundle
+
+    if egfr_xgb_bundle is None:
+        if not os.path.isfile(EGFR_XGB_BUNDLE_PATH):
+            raise FileNotFoundError(
+                f"EGFR XGBoost model bundle not found: {EGFR_XGB_BUNDLE_PATH}"
+            )
+
+        bundle = joblib.load(EGFR_XGB_BUNDLE_PATH)
+        if not isinstance(bundle, dict):
+            raise RuntimeError("EGFR XGBoost artifact must be a model bundle.")
+        if bundle.get("feature_config") != EGFR_FEATURE_CONFIG:
+            raise RuntimeError(
+                "EGFR model feature configuration does not match the API fingerprint settings."
+            )
+        if not all(key in bundle for key in ("estimator", "calibrator", "threshold")):
+            raise RuntimeError("EGFR XGBoost model bundle is missing required components.")
+        if not hasattr(bundle["estimator"], "predict_proba"):
+            raise RuntimeError("EGFR XGBoost estimator does not support probability predictions.")
+        if not hasattr(bundle["calibrator"], "predict_proba"):
+            raise RuntimeError("EGFR calibration object does not support probability predictions.")
+
+        egfr_xgb_bundle = bundle
+
+    return egfr_xgb_bundle
+
+
 # ==================================================
 # FINAL XGBOOST PREDICTION API
 # ==================================================
@@ -749,6 +1558,9 @@ def predict_final_xgb(request: PredictRequest):
         model = load_final_xgb_model()
 
         prediction = int(model.predict(fingerprint)[0])
+        model_classes = list(model.classes_)
+        active_class_index = model_classes.index(1)
+        probability_active = float(model.predict_proba(fingerprint)[0][active_class_index])
 
         prediction_label = (
             "Active" if prediction == 1 else "Inactive"
@@ -760,6 +1572,9 @@ def predict_final_xgb(request: PredictRequest):
             "target": "COX-2",
             "prediction": prediction_label,
             "class_id": prediction,
+            "probability_active": probability_active,
+            "probability_type": "model_probability",
+            "classification_threshold": 0.5,
             "canonical_smiles": Chem.MolToSmiles(
                 molecule,
                 canonical=True,
@@ -769,7 +1584,8 @@ def predict_final_xgb(request: PredictRequest):
             "fingerprint": {
                 "type": "Morgan",
                 "radius": 2,
-                "bits": 2048
+                "bits": 2048,
+                "use_chirality": False,
             }
         }
 
@@ -786,3 +1602,184 @@ def predict_final_xgb(request: PredictRequest):
             status_code=500,
             detail=f"Prediction failed: {str(error)}"
         )
+
+
+@app.post("/predict-egfr-xgb")
+@app.post("/api/v1/predict-egfr-xgb")
+def predict_egfr_xgb(request: PredictRequest):
+    smiles = request.smiles.strip()
+    if not smiles:
+        raise HTTPException(
+            status_code=422,
+            detail="SMILES input is required."
+        )
+
+    try:
+        fingerprint = smiles_to_egfr_morgan_fingerprint(smiles)
+        molecule = Chem.MolFromSmiles(smiles)
+        bundle = load_egfr_xgb_bundle()
+
+        estimator = bundle["estimator"]
+        calibrator = bundle["calibrator"]
+        class_index = list(estimator.classes_).index(1)
+        raw_probability = float(estimator.predict_proba(fingerprint)[0][class_index])
+        calibrated_probability = float(
+            calibrator.predict_proba(np.asarray([[raw_probability]], dtype=float))[0][1]
+        )
+        threshold = float(bundle["threshold"])
+        prediction = int(calibrated_probability >= threshold)
+
+        return {
+            "smiles": smiles,
+            "model": "Tuned EGFR XGBoost - Morgan Fingerprint",
+            "target": "EGFR",
+            "target_uniprot": "P00533",
+            "prediction": "Active" if prediction == 1 else "Inactive",
+            "class_id": prediction,
+            "probability_active": calibrated_probability,
+            "probability_type": "calibrated_probability",
+            "raw_model_probability_active": raw_probability,
+            "classification_threshold": threshold,
+            "canonical_smiles": Chem.MolToSmiles(
+                molecule,
+                canonical=True,
+                isomericSmiles=True,
+            ),
+            "molecular_descriptors": calculate_molecular_descriptors(molecule),
+            "fingerprint": {
+                "type": "Morgan",
+                "radius": EGFR_FEATURE_CONFIG["radius"],
+                "bits": EGFR_FEATURE_CONFIG["n_bits"],
+                "use_chirality": EGFR_FEATURE_CONFIG["use_chirality"],
+            },
+        }
+    except ValueError as error:
+        raise HTTPException(
+            status_code=422,
+            detail=str(error)
+        ) from error
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"EGFR prediction failed: {error}"
+        ) from error
+
+
+# ==================================================
+# BATCH MOLECULE SCREENING API
+# ==================================================
+
+@app.post("/api/v1/batch-predict")
+def batch_predict(request: BatchPredictRequest):
+    supported_targets = {
+        "COX-2": predict_final_xgb,
+        "EGFR": predict_egfr_xgb,
+    }
+
+    if request.target not in {"COX-2", "EGFR", "Both"}:
+        raise HTTPException(
+            status_code=422,
+            detail="Target must be COX-2, EGFR, or Both.",
+        )
+    if not request.smiles:
+        raise HTTPException(
+            status_code=422,
+            detail="Provide at least one SMILES string.",
+        )
+    if len(request.smiles) > 500:
+        raise HTTPException(
+            status_code=422,
+            detail="A batch can contain at most 500 molecules.",
+        )
+
+    selected_targets = (
+        list(supported_targets)
+        if request.target == "Both"
+        else [request.target]
+    )
+    results = []
+
+    for index, submitted_smiles in enumerate(request.smiles, start=1):
+        clean_smiles = submitted_smiles.strip()
+        molecule = Chem.MolFromSmiles(clean_smiles) if clean_smiles else None
+        if molecule is None:
+            results.append({
+                "index": index,
+                "smiles": submitted_smiles,
+                "validation_status": "invalid",
+                "error_message": (
+                    "SMILES is empty."
+                    if not clean_smiles
+                    else "Invalid SMILES: RDKit could not parse this structure."
+                ),
+                "predictions": {},
+            })
+            continue
+
+        predictions = {}
+        errors = []
+        prediction_request = PredictRequest(smiles=clean_smiles)
+
+        for target in selected_targets:
+            try:
+                prediction_data = supported_targets[target](prediction_request)
+                predictions[target] = {
+                    "prediction": prediction_data["prediction"],
+                    "probability": prediction_data["probability_active"],
+                    "probability_type": prediction_data.get("probability_type"),
+                    "classification_threshold": prediction_data.get(
+                        "classification_threshold"
+                    ),
+                    "error_message": None,
+                }
+            except HTTPException as error:
+                detail = error.detail
+                message = (
+                    json.dumps(detail, ensure_ascii=False)
+                    if isinstance(detail, (dict, list))
+                    else str(detail)
+                )
+                predictions[target] = {
+                    "prediction": None,
+                    "probability": None,
+                    "probability_type": None,
+                    "classification_threshold": None,
+                    "error_message": message,
+                }
+                errors.append(f"{target}: {message}")
+            except Exception as error:
+                message = f"Unexpected prediction failure: {error}"
+                print(
+                    f"[ERROR] Batch prediction failed for molecule {index}, "
+                    f"target {target}: {error}"
+                )
+                predictions[target] = {
+                    "prediction": None,
+                    "probability": None,
+                    "probability_type": None,
+                    "classification_threshold": None,
+                    "error_message": message,
+                }
+                errors.append(f"{target}: {message}")
+
+        results.append({
+            "index": index,
+            "smiles": submitted_smiles,
+            "validation_status": "valid",
+            "error_message": "; ".join(errors),
+            "predictions": predictions,
+        })
+
+    return {
+        "target": request.target,
+        "total": len(results),
+        "valid": sum(
+            result["validation_status"] == "valid" for result in results
+        ),
+        "invalid": sum(
+            result["validation_status"] == "invalid" for result in results
+        ),
+        "results": results,
+    }

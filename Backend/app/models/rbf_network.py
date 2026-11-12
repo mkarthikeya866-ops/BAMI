@@ -1,8 +1,20 @@
+# ============================================================
+# RBF NETWORK CLASSIFIER
+# ============================================================
+
+# ============================================================
+# DEPENDENCIES
+# ============================================================
+
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import euclidean_distances
 
+
+# ============================================================
+# CLASSIFIER CONFIGURATION AND RADIAL BASIS LAYER
+# ============================================================
 
 class RBFNetworkClassifier(ClassifierMixin, BaseEstimator):
 
@@ -14,6 +26,10 @@ class RBFNetworkClassifier(ClassifierMixin, BaseEstimator):
     def _rbf(self, X):
         distances = euclidean_distances(X, self.centers_)
         return np.exp(-self.gamma_ * distances ** 2)
+
+    # ========================================================
+    # MODEL FITTING
+    # ========================================================
 
     def fit(self, X, y):
 
@@ -47,6 +63,10 @@ class RBFNetworkClassifier(ClassifierMixin, BaseEstimator):
         )
 
         return self
+
+    # ========================================================
+    # PROBABILITY AND CLASS PREDICTION
+    # ========================================================
 
     def predict_proba(self, X):
 
