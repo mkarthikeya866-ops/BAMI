@@ -54,6 +54,13 @@ Useful API pages:
 - Interactive API documentation: <http://127.0.0.1:8000/docs>
 - Model metrics: <http://127.0.0.1:8000/api/v1/model-metrics>
 
+## Deploy to Render
+
+The root `render.yaml` configures one Free Web Service. FastAPI serves the
+frontend and API from the same Render URL; the Free plan may spin down after
+inactivity. In Render, create a **Blueprint** from this GitHub repository and
+deploy the `xgbioactive` service. The health check is available at `/health`.
+
 ## Model evaluation
 
 The trained models and evaluated metrics are included in the repository. To regenerate them, activate the virtual environment and run from the `Backend` directory:

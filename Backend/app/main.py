@@ -33,6 +33,7 @@ from xgboost import XGBClassifier
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from rdkit import Chem
@@ -83,9 +84,9 @@ RESULTS_DIR = os.path.join(
 )
 METRICS_PATH = os.path.join(RESULTS_DIR, "model_metrics.csv")
 
-FRONTEND_DIR = os.path.join(PROJECT_ROOT, "Frontend")
+FRONTEND_DIR = os.path.join(REPOSITORY_ROOT, "Frontend")
 if not os.path.isdir(FRONTEND_DIR):
-    FRONTEND_DIR = os.path.join(PROJECT_ROOT, "frontend")
+    FRONTEND_DIR = os.path.join(REPOSITORY_ROOT, "frontend")
 
 
 # ==================================================
@@ -1083,21 +1084,17 @@ def calculate_confidence(model, features, predicted_class):
 
 @app.get("/")
 def root():
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
+
+@app.get("/api")
+def api_root():
     return {
-
         "message": "Bioactive Molecule Predictor API",
-
         "default_model": BEST_MODEL_NAME,
-
-        "available_models": list(
-            MODEL_FILES.keys()
-        ),
-
+        "available_models": list(MODEL_FILES.keys()),
         "prediction_mode": "All five models",
-
-        "docs": "/docs"
-
+        "docs": "/docs",
     }
 
 
@@ -1783,3 +1780,6 @@ def batch_predict(request: BatchPredictRequest):
         ),
         "results": results,
     }
+
+
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

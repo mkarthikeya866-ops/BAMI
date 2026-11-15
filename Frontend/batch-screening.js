@@ -2,8 +2,11 @@
    BATCH MOLECULE SCREENING
    ========================================================= */
 
-const batchApiUrl =
-    `http://${window.location.hostname || "127.0.0.1"}:8000/api/v1/batch-predict`;
+const batchHost = window.location.hostname || "127.0.0.1";
+const batchApiBaseUrl = ["localhost", "127.0.0.1"].includes(batchHost)
+    ? `http://${batchHost}:8000/api/v1`
+    : "/api/v1";
+const batchApiUrl = `${batchApiBaseUrl}/batch-predict`;
 const batchSmilesInput = document.getElementById("batch-smiles-input");
 const batchTargetSelect = document.getElementById("batch-target-select");
 const batchCsvFile = document.getElementById("batch-csv-file");

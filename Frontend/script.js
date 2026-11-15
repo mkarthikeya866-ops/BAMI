@@ -7,7 +7,9 @@
    ========================================================= */
 
 const API_HOST = window.location.hostname || "127.0.0.1";
-const API_BASE_URL = `http://${API_HOST}:8000/api/v1`;
+const API_BASE_URL = ["localhost", "127.0.0.1"].includes(API_HOST)
+    ? `http://${API_HOST}:8000/api/v1`
+    : "/api/v1";
 const PREDICTION_API_URLS = {
     "COX-2": `${API_BASE_URL}/predict-xgb`,
     "EGFR": `${API_BASE_URL}/predict-egfr-xgb`

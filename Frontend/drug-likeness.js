@@ -4,7 +4,9 @@
 
 const API_HOST = window.location.hostname || "127.0.0.1";
 const DRUG_LIKENESS_API_URL =
-    `http://${API_HOST}:8000/api/v1/drug-likeness`;
+    `${["localhost", "127.0.0.1"].includes(API_HOST)
+        ? `http://${API_HOST}:8000`
+        : ""}/api/v1/drug-likeness`;
 const PUBCHEM_NAME_URL =
     "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name";
 
