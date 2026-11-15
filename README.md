@@ -24,14 +24,22 @@ On Windows, activate the environment with `.venv\Scripts\activate` instead.
 
 ## Run locally
 
-Start the API in one terminal:
+From the project root, start both the API and frontend in one terminal:
+
+```bash
+npm run dev
+```
+
+Open <http://127.0.0.1:5501/>. Press `Ctrl+C` to stop both services.
+
+Alternatively, start each service in its own terminal. Start the API:
 
 ```bash
 cd /path/to/XGBioactiveNew/Backend
 ../.venv/bin/python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-Start the static frontend in a second terminal:
+Then start the static frontend:
 
 ```bash
 cd /path/to/XGBioactiveNew/Frontend
