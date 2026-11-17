@@ -728,17 +728,6 @@ Potential future improvements include:
 
 ---
 
-## 👨‍💻 Development Team
-
-**Project:** XGBioactive – AI-Based Bioactivity Prediction
-
-**Institution:** NGIT, Osmania University
-
-**Department:** Computer Science and Engineering
-
-**Project Lead / Contributor:** Mandala Sai Karthikeya
-
----
 
 ## 📚 References and Resources
 
