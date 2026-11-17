@@ -347,6 +347,7 @@ batchScreenButton.addEventListener("click", async function () {
         const response = await fetch(batchApiUrl, {
             method: "POST",
             headers: {
+                ...(await window.getFirebaseAuthHeaders()),
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },

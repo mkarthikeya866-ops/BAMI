@@ -993,6 +993,69 @@ button:disabled {
     scroll-margin-top: 100px;
 }
 
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding-left: 10px;
+    border-left: 1px solid var(--border);
+}
+
+.nav-auth[hidden] {
+    display: none;
+}
+
+.nav-user-name {
+    max-width: 150px;
+    overflow: hidden;
+    color: var(--brown-dark);
+    font-size: 11px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.auth-guard-overlay {
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(246, 244, 252, 0.97);
+}
+
+.auth-guard-overlay[hidden] {
+    display: none;
+}
+
+.auth-guard-card {
+    max-width: 380px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.auth-guard-card h2 {
+    font-size: 20px;
+}
+
+.auth-guard-card p {
+    margin-top: 10px;
+    color: var(--text-light);
+    font-size: 13px;
+}
+
+.auth-guard-card a {
+    display: inline-flex;
+    margin-top: 18px;
+    color: var(--sage-dark);
+    font-size: 13px;
+    font-weight: 700;
+}
 
 
 

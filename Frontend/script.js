@@ -356,7 +356,10 @@ knownUsesButton.addEventListener("click", async function() {
     try {
         const response = await fetch(`${API_BASE_URL}/clinical-uses`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                ...(await window.getFirebaseAuthHeaders()),
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ smiles: lastPredictedSmiles })
         });
         const data = await response.json().catch(() => null);
@@ -503,6 +506,8 @@ predictBtn.addEventListener("click", async function() {
             method: "POST",
 
             headers: {
+
+                ...(await window.getFirebaseAuthHeaders()),
 
                 "Content-Type": "application/json",
 

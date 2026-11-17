@@ -3,6 +3,11 @@ const { existsSync } = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
+const envFile = path.join(root, ".env");
+if (existsSync(envFile)) {
+    process.loadEnvFile(envFile);
+}
+
 const venvPython = process.platform === "win32"
     ? path.join(root, ".venv", "Scripts", "python.exe")
     : path.join(root, ".venv", "bin", "python");

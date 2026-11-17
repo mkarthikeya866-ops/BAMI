@@ -7,10 +7,17 @@
 
     <title>Bioactive Molecule Intelligence | Bioactivity Prediction</title>
 
-    <link rel="stylesheet" href="style.css?v=21">
+    <link rel="stylesheet" href="style.css?v=23">
 </head>
 
-<body>
+<body data-auth-page="protected">
+    <div class="auth-guard-overlay" id="auth-guard-overlay" role="status" aria-live="polite">
+        <div class="auth-guard-card">
+            <h2>Checking your session</h2>
+            <p data-guard-message>Verifying your sign-in before opening the workspace…</p>
+            <a href="login.html">Go to sign in</a>
+        </div>
+    </div>
 
     <!-- Header UI: brand and link to the prediction tool. -->
 
@@ -28,6 +35,12 @@
                 <a href="drug-likeness.html" class="nav-button nav-button-secondary">
                     Drug-Likeness
                 </a>
+                <div class="nav-auth" data-auth-user-container hidden>
+                    <span class="nav-user-name" data-auth-user></span>
+                    <button class="nav-button nav-button-secondary" type="button" data-auth-logout>
+                        Sign out
+                    </button>
+                </div>
             </nav>
 
         </div>
@@ -424,6 +437,7 @@
 <!-- Main JavaScript -->
 <script src="script.js?v=19"></script>
 <script src="batch-screening.js?v=3"></script>
+<script type="module" src="auth.js?v=2"></script>
 
 </body>
 </html>

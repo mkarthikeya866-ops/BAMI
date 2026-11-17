@@ -35,9 +35,10 @@ from urllib.request import Request, urlopen
 from rdkit.Chem import rdFingerprintGenerator
 from xgboost import XGBClassifier
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -137,6 +138,54 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+firebase_bearer = HTTPBearer(auto_error=False)
+
+
+def get_firebase_user(
+    authorization: HTTPAuthorizationCredentials | None = Depends(firebase_bearer),
+):
+    if authorization is None or authorization.scheme.casefold() != "bearer":
+        raise HTTPException(
+            status_code=401,
+            detail="Sign in to access this resource.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        from google.auth import exceptions as google_auth_exceptions
+        from google.auth.transport.requests import Request
+        from google.oauth2 import id_token
+    except ImportError as error:
+        raise HTTPException(
+            status_code=503,
+            detail="Install the backend dependencies to enable Firebase authentication.",
+        ) from error
+
+    project_id = os.getenv("FIREBASE_PROJECT_ID")
+    if not project_id:
+        raise HTTPException(
+            status_code=503,
+            detail="FIREBASE_PROJECT_ID must be configured to verify Firebase tokens.",
+        )
+
+    try:
+        return id_token.verify_firebase_token(
+            authorization.credentials,
+            Request(),
+            audience=project_id,
+        )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=401,
+            detail="Your session is invalid or expired. Please sign in again.",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from error
+    except google_auth_exceptions.GoogleAuthError as error:
+        raise HTTPException(
+            status_code=503,
+            detail="Firebase token verification is temporarily unavailable.",
+        ) from error
+
 
 # ==================================================
 # REQUEST SCHEMA
@@ -149,6 +198,45 @@ class PredictRequest(BaseModel):
 class BatchPredictRequest(BaseModel):
     smiles: list[str]
     target: str
+
+
+@app.get("/api/v1/firebase-config")
+def firebase_client_config():
+    required = {
+        "apiKey": "FIREBASE_API_KEY",
+        "authDomain": "FIREBASE_AUTH_DOMAIN",
+        "projectId": "FIREBASE_PROJECT_ID",
+        "appId": "FIREBASE_APP_ID",
+    }
+    config = {
+        key: os.getenv(environment_name)
+        for key, environment_name in required.items()
+    }
+    missing = [
+        environment_name
+        for key, environment_name in required.items()
+        if not config[key]
+    ]
+    if missing:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Firebase web configuration is incomplete. Set: "
+                + ", ".join(missing)
+                + "."
+            ),
+        )
+
+    optional = {
+        "storageBucket": "FIREBASE_STORAGE_BUCKET",
+        "messagingSenderId": "FIREBASE_MESSAGING_SENDER_ID",
+    }
+    config.update({
+        key: os.getenv(environment_name)
+        for key, environment_name in optional.items()
+        if os.getenv(environment_name)
+    })
+    return config
 
 
 # ==================================================
@@ -287,7 +375,10 @@ def calculate_molecular_descriptors(mol):
 
 @app.post("/drug-likeness")
 @app.post("/api/v1/drug-likeness")
-def analyze_drug_likeness(request: PredictRequest):
+def analyze_drug_likeness(
+    request: PredictRequest,
+    _user: dict = Depends(get_firebase_user),
+):
     smiles = request.smiles.strip()
 
     if not smiles:
@@ -895,7 +986,10 @@ def get_dailymed_indications(compound_name: str) -> dict | None:
 # ==================================================
 
 @app.post("/api/v1/clinical-uses")
-def lookup_clinical_uses(request: PredictRequest):
+def lookup_clinical_uses(
+    request: PredictRequest,
+    _user: dict = Depends(get_firebase_user),
+):
     smiles = request.smiles.strip()
     molecule = Chem.MolFromSmiles(smiles) if smiles else None
     if molecule is None:
@@ -1134,7 +1228,7 @@ def health():
 # ==================================================
 
 @app.get("/models")
-def get_available_models():
+def get_available_models(_user: dict = Depends(get_firebase_user)):
 
     model_status = {}
 
@@ -1179,7 +1273,7 @@ def get_available_models():
 # ==================================================
 
 @app.get("/api/v1/model-metrics")
-def get_model_metrics():
+def get_model_metrics(_user: dict = Depends(get_firebase_user)):
 
     if not os.path.isfile(METRICS_PATH):
         raise HTTPException(
@@ -1248,7 +1342,10 @@ def get_model_metrics():
 
 @app.post("/predict")
 @app.post("/api/v1/predict")
-def predict(request: PredictRequest):
+def predict(
+    request: PredictRequest,
+    _user: dict = Depends(get_firebase_user),
+):
 
     if hasattr(request, "smiles"):
         clean_smiles = request.smiles.strip()
@@ -1374,7 +1471,10 @@ def predict(request: PredictRequest):
 # ==================================================
 
 @app.get("/model-image/{filename}")
-def get_model_image(filename: str):
+def get_model_image(
+    filename: str,
+    _user: dict = Depends(get_firebase_user),
+):
 
     allowed = [
 
@@ -1542,7 +1642,10 @@ def load_egfr_xgb_bundle():
 
 @app.post("/predict-xgb")
 @app.post("/api/v1/predict-xgb")
-def predict_final_xgb(request: PredictRequest):
+def predict_final_xgb(
+    request: PredictRequest,
+    _user: dict = Depends(get_firebase_user),
+):
 
     smiles = request.smiles.strip()
 
@@ -1608,7 +1711,10 @@ def predict_final_xgb(request: PredictRequest):
 
 @app.post("/predict-egfr-xgb")
 @app.post("/api/v1/predict-egfr-xgb")
-def predict_egfr_xgb(request: PredictRequest):
+def predict_egfr_xgb(
+    request: PredictRequest,
+    _user: dict = Depends(get_firebase_user),
+):
     smiles = request.smiles.strip()
     if not smiles:
         raise HTTPException(
@@ -1674,7 +1780,10 @@ def predict_egfr_xgb(request: PredictRequest):
 # ==================================================
 
 @app.post("/api/v1/batch-predict")
-def batch_predict(request: BatchPredictRequest):
+def batch_predict(
+    request: BatchPredictRequest,
+    _user: dict = Depends(get_firebase_user),
+):
     supported_targets = {
         "COX-2": predict_final_xgb,
         "EGFR": predict_egfr_xgb,

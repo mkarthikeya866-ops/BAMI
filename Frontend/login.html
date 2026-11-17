@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sign in to Bioactive Molecule Intelligence.">
+    <title>Sign In | Bioactive Molecule Intelligence</title>
+    <link rel="stylesheet" href="style.css?v=21">
+    <link rel="stylesheet" href="auth.css?v=2">
+</head>
+<body class="auth-body" data-auth-page="login">
+    <main class="auth-layout">
+        <section class="auth-intro" aria-labelledby="auth-brand">
+            <a class="auth-brand" href="index.html">
+                <span class="logo-icon" aria-hidden="true">✦</span>
+                <span id="auth-brand">Bioactive Molecule Intelligence</span>
+            </a>
+            <div class="auth-intro-copy">
+                <span class="auth-kicker"><span></span> MOLECULAR AI WORKSPACE</span>
+                <h1>Research starts with a <span>molecule.</span></h1>
+                <p>Sign in to continue exploring bioactivity, molecular structure, and drug-likeness insights.</p>
+            </div>
+            <div class="auth-molecule-art" aria-hidden="true">
+                <span class="molecule-node node-one"></span>
+                <span class="molecule-node node-two"></span>
+                <span class="molecule-node node-three"></span>
+                <span class="molecule-node node-four"></span>
+                <span class="molecule-node node-five"></span>
+                <span class="molecule-bond bond-one"></span>
+                <span class="molecule-bond bond-two"></span>
+                <span class="molecule-bond bond-three"></span>
+                <span class="molecule-bond bond-four"></span>
+                <span class="molecule-orbit"></span>
+                <span class="molecule-center">C</span>
+            </div>
+            <p class="auth-intro-foot">COX-2 &amp; EGFR · Computational research tools</p>
+        </section>
+
+        <section class="auth-panel" aria-labelledby="login-heading">
+            <a class="auth-mobile-brand" href="index.html">
+                <span class="logo-icon" aria-hidden="true">✦</span>
+                <span>Bioactive Molecule Intelligence</span>
+            </a>
+            <div class="auth-card">
+                <div class="auth-heading">
+                    <span class="auth-eyebrow">WELCOME BACK</span>
+                    <h2 id="login-heading">Sign in to your account</h2>
+                    <p>Access your molecular analysis workspace.</p>
+                </div>
+
+                <div id="auth-notice" class="auth-notice" role="status" aria-live="polite" hidden></div>
+                <div id="auth-config-error" class="auth-notice auth-notice-error" role="alert" hidden></div>
+
+                <div class="auth-fields" id="login-form">
+                    <div class="auth-field">
+                        <label for="login-email">Email address</label>
+                        <input
+                            id="login-email"
+                            name="email"
+                            type="email"
+                            autocomplete="username"
+                            placeholder="you@example.com"
+                            required
+                        >
+                    </div>
+                    <div class="auth-field">
+                        <div class="auth-label-row">
+                            <label for="login-password">Password</label>
+                            <button class="auth-text-button" type="button" id="forgot-password">
+                                Forgot password?
+                            </button>
+                        </div>
+                        <div class="auth-password-wrap">
+                            <input
+                                id="login-password"
+                                name="password"
+                                type="password"
+                                autocomplete="current-password"
+                                placeholder="Enter your password"
+                                required
+                            >
+                            <button
+                                class="password-toggle"
+                                type="button"
+                                data-password-toggle="login-password"
+                                aria-label="Show password"
+                                aria-pressed="false"
+                            >Show</button>
+                        </div>
+                    </div>
+                    <button class="auth-submit" id="login-submit" type="button">
+                        <span class="auth-spinner" aria-hidden="true"></span>
+                        <span class="auth-submit-label">Sign in</span>
+                        <span class="auth-submit-arrow" aria-hidden="true">→</span>
+                    </button>
+                </div>
+
+                <p class="auth-switch">New to the workspace? <a href="register.html">Create an account</a></p>
+                <p class="auth-security-note"><span aria-hidden="true">⌑</span> Secure sign-in powered by Firebase Authentication</p>
+            </div>
+            <p class="auth-legal">For research and educational use. Predictions are not medical advice.</p>
+        </section>
+    </main>
+    <script type="module" src="auth.js?v=2"></script>
+</body>
+</html>

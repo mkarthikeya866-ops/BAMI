@@ -87,7 +87,10 @@ function displayResults(data) {
 async function requestAnalysis(smiles) {
     const response = await fetch(DRUG_LIKENESS_API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            ...(await window.getFirebaseAuthHeaders()),
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({ smiles })
     });
     const data = await response.json().catch(() => null);
