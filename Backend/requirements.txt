@@ -1,6 +1,10 @@
+# ============================================================
+# BACKEND DEPENDENCIES
+# ============================================================
 fastapi
 uvicorn[standard]
 numpy
+scipy
 joblib
 xgboost
 scikit-learn

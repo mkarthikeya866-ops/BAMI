@@ -16,6 +16,10 @@ Active = Class 1
 Inactive = Class 0
 """
 
+# ==========================================================
+# BIOACTIVE MOLECULE PREDICTOR BACKEND
+# ==========================================================
+
 import os
 import csv
 import json
@@ -24,6 +28,7 @@ import ssl
 import xml.etree.ElementTree as ET
 import numpy as np
 import joblib
+from scipy.sparse import csr_matrix
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
@@ -1500,7 +1505,7 @@ def smiles_to_egfr_morgan_fingerprint(smiles: str):
         dtype=np.uint8,
     )
     Chem.DataStructs.ConvertToNumpyArray(fingerprint, fingerprint_array)
-    return fingerprint_array.reshape(1, -1)
+    return csr_matrix(fingerprint_array.reshape(1, -1), dtype=np.uint8)
 
 
 def load_egfr_xgb_bundle():

@@ -1,3 +1,7 @@
+# ============================================================
+# MODEL COMPARISON AND TRAINING PIPELINE
+# ============================================================
+
 from pathlib import Path
 import warnings
 
