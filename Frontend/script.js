@@ -192,6 +192,16 @@ async function resolveCompoundInput(input) {
         return { smiles: input, compoundName: "", correctedName: "" };
     }
 
+    // Fast resolution: check curated scientific dataset first
+    const curatedMatch = window.BAMI?.findBioactiveMoleculeByName?.(input);
+    if (curatedMatch && curatedMatch.smiles) {
+        return {
+            smiles: curatedMatch.smiles,
+            compoundName: curatedMatch.name,
+            correctedName: ""
+        };
+    }
+
     let lookupName = input;
     let correctedName = "";
     let response = await fetch(
@@ -235,6 +245,10 @@ async function resolveCompoundInput(input) {
 /* Load Example button: fill the SMILES field and preview aspirin. */
 
 exampleBtn.addEventListener("click", async function() {
+
+    if (window.moleculeAutocomplete) {
+        window.moleculeAutocomplete.close();
+    }
 
     smilesInput.value = exampleSmiles;
 
@@ -324,6 +338,10 @@ function resetResults() {
 /* Clear button: empty the input and reset the prediction UI. */
 
 clearBtn.addEventListener("click", function() {
+
+    if (window.moleculeAutocomplete) {
+        window.moleculeAutocomplete.close();
+    }
 
     smilesInput.value = "";
 
@@ -736,10 +754,56 @@ function displayPrediction(data, resolvedCompound = {}) {
    INITIALIZATION
    ========================================================= */
 
+function setupMoleculeAutocomplete() {
+    const searchContainer = document.getElementById("molecule-search-container");
+    const searchDropdown = document.getElementById("molecule-suggestions-dropdown");
+
+    if (typeof initMoleculeAutocomplete === "function" && smilesInput && searchDropdown) {
+        window.moleculeAutocomplete = initMoleculeAutocomplete({
+            input: smilesInput,
+            container: searchContainer,
+            dropdown: searchDropdown,
+            targetSelect: targetSelect,
+            onSelect: async (molecule) => {
+                smilesInput.value = molecule.name;
+
+                // Intelligently sync target dropdown if target is specified
+                if (molecule.target) {
+                    if (molecule.target.toUpperCase().includes("EGFR")) {
+                        targetSelect.value = "EGFR";
+                    } else if (molecule.target.toUpperCase().includes("COX-2")) {
+                        targetSelect.value = "COX-2";
+                    }
+                }
+
+                predictionMessage.textContent = `Selected ${molecule.name} (${molecule.formula ? molecule.formula + " · " : ""}${molecule.target ? molecule.target : "Molecule"}). Click Predict Bioactivity to screen.`;
+                predictionMessage.className = "prediction-message success";
+
+                // Fast render 2D molecular structure if SMILES is available
+                if (molecule.smiles) {
+                    try {
+                        await renderMolecule(molecule.smiles);
+                        structureStatus.textContent = `${molecule.name} structure preview ready.`;
+                    } catch (err) {
+                        console.warn("Could not preview selected molecule structure:", err);
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Run immediately or on DOM ready
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupMoleculeAutocomplete);
+} else {
+    setupMoleculeAutocomplete();
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
     console.log(
-        "XGBioactive frontend initialized."
+        "XGBioactive frontend initialized with intelligent molecule autocomplete."
     );
 
     console.log(

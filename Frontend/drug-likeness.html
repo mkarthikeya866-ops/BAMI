@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Analyze molecular descriptors and Lipinski Rule of Five properties from a SMILES string.">
     <title>Bioactive Molecule Intelligence | Drug-Likeness Analysis</title>
-    <link rel="stylesheet" href="style.css?v=24">
+    <link rel="stylesheet" href="style.css?v=35">
 </head>
 
 <body data-auth-page="protected">
@@ -65,14 +65,18 @@
                     </div>
 
                     <label for="drug-smiles-input">Enter a molecule name or SMILES</label>
-                    <textarea
-                        id="drug-smiles-input"
-                        name="smiles"
-                        placeholder="Example: aspirin or CC(=O)Oc1ccccc1C(=O)O"
-                        rows="4"
-                        required
-                        spellcheck="false"
-                    ></textarea>
+                    <div class="molecule-search-container" id="drug-search-container">
+                        <textarea
+                            id="drug-smiles-input"
+                            name="smiles"
+                            placeholder="Example: aspirin, erlotinib, paracetamol, or CC(=O)Oc1ccccc1C(=O)O"
+                            rows="4"
+                            required
+                            autocomplete="off"
+                            spellcheck="false"
+                        ></textarea>
+                        <div id="drug-suggestions-dropdown" class="molecule-suggestions-dropdown" hidden></div>
+                    </div>
                     <p class="input-helper">
                         Enter a molecule name or paste a valid SMILES. Names are resolved through PubChem.
                     </p>
@@ -162,9 +166,10 @@
         </div>
     </footer>
 
-    <!-- Drug-likeness page behavior. -->
-    <script src="drug-likeness.js"></script>
+    <!-- Molecule Autocomplete & Suggestion Engine -->
+    <script src="molecule-suggestions.js?v=35"></script>
+    <script src="drug-likeness.js?v=35"></script>
     <script type="module" src="auth.js?v=2"></script>
-    <script type="module" src="particle-wave.js?v=7"></script>
+    <script type="module" src="particle-wave.js?v=8"></script>
 </body>
 </html>

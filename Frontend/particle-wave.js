@@ -57,7 +57,7 @@ try {
             colors[offset] = color.r * brightness;
             colors[offset + 1] = color.g * brightness;
             colors[offset + 2] = color.b * brightness;
-            sizes[index] = 1.2 + random() * 1.2;
+            sizes[index] = 2.2 + random() * 2.0;
         }
     }
 
@@ -93,7 +93,7 @@ try {
 
                 vec4 viewPosition = modelViewMatrix * vec4(flowingPosition, 1.0);
                 gl_Position = projectionMatrix * viewPosition;
-                gl_PointSize = aSize * uPixelRatio * (42.0 / -viewPosition.z);
+                gl_PointSize = aSize * uPixelRatio * (56.0 / -viewPosition.z);
                 vColor = color;
                 vDepth = clamp((-viewPosition.z - 10.0) / 28.0, 0.0, 1.0);
             }

@@ -98,6 +98,11 @@ async function requestAnalysis(smiles) {
 }
 
 async function resolveMoleculeName(name) {
+    const localMatch = window.BAMI?.findBioactiveMoleculeByName?.(name);
+    if (localMatch && localMatch.smiles) {
+        return localMatch.smiles;
+    }
+
     let response;
     try {
         const url = `${PUBCHEM_NAME_URL}/${encodeURIComponent(name)}/property/CanonicalSMILES,IsomericSMILES,ConnectivitySMILES/JSON`;
@@ -186,3 +191,15 @@ form.addEventListener("submit", async function (event) {
         analyzeLabel.textContent = "Analyze Drug-Likeness";
     }
 });
+
+/* Initialize live molecule autocomplete for drug likeness search */
+if (typeof initMoleculeAutocomplete === "function") {
+    initMoleculeAutocomplete({
+        input: smilesInput,
+        container: document.getElementById("drug-search-container"),
+        dropdown: document.getElementById("drug-suggestions-dropdown"),
+        onSelect: (molecule) => {
+            smilesInput.value = molecule.name;
+        }
+    });
+}
