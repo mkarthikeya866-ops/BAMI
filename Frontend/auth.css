@@ -1,8 +1,8 @@
 .auth-body {
     min-height: 100vh;
     background:
-        radial-gradient(ellipse at 2% 5%, rgba(196, 179, 226, 0.34), transparent 35%),
-        var(--cream);
+        radial-gradient(ellipse at 2% 5%, rgba(196, 179, 226, 0.28), transparent 35%),
+        rgba(246, 244, 252, 0.72);
 }
 
 .auth-layout {
@@ -21,8 +21,8 @@
     padding: 48px clamp(36px, 6vw, 88px) 36px;
     color: #fff;
     background:
-        radial-gradient(ellipse at 75% 65%, rgba(164, 142, 204, 0.4), transparent 34%),
-        linear-gradient(145deg, #342D45 4%, #51436B 58%, #72629A 100%);
+        radial-gradient(ellipse at 75% 65%, rgba(164, 142, 204, 0.36), transparent 34%),
+        linear-gradient(145deg, rgba(52, 45, 69, 0.88) 4%, rgba(81, 67, 107, 0.82) 58%, rgba(114, 98, 154, 0.78) 100%);
 }
 
 .auth-intro::before,
@@ -198,6 +198,7 @@
     align-items: center;
     justify-content: center;
     padding: 40px clamp(24px, 6vw, 84px) 24px;
+    background: linear-gradient(145deg, rgba(246, 244, 252, 0.72), rgba(246, 244, 252, 0.88));
 }
 
 .auth-card {
