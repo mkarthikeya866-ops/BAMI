@@ -601,40 +601,7 @@
                         </div>
                     </section>
 
-                    <!-- 5. Model Transparency & Validation Benchmark Table -->
-                    <section class="admet-transparency-section" aria-labelledby="transparency-heading">
-                        <div class="admet-card transparency-card">
-                            <div class="transparency-header">
-                                <span class="transparency-kicker">Scientific Openness</span>
-                                <h3 id="transparency-heading">Model Architecture &amp; Held-Out Test Evaluation</h3>
-                                <p>
-                                    All 10 endpoint models were trained independently with scikit-learn Random Forests utilizing 
-                                    2048-bit Morgan Fingerprints (radius 2, chiral) + 10 physicochemical descriptors, validated 
-                                    on strict 20% held-out test splits without data leakage.
-                                </p>
-                            </div>
 
-                            <div class="table-responsive">
-                                <table class="admet-metrics-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Endpoint</th>
-                                            <th>Category</th>
-                                            <th>Algorithm</th>
-                                            <th>Public Benchmark Source</th>
-                                            <th>Total Samples</th>
-                                            <th>Test Set</th>
-                                            <th>Primary Evaluation Metric</th>
-                                            <th>Secondary Metric</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="admet-metrics-table-body">
-                                        <!-- Dynamically Populated from /admet-metrics -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </section>
 
                     <!-- 6. Regulatory & Scientific Limitations Notice -->
                     <section class="admet-disclaimer-section" aria-labelledby="disclaimer-heading">
@@ -676,7 +643,7 @@
     <script src="sidebar.js?v=50"></script>
 
     <!-- Firebase Auth & App Scripts -->
-    <script src="admet.js?v=3" defer></script>
+    <script src="admet.js?v=71" defer></script>
     <script type="module" src="auth.js?v=2"></script>
 
     <!-- 3D WebGL Particle-Wave Visualization Background -->

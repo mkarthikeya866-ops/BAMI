@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
             ? `${window.location.origin}/api/v1`
             : "http://127.0.0.1:8000/api/v1");
     const ADMET_PREDICT_URL = `${API_BASE_URL}/admet-predict`;
-    const ADMET_METRICS_URL = `${API_BASE_URL}/admet-metrics`;
     const PUBCHEM_NAME_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name";
 
     // Form and input elements
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const errorMsg = document.getElementById('admet-error');
     const resultsContainer = document.getElementById('admet-results-container');
     const bioactivityCheckbox = document.getElementById('include-bioactivity-checkbox');
-    const metricsTableBody = document.getElementById('admet-metrics-table-body');
 
     // Sample buttons
     const sampleButtons = document.querySelectorAll('.sample-pill-btn');
@@ -52,66 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return {};
     }
-
-    // =========================================================
-    // LOAD BENCHMARK VALIDATION METRICS
-    // =========================================================
-    async function loadMetricsTable() {
-        if (!metricsTableBody) return;
-        try {
-            const resp = await fetch(ADMET_METRICS_URL);
-            if (!resp.ok) return;
-            const data = await resp.json();
-
-            metricsTableBody.innerHTML = '';
-            const epList = [
-                "solubility_esol",
-                "caco2_wang",
-                "hia_hou",
-                "bbbp_martins",
-                "cyp3a4_veith",
-                "cyp2d6_veith",
-                "cyp2c9_veith",
-                "ames_hansen",
-                "dili_fdadili",
-                "herg_karim"
-            ];
-
-            epList.forEach(key => {
-                const ep = data[key];
-                if (!ep) return;
-
-                const tr = document.createElement('tr');
-                const m = ep.metrics || {};
-                let primary = '--';
-                let secondary = '--';
-
-                if (ep.task_type === 'regression') {
-                    primary = `R² = ${m.r2_score !== undefined ? m.r2_score : '--'}`;
-                    secondary = `RMSE = ${m.rmse !== undefined ? m.rmse : '--'}`;
-                } else {
-                    primary = `ROC-AUC = ${m.roc_auc !== undefined ? m.roc_auc : '--'}`;
-                    secondary = `F1 = ${m.f1_score !== undefined ? m.f1_score : '--'}`;
-                }
-
-                tr.innerHTML = `
-                    <td><strong>${escapeHtml(ep.endpoint_name || key)}</strong></td>
-                    <td><span class="table-cat-badge cat-${(ep.category || '').toLowerCase()}">${escapeHtml(ep.category || '')}</span></td>
-                    <td>Random Forest (2058-D)</td>
-                    <td>${escapeHtml(ep.source || '--')}</td>
-                    <td>${m.total_samples || '--'}</td>
-                    <td>${m.test_samples || '--'} (20%)</td>
-                    <td><strong class="metric-highlight">${primary}</strong></td>
-                    <td>${secondary}</td>
-                `;
-                metricsTableBody.appendChild(tr);
-            });
-        } catch (err) {
-            console.warn('Could not load validation metrics:', err);
-        }
-    }
-
-    loadMetricsTable();
 
     // =========================================================
     // SAMPLE PILLS HANDLER
