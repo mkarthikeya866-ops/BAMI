@@ -7,3 +7,5 @@ __pycache__/
 .DS_Store
 .localized
 Frontend/node_modules/
+Backend/data/docking_runs/
+Backend/data/docking_runs/*

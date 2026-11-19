@@ -97,29 +97,72 @@ DOCKING_JOBS: Dict[str, Dict[str, Any]] = {}
 DOCKING_LOCK = threading.Lock()
 
 
-def get_vina_binary() -> str:
-    """Locate the AutoDock Vina binary (local bundle or system PATH)."""
-    # Windows executable check
-    if sys.platform.startswith("win"):
-        vina_win = os.path.join(BIN_DIR, "vina.exe")
-        if os.path.isfile(vina_win):
-            return vina_win
-        win_sys = shutil.which("vina.exe") or shutil.which("vina")
-        if win_sys:
-            return win_sys
+def is_binary_compatible(path: str) -> bool:
+    """Check if the binary executable format matches the current host OS."""
+    if not os.path.isfile(path) or not os.access(path, os.X_OK):
+        return False
+    try:
+        with open(path, "rb") as f:
+            magic = f.read(4)
+        if sys.platform.startswith("linux"):
+            # ELF magic: \x7fELF or shell script
+            return magic == b"\x7fELF" or magic.startswith(b"#!")
+        elif sys.platform == "darwin":
+            # Mach-O magics: \xcf\xfa\xed\xfe, \xfe\xed\xfa\xcf, \xca\xfe\xba\xbe, \xce\xfa\xed\xfe or shell script
+            macho_magics = (b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xca\xfe\xba\xbe", b"\xce\xfa\xed\xfe")
+            return magic in macho_magics or magic.startswith(b"#!")
+        elif sys.platform.startswith("win"):
+            return magic.startswith(b"MZ")
+    except Exception:
+        pass
+    return True
 
-    # Unix/macOS bundled executable check
-    if os.path.isfile(VINA_EXECUTABLE) and os.access(VINA_EXECUTABLE, os.X_OK):
-        return VINA_EXECUTABLE
+
+def get_vina_binary() -> str:
+    """
+    Locate the AutoDock Vina binary matching the current host operating system:
+      - Linux (Render / Cloud / Ubuntu): Backend/bin/vina_linux_x86_64 (statically linked ELF)
+      - macOS (Local development): Backend/bin/vina_mac_arm64 (Mach-O ARM64)
+      - Windows: Backend/bin/vina.exe
+      - Fallback: System PATH 'vina'
+    """
+    candidates = []
+
+    if sys.platform.startswith("linux"):
+        candidates.extend([
+            os.path.join(BIN_DIR, "vina_linux_x86_64"),
+            os.path.join(BIN_DIR, "vina-linux"),
+            os.path.join(BIN_DIR, "vina"),
+        ])
+    elif sys.platform == "darwin":
+        candidates.extend([
+            os.path.join(BIN_DIR, "vina_mac_arm64"),
+            os.path.join(BIN_DIR, "vina"),
+        ])
+    elif sys.platform.startswith("win"):
+        candidates.extend([
+            os.path.join(BIN_DIR, "vina.exe"),
+            os.path.join(BIN_DIR, "vina"),
+        ])
+
+    # Check candidates for file existence and binary compatibility
+    for c in candidates:
+        if is_binary_compatible(c):
+            return c
 
     # System PATH fallback
     system_vina = shutil.which("vina") or shutil.which("vina.exe")
     if system_vina:
         return system_vina
 
+    # Last resort fallback: any candidate that is executable
+    for c in candidates:
+        if os.path.isfile(c) and os.access(c, os.X_OK):
+            return c
+
     raise FileNotFoundError(
-        f"AutoDock Vina binary not found at '{VINA_EXECUTABLE}' or in system PATH. "
-        "Please ensure AutoDock Vina is installed or placed in Backend/bin/."
+        f"Compatible AutoDock Vina binary not found for host platform '{sys.platform}'. "
+        f"Available in '{BIN_DIR}': {os.listdir(BIN_DIR) if os.path.exists(BIN_DIR) else 'None'}."
     )
 
 
