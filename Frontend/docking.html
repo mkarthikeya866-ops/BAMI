@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Simulate authentic AutoDock Vina molecular docking against COX-2 (PDB 6COX) and EGFR (PDB 1M17) with 3D protein-ligand visualization.">
     <title>BAMI | Molecular Docking Simulation</title>
-    <link rel="stylesheet" href="style.css?v=48">
-    <link rel="stylesheet" href="sidebar.css?v=50">
-    <link rel="stylesheet" href="ui-enhancements.css?v=50">
-    <link rel="stylesheet" href="docking.css?v=50">
+    <link rel="stylesheet" href="style.css?v=66">
+    <link rel="stylesheet" href="sidebar.css?v=66">
+    <link rel="stylesheet" href="ui-enhancements.css?v=66">
+    <link rel="stylesheet" href="docking.css?v=66">
     <!-- 3Dmol.js for WebGL Protein-Ligand Molecular Rendering -->
     <script src="assets/3Dmol-min.js"></script>
 </head>
@@ -266,6 +266,14 @@
                                         <!-- Dynamically filled -->
                                     </div>
                                 </div>
+
+                                <!-- Download Comprehensive PDF Report Button -->
+                                <div class="docking-report-download-box" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(229, 221, 242, 0.15);">
+                                    <button type="button" class="primary-button" id="docking-download-pdf-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #651FFF 0%, #3D5AFE 100%);">
+                                        <span>📄 Download Scientific Report with Docking Pose (PDF)</span>
+                                        <span aria-hidden="true">&rarr;</span>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- 3D WebGL Molecular Viewer Card -->
@@ -329,9 +337,9 @@
     </div><!-- /.app-layout -->
 
     <!-- Scripts -->
-    <script src="sidebar.js?v=50"></script>
-    <script src="molecule-suggestions.js?v=50"></script>
-    <script src="docking.js?v=50"></script>
-    <script type="module" src="particle-wave.js?v=8"></script>
+    <script src="sidebar.js?v=66"></script>
+    <script src="molecule-suggestions.js?v=66"></script>
+    <script src="docking.js?v=66"></script>
+    <script type="module" src="particle-wave.js?v=66"></script>
 </body>
 </html>

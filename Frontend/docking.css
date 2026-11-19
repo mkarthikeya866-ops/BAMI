@@ -1,64 +1,148 @@
 /* =========================================================
    BAMI MOLECULAR DOCKING SIMULATION STYLES
+   Fully Responsive & Anti-Collision Layout
+   Guarantees zero overlapping elements across all viewport widths
    ========================================================= */
 
+/* Main layout wrapper */
 .docking-main {
-    padding: 30px 40px 60px;
-    max-width: 1560px;
+    padding: clamp(24px, 3.5vw, 42px) clamp(20px, 4vw, 54px) 70px;
+    max-width: 1760px;
+    width: 100%;
     margin: 0 auto;
+    box-sizing: border-box;
+    font-size: 17px;
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
+/* Page Section Header */
 .docking-hero-section {
-    margin-bottom: 20px;
+    margin-bottom: 28px;
 }
 
-/* Two-column layout */
+.docking-hero-section .section-badge {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 7px 18px;
+    border-radius: 999px;
+    background: #EDE9FE;
+    color: #651FFF;
+    display: inline-block;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.docking-hero-section h2 {
+    font-size: clamp(30px, 3.8vw, 44px);
+    font-weight: 800;
+    color: #1E1530;
+    line-height: 1.2;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+    word-break: break-word;
+}
+
+.docking-hero-section h2 span {
+    color: #651FFF;
+}
+
+.docking-hero-section p {
+    font-size: clamp(16px, 1.8vw, 19px);
+    color: #4C3C66;
+    line-height: 1.65;
+    max-width: 1050px;
+    margin: 0;
+    word-break: break-word;
+}
+
+/* =========================================================
+   TWO-COLUMN RESPONSIVE GRID (ZERO OVERLAP)
+   ========================================================= */
 .docking-grid-container {
     display: grid;
-    grid-template-columns: minmax(460px, 540px) 1fr;
-    gap: 30px;
+    grid-template-columns: minmax(380px, 520px) minmax(0, 1fr);
+    gap: 32px;
     align-items: start;
-    margin-top: 25px;
+    margin-top: 28px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Standard Docking Card */
+.docking-controls-col,
+.docking-visuals-col {
+    min-width: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   STANDARD DOCKING CARD
+   ========================================================= */
 .docking-card {
     background: #FFFFFF;
-    border: 1px solid rgba(200, 168, 233, 0.45);
+    border: 1.5px solid rgba(196, 160, 235, 0.45);
     border-radius: 20px;
-    padding: 26px 30px;
-    box-shadow: 0 10px 30px rgba(50, 20, 90, 0.04);
+    padding: clamp(20px, 2.5vw, 30px);
+    box-shadow: 0 8px 30px rgba(50, 20, 90, 0.04);
     margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .docking-card:hover {
-    box-shadow: 0 14px 38px rgba(50, 20, 90, 0.08);
+    box-shadow: 0 12px 38px rgba(50, 20, 90, 0.08);
 }
 
 .docking-card .card-heading {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
     margin-bottom: 20px;
+    min-width: 0;
+}
+
+.docking-card .card-heading > div {
+    flex: 1 1 180px;
+    min-width: 0;
+}
+
+.card-number {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 900;
+    color: #651FFF;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
 }
 
 .docking-card .card-heading h3 {
-    font-size: 21px;
-    font-weight: 700;
+    font-size: clamp(20px, 2.5vw, 24px);
+    font-weight: 800;
     color: #1E1530;
-    margin: 4px 0 0;
+    margin: 2px 0 0;
+    letter-spacing: -0.01em;
+    word-break: break-word;
 }
 
 .dock-tag {
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
-    padding: 4px 10px;
+    letter-spacing: 0.06em;
+    padding: 5px 12px;
     border-radius: 20px;
     background: #F3E8FF;
     color: #6D28D9;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .dock-tag.success-tag {
@@ -71,22 +155,27 @@
    ========================================================= */
 .target-toggle-group {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
     margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .target-toggle-btn {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
+    gap: 12px;
+    padding: 14px 16px;
     border: 2px solid #E9D5FF;
     border-radius: 14px;
     background: #FAF7FD;
     cursor: pointer;
     text-align: left;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .target-toggle-btn:hover {
@@ -105,7 +194,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: 2px solid #C4B5FD;
+    border: 2.5px solid #C4B5FD;
     display: grid;
     place-items: center;
     flex-shrink: 0;
@@ -132,43 +221,56 @@
 .target-title-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 2px;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin-bottom: 3px;
+    min-width: 0;
 }
 
 .target-title-row strong {
     font-size: 18px;
+    font-weight: 800;
     color: #1E1530;
+    white-space: nowrap;
 }
 
 .pdb-pill {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     padding: 2px 7px;
-    border-radius: 12px;
+    border-radius: 10px;
     background: #EDE9FE;
     color: #5B21B6;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
 .target-subtitle {
     font-size: 13.5px;
+    font-weight: 500;
     color: #6B5E87;
     display: block;
+    word-break: break-word;
+    line-height: 1.35;
 }
 
 /* Receptor Metadata Panel */
 .receptor-meta-panel {
     background: #FAF8FE;
-    border: 1px solid #E7DDF7;
-    border-radius: 14px;
-    padding: 16px 20px;
+    border: 1.5px solid #E7DDF7;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .receptor-meta-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .receptor-id-badge {
@@ -176,18 +278,20 @@
     font-weight: 800;
     color: #4C1D95;
     background: #EDE9FE;
-    padding: 3px 10px;
+    padding: 4px 12px;
     border-radius: 8px;
+    letter-spacing: 0.03em;
 }
 
 .rcsb-link {
-    font-size: 13.5px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     color: #651FFF;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    white-space: nowrap;
 }
 
 .rcsb-link:hover {
@@ -196,28 +300,32 @@
 }
 
 .receptor-desc {
-    font-size: 14.5px;
-    color: #4B3B69;
-    line-height: 1.5;
-    margin: 0 0 12px;
+    font-size: 15px;
+    color: #433360;
+    line-height: 1.55;
+    margin: 0 0 14px;
+    word-break: break-word;
 }
 
 .receptor-coords-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    border-top: 1px dashed #DDD2F2;
-    padding-top: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    border-top: 1.5px dashed #DDD2F2;
+    padding-top: 14px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .coord-item {
-    font-size: 12.5px;
+    font-size: 13px;
+    min-width: 0;
 }
 
 .coord-label {
     display: block;
     color: #796C97;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     font-size: 11px;
     letter-spacing: 0.05em;
@@ -225,9 +333,12 @@
 }
 
 .coord-item strong {
-    font-size: 13.5px;
+    font-size: 14px;
+    font-weight: 700;
     color: #1E1530;
-    word-break: break-all;
+    display: block;
+    word-break: break-word;
+    line-height: 1.35;
 }
 
 /* =========================================================
@@ -235,10 +346,34 @@
    ========================================================= */
 .field-label {
     display: block;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 800;
     color: #2D1F47;
     margin-bottom: 8px;
+    letter-spacing: -0.01em;
+}
+
+.docking-smiles-input {
+    width: 100%;
+    min-height: 110px;
+    padding: 14px 18px;
+    font-size: 16px;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    line-height: 1.55;
+    border: 2px solid #D8C7F5;
+    border-radius: 14px;
+    background: #FCFAFF;
+    color: #1E1530;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.docking-smiles-input:focus {
+    outline: none;
+    border-color: #651FFF;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(101, 31, 255, 0.15);
 }
 
 .docking-presets-row {
@@ -246,43 +381,48 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 14px 0 16px;
+    margin: 14px 0 18px;
+    width: 100%;
 }
 
 .presets-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #796C97;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #6E5F8E;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
 }
 
 .preset-pill {
     background: #F4EFFF;
-    border: 1px solid #DDD0F7;
-    border-radius: 16px;
-    padding: 5px 12px;
+    border: 1.5px solid #DDD0F7;
+    border-radius: 18px;
+    padding: 6px 14px;
     font-size: 13.5px;
-    font-weight: 600;
+    font-weight: 700;
     color: #5B21B6;
     cursor: pointer;
     transition: all 0.18s ease;
+    white-space: nowrap;
 }
 
 .preset-pill:hover {
     background: #651FFF;
     border-color: #651FFF;
     color: #FFFFFF;
-    transform: translateY(-1px);
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 12px rgba(101, 31, 255, 0.25);
 }
 
 .exhaustiveness-control {
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .exhaustiveness-control label {
     display: block;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 700;
     color: #493B66;
     margin-bottom: 6px;
@@ -290,30 +430,54 @@
 
 .exhaustiveness-control select {
     width: 100%;
-    padding: 10px 14px;
-    border: 1.5px solid #DDD0F7;
-    border-radius: 10px;
-    font-size: 14.5px;
+    padding: 12px 16px;
+    border: 2px solid #DDD0F7;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
     background: #FFFFFF;
     color: #1E1530;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.exhaustiveness-control select:focus {
+    outline: none;
+    border-color: #651FFF;
 }
 
 .run-docking-btn {
     width: 100%;
-    padding: 14px 24px;
-    font-size: 17px;
-    font-weight: 700;
+    padding: 16px 28px;
+    font-size: 18px;
+    font-weight: 800;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+    border-radius: 14px;
     background: linear-gradient(135deg, #651FFF 0%, #4E0ED8 100%);
-    box-shadow: 0 6px 20px rgba(101, 31, 255, 0.35);
+    box-shadow: 0 8px 24px rgba(101, 31, 255, 0.35);
+    color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
 }
 
 .run-docking-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(101, 31, 255, 0.45);
+    box-shadow: 0 10px 30px rgba(101, 31, 255, 0.45);
+}
+
+.run-docking-btn .btn-icon {
+    font-size: 20px;
+}
+
+.run-docking-btn .btn-arrow {
+    font-size: 22px;
+    font-weight: 700;
 }
 
 /* =========================================================
@@ -322,17 +486,18 @@
 .status-indicator-badge {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 5px 12px;
+    gap: 8px;
+    padding: 6px 14px;
     border-radius: 20px;
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 13.5px;
+    font-weight: 800;
     letter-spacing: 0.03em;
+    white-space: nowrap;
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
 }
 
@@ -389,18 +554,19 @@
 /* Animated Progress Bar */
 .docking-progress-track {
     width: 100%;
-    height: 9px;
+    height: 12px;
     background: #EDE5F8;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
     position: relative;
-    margin: 14px 0 8px;
+    margin: 16px 0 8px;
+    box-sizing: border-box;
 }
 
 .docking-progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #651FFF 0%, #8B5CF6 50%, #10B981 100%);
-    border-radius: 6px;
+    border-radius: 8px;
     transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
 }
@@ -422,62 +588,81 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 14.5px;
     color: #645582;
+    margin-top: 4px;
 }
 
 .progress-percent {
-    font-weight: 800;
+    font-size: 17px;
+    font-weight: 900;
     color: #4A1D96;
+    white-space: nowrap;
 }
 
 .progress-stage-name {
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
+    word-break: break-word;
 }
 
 .docking-stage-box {
     background: #F8F5FD;
     border-left: 4px solid #8B5CF6;
-    padding: 12px 16px;
-    border-radius: 8px;
+    padding: 14px 18px;
+    border-radius: 10px;
     margin-top: 14px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .stage-text {
-    font-size: 14px;
+    font-size: 15px;
     color: #382A54;
     line-height: 1.55;
     margin: 0;
+    word-break: break-word;
 }
 
 /* Error Box */
 .docking-error-box {
     margin-top: 16px;
-    padding: 14px 18px;
+    padding: 16px 20px;
     border-radius: 12px;
     background: #FEF2F2;
-    border: 1.5px solid #FCA5A5;
+    border: 2px solid #FCA5A5;
     display: flex;
-    gap: 12px;
+    gap: 14px;
     align-items: flex-start;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .error-icon {
-    font-size: 22px;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.error-body {
+    min-width: 0;
+    flex: 1;
 }
 
 .error-body h4 {
     color: #991B1B;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 800;
     margin: 0 0 4px;
 }
 
 .error-body p {
     color: #B91C1C;
-    font-size: 13.5px;
-    margin: 0 0 10px;
+    font-size: 14.5px;
+    margin: 0 0 12px;
     line-height: 1.5;
+    word-break: break-word;
 }
 
 .retry-docking-btn {
@@ -485,8 +670,8 @@
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 13.5px;
+    padding: 8px 18px;
+    font-size: 14.5px;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.18s ease;
@@ -497,111 +682,143 @@
 }
 
 /* =========================================================
-   4. AUTODOCK VINA BINDING RESULTS CARD
+   4. AUTODOCK VINA BINDING RESULTS CARD (ZERO OVERLAP)
    ========================================================= */
 .affinity-hero-banner {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    flex-wrap: wrap;
+    gap: 20px 28px;
     padding: 24px 28px;
-    border-radius: 16px;
+    border-radius: 20px;
     background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 45%, #FAF5FF 100%);
-    border: 1.5px solid #86EFAC;
-    margin-bottom: 22px;
+    border: 2px solid #86EFAC;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+}
+
+.affinity-metric-group {
+    flex: 1 1 240px;
+    min-width: 0;
 }
 
 .affinity-kicker {
     display: block;
-    font-size: 12.5px;
+    font-size: 13.5px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: #166534;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .affinity-value-row {
     display: flex;
     align-items: baseline;
-    gap: 8px;
-    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 8px;
+    min-width: 0;
 }
 
 .affinity-number {
-    font-size: 3.4rem;
+    font-size: clamp(3rem, 5vw, 4.4rem);
     font-weight: 900;
     letter-spacing: -0.02em;
-    color: #14532D;
+    color: #064E3B;
     line-height: 1;
+    white-space: nowrap;
+    word-break: normal;
 }
 
 .affinity-unit {
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: 1.55rem;
+    font-weight: 800;
     color: #166534;
+    white-space: nowrap;
 }
 
 .affinity-badge-pill {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 14px;
-    font-size: 13px;
-    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 800;
     background: #16A34A;
     color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+    white-space: nowrap;
 }
 
 .affinity-meta-stats {
+    flex: 1 1 220px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    text-align: right;
+    gap: 10px;
+    text-align: left;
+    min-width: 0;
 }
 
 .meta-stat-item .stat-lbl {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     text-transform: uppercase;
     color: #166534;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
 }
 
 .meta-stat-item strong {
-    font-size: 16px;
+    font-size: 17px;
+    font-weight: 800;
     color: #0F3E22;
+    word-break: break-word;
 }
 
 /* Ranked Modes Table */
+.modes-table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
 .modes-table-container h4,
 .contacts-container h4 {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 800;
     color: #1E1530;
-    margin: 0 0 10px;
+    margin: 0 0 12px;
 }
 
 .vina-modes-table {
     width: 100%;
+    min-width: 440px;
     border-collapse: collapse;
-    font-size: 14px;
-    margin-bottom: 20px;
+    font-size: 14.5px;
 }
 
 .vina-modes-table th {
     background: #F5EEFD;
     color: #4C1D95;
-    font-weight: 700;
+    font-weight: 800;
     padding: 10px 14px;
     text-align: left;
-    border-bottom: 1.5px solid #E5D5F9;
+    border-bottom: 2px solid #E5D5F9;
+    white-space: nowrap;
 }
 
 .vina-modes-table td {
-    padding: 9px 14px;
-    border-bottom: 1px solid #F1E8FB;
+    padding: 10px 14px;
+    border-bottom: 1.5px solid #F1E8FB;
     color: #2D1F47;
+    white-space: nowrap;
 }
 
 .vina-modes-table tr:hover td {
@@ -610,19 +827,20 @@
 
 .vina-modes-table tr.active-mode td {
     background: #EDE9FE;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .pose-select-btn {
     background: #EDE9FE;
-    border: 1px solid #C4B5FD;
+    border: 1.5px solid #C4B5FD;
     border-radius: 8px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 700;
+    padding: 5px 12px;
+    font-size: 12.5px;
+    font-weight: 800;
     color: #6D28D9;
     cursor: pointer;
     transition: all 0.15s ease;
+    white-space: nowrap;
 }
 
 .pose-select-btn:hover {
@@ -636,44 +854,49 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    width: 100%;
 }
 
 .contact-pill {
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 12px;
-    font-size: 12.5px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     background: #F3E8FF;
-    border: 1px solid #DDD0F7;
+    border: 1.5px solid #DDD0F7;
     color: #5B21B6;
     cursor: pointer;
     transition: all 0.18s ease;
+    white-space: nowrap;
 }
 
 .contact-pill:hover {
     background: #8B5CF6;
     color: #FFFFFF;
     border-color: #8B5CF6;
+    transform: translateY(-1.5px);
 }
 
 /* =========================================================
-   5. 3D WEBGL PROTEIN-LIGAND VIEWPORT
+   5. 3D WEBGL PROTEIN-LIGAND VIEWPORT (ZERO OVERLAP)
    ========================================================= */
 .viewer-3d-wrapper {
     position: relative;
     width: 100%;
-    height: 540px;
-    border-radius: 16px;
+    height: clamp(500px, 58vh, 680px);
+    border-radius: 20px;
     overflow: hidden;
     background: radial-gradient(circle at center, #13092A 0%, #080314 100%);
-    border: 1.5px solid #2B184F;
-    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.4);
+    border: 2px solid #361F63;
+    box-shadow: inset 0 2px 14px rgba(0, 0, 0, 0.45);
+    box-sizing: border-box;
 }
 
 .docking-3dmol-viewport {
     width: 100%;
     height: 100%;
     display: block;
+    position: relative;
 }
 
 /* Placeholder when not active */
@@ -683,9 +906,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(12, 5, 26, 0.88);
-    backdrop-filter: blur(4px);
+    background: rgba(12, 5, 26, 0.92);
+    backdrop-filter: blur(5px);
     z-index: 10;
+    padding: 24px;
+    box-sizing: border-box;
     transition: opacity 0.3s ease;
 }
 
@@ -696,26 +921,28 @@
 
 .placeholder-content {
     text-align: center;
-    max-width: 380px;
-    padding: 24px;
+    max-width: 440px;
+    padding: 70px 24px 60px;
+    margin: auto;
+    box-sizing: border-box;
 }
 
 .placeholder-icon {
-    font-size: 44px;
+    font-size: 52px;
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .placeholder-content h4 {
-    font-size: 19px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 800;
     color: #FFFFFF;
-    margin: 0 0 8px;
+    margin: 0 0 10px;
 }
 
 .placeholder-content p {
-    font-size: 14.5px;
-    color: #A78BFA;
+    font-size: 15.5px;
+    color: #C4B5FD;
     line-height: 1.6;
     margin: 0;
 }
@@ -726,21 +953,26 @@
     top: 14px;
     right: 14px;
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 8px;
-    z-index: 20;
+    z-index: 25;
+    max-width: calc(100% - 28px);
+    box-sizing: border-box;
 }
 
 .view-btn {
-    background: rgba(28, 16, 56, 0.75);
-    border: 1px solid rgba(167, 139, 250, 0.35);
+    background: rgba(28, 16, 56, 0.88);
+    border: 1px solid rgba(167, 139, 250, 0.45);
     color: #EDE9FE;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 12.5px;
-    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
     backdrop-filter: blur(8px);
-    transition: all 0.18s ease;
+    transition: all 0.15s ease;
+    white-space: nowrap;
 }
 
 .view-btn:hover {
@@ -756,27 +988,33 @@
     bottom: 14px;
     left: 14px;
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
-    background: rgba(15, 8, 30, 0.82);
-    border: 1px solid rgba(167, 139, 250, 0.25);
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 12px;
-    color: #D8B4FE;
-    backdrop-filter: blur(6px);
-    z-index: 20;
+    background: rgba(15, 8, 30, 0.92);
+    border: 1px solid rgba(167, 139, 250, 0.38);
+    border-radius: 9px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #E9D5FF;
+    backdrop-filter: blur(8px);
+    z-index: 25;
+    max-width: calc(100% - 28px);
+    box-sizing: border-box;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
+    white-space: nowrap;
 }
 
 .legend-color {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    flex-shrink: 0;
 }
 
 .ribbon-color { background: linear-gradient(135deg, #38BDF8, #818CF8); }
@@ -784,20 +1022,21 @@
 .ligand-color { background: #10B981; }
 
 .viewport-instructions {
-    font-size: 13px;
+    font-size: 14.5px;
     color: #6B5E87;
-    margin: 10px 0 0;
-    line-height: 1.5;
+    margin: 14px 0 0;
+    line-height: 1.55;
 }
 
-.viewport-tech-badge {
-    font-size: 12px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 6px;
+.viewer-tech-badge {
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 8px;
     background: #0F172A;
     color: #38BDF8;
-    border: 1px solid rgba(56, 189, 248, 0.3);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    white-space: nowrap;
 }
 
 /* Fullscreen mode for 3Dmol viewer */
@@ -810,31 +1049,64 @@
     border: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1100px) {
+/* =========================================================
+   RESPONSIVE BREAKPOINTS (NO SQUEEZING / ZERO OVERLAP)
+   ========================================================= */
+@media (max-width: 1360px) {
     .docking-grid-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 28px;
     }
-    .viewer-3d-wrapper {
-        height: 480px;
-    }
-}
 
-@media (max-width: 600px) {
-    .docking-main {
-        padding: 20px 16px 40px;
-    }
-    .target-toggle-group {
-        grid-template-columns: 1fr;
-    }
-    .affinity-hero-banner {
-        flex-direction: column;
-        align-items: flex-start;
-    }
     .affinity-meta-stats {
         text-align: left;
     }
+}
+
+@media (max-width: 768px) {
+    .docking-main {
+        padding: 18px 14px 44px;
+    }
+
+    .docking-hero-section h2 {
+        font-size: 26px;
+    }
+
+    .target-toggle-group {
+        grid-template-columns: 1fr;
+    }
+
+    .affinity-hero-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px 20px;
+    }
+
+    .affinity-number {
+        font-size: 3rem;
+    }
+
+    .affinity-meta-stats {
+        text-align: left;
+        width: 100%;
+    }
+
     .receptor-coords-grid {
         grid-template-columns: 1fr;
+    }
+
+    .viewer-3d-wrapper {
+        height: 400px;
+    }
+
+    .viewport-toolbar {
+        top: 8px;
+        right: 8px;
+        gap: 4px;
+    }
+
+    .view-btn {
+        padding: 4px 8px;
+        font-size: 11.5px;
     }
 }

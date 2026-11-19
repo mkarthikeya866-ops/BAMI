@@ -101,7 +101,8 @@ def generate_bami_pdf_report(
     include_admet: bool = True,
     bioactivity_data: dict[str, Any] | None = None,
     admet_data: dict[str, Any] | None = None,
-    scaffold_data: dict[str, Any] | None = None
+    scaffold_data: dict[str, Any] | None = None,
+    docking_data: dict[str, Any] | None = None
 ) -> bytes:
     """
     Builds a multi-page, publication-grade scientific PDF report for a given molecule.
@@ -570,27 +571,128 @@ def generate_bami_pdf_report(
     # ==========================================================================
     story.append(Paragraph("6. Molecular Docking Simulation Status", section_header_style))
 
-    docking_rows = [
-        [
-            Paragraph("In Silico Simulation Target", table_header_style),
-            Paragraph("Docking Protocol Status", table_header_style),
-            Paragraph("Scientific Guidance", table_header_style)
-        ],
-        [
-            Paragraph("EGFR Kinase Domain (1M17 / 2J6M)<br/>COX-2 Active Site (1CX2 / 6COX)", table_cell_style),
-            Paragraph("<b>UNAVAILABLE / NOT EXECUTED</b>", badge_amber_style),
-            Paragraph("Molecular mechanics docking (AutoDock Vina / Glide) was not conducted in this 2D ligand-based screening phase. High-scoring predictions should proceed to molecular dynamics or crystallographic validation.", table_cell_style)
+    if docking_data and isinstance(docking_data, dict) and "top_affinity_kcal_mol" in docking_data:
+        target_name = docking_data.get("target_name") or docking_data.get("target") or "COX-2"
+        pdb_id = docking_data.get("pdb_id") or "6COX"
+        resolution = docking_data.get("resolution") or ""
+        top_score = docking_data.get("top_affinity_kcal_mol")
+        affinity_val_str = f"{top_score:.2f} kcal/mol" if top_score is not None else "N/A"
+        level = docking_data.get("affinity_level") or "Active Pose"
+        badge = docking_data.get("affinity_badge") or "Evaluated with AutoDock Vina v1.2.7"
+        duration = docking_data.get("docking_duration_seconds", "--")
+
+        docking_summary_rows = [
+            [
+                Paragraph("Target Crystallographic Receptor", table_header_style),
+                Paragraph("AutoDock Vina Affinity (ΔG)", table_header_style),
+                Paragraph("Biophysical Binding Assessment", table_header_style)
+            ],
+            [
+                Paragraph(
+                    f"<b>{target_name}</b><br/>"
+                    f"PDB ID: <b>{pdb_id}</b> {f'({resolution})' if resolution else ''}<br/>"
+                    f"<font size='7.5' color='#645B7A'>Grid search box: 18.0 × 18.0 × 18.0 Å</font>",
+                    table_cell_style
+                ),
+                Paragraph(
+                    f"<font size='10' color='#059669'><b>{affinity_val_str}</b></font><br/>"
+                    f"<font size='7.5' color='#645B7A'>Duration: {duration}s · Vina v1.2.7</font>",
+                    table_cell_style
+                ),
+                Paragraph(
+                    f"<b>{level}</b><br/>"
+                    f"<font size='7.5'>{badge}</font><br/>"
+                    f"<font size='7.5' color='#047857'>✓ Ranked thermodynamic poses generated</font>",
+                    badge_pass_style
+                )
+            ]
         ]
-    ]
-    docking_table = Table(docking_rows, colWidths=[180, 160, 200])
-    docking_table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EDE7F6")),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#DDD4EC")),
-        ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#FFFBEB")),
-    ]))
-    story.append(docking_table)
+        docking_table = Table(docking_summary_rows, colWidths=[180, 150, 210])
+        docking_table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EDE7F6")),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#DDD4EC")),
+            ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#F0FDF4")),
+        ]))
+        story.append(docking_table)
+        story.append(Spacer(1, 6))
+
+        # Top Binding Modes Breakdown Table
+        modes = docking_data.get("modes") or []
+        if modes:
+            modes_rows = [
+                [
+                    Paragraph("Mode", table_header_style),
+                    Paragraph("Affinity (ΔG)", table_header_style),
+                    Paragraph("RMSD Lower Bound", table_header_style),
+                    Paragraph("RMSD Upper Bound", table_header_style),
+                    Paragraph("Pose Ranking & Convergence", table_header_style)
+                ]
+            ]
+            for m in modes[:4]:
+                mode_num = m.get("mode", 1)
+                aff = m.get("affinity_kcal_mol", 0.0)
+                rmsd_l = m.get("rmsd_lb", 0.0)
+                rmsd_u = m.get("rmsd_ub", 0.0)
+                status_label = "<b>Best Conformational Pose (Rank 1)</b>" if mode_num == 1 else f"Alternative Pose {mode_num}"
+                modes_rows.append([
+                    Paragraph(f"Mode {mode_num}", table_cell_style),
+                    Paragraph(f"<b>{aff:.2f} kcal/mol</b>", table_cell_bold),
+                    Paragraph(f"{rmsd_l:.2f} Å", table_cell_style),
+                    Paragraph(f"{rmsd_u:.2f} Å", table_cell_style),
+                    Paragraph(status_label, table_cell_style)
+                ])
+
+            modes_table = Table(modes_rows, colWidths=[60, 110, 110, 110, 150])
+            modes_table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EDE7F6")),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#DDD4EC")),
+                ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#F9F7FD")),
+            ]))
+            story.append(modes_table)
+            story.append(Spacer(1, 6))
+
+        # Active Pocket Contact Residues
+        contacts = docking_data.get("contact_residues") or []
+        if contacts:
+            contact_items = [f"<b>{c.get('label', '')}</b> ({c.get('min_dist_angstrom', '')} Å)" for c in contacts[:14]]
+            contact_text = ", ".join(contact_items)
+            contact_p = Paragraph(
+                f"<font size='7.5' color='#2A223B'><b>Active Pocket Contact Residues within 4.5 Å:</b> {contact_text}</font>",
+                body_style
+            )
+            story.append(contact_p)
+
+    else:
+        docking_rows = [
+            [
+                Paragraph("In Silico Simulation Target", table_header_style),
+                Paragraph("Docking Protocol Status", table_header_style),
+                Paragraph("Scientific Guidance", table_header_style)
+            ],
+            [
+                Paragraph("EGFR Kinase Domain (PDB: 1M17)<br/>COX-2 Catalytic Pocket (PDB: 6COX)", table_cell_style),
+                Paragraph("<b>READY ON DEMAND</b>", badge_amber_style),
+                Paragraph(
+                    "AutoDock Vina v1.2.7 physics simulation is fully integrated into BAMI. "
+                    "Execute 3D ligand-receptor docking on demand in the BAMI Docking Module (<b>/docking.html</b>) "
+                    "to compute thermodynamic binding free energy (ΔG in kcal/mol), RMSD modes, and interactive 3D WebGL poses.",
+                    table_cell_style
+                )
+            ]
+        ]
+        docking_table = Table(docking_rows, colWidths=[180, 150, 210])
+        docking_table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EDE7F6")),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#DDD4EC")),
+            ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#FFFBEB")),
+        ]))
+        story.append(docking_table)
     story.append(Spacer(1, 14))
 
     # ==========================================================================

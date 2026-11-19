@@ -2132,6 +2132,17 @@ def download_report_endpoint(
         except Exception:
             pass
 
+    # 3.5 Gather Docking Data if provided or requested
+    docking_data = request.docking_data
+    if not docking_data and request.include_docking:
+        target = request.target or "COX-2"
+        try:
+            from app.docking_service import run_docking_sync
+            docking_data = run_docking_sync(smiles, target=target, exhaustiveness=2)
+        except Exception as e:
+            logger.warning("Synchronous AutoDock Vina execution for report skipped: %s", e)
+            docking_data = None
+
     # 4. Generate publication-grade PDF report
     try:
         pdf_bytes = generate_bami_pdf_report(
@@ -2140,7 +2151,8 @@ def download_report_endpoint(
             include_admet=request.include_admet,
             bioactivity_data=bioactivity_data,
             admet_data=admet_data,
-            scaffold_data=scaffold_data
+            scaffold_data=scaffold_data,
+            docking_data=docking_data
         )
     except Exception as e:
         raise HTTPException(

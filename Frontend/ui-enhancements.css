@@ -403,8 +403,10 @@ select:focus,
 /* Stepper Steps Grid */
 .pipeline-steps-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 18px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .pipeline-step-item {
@@ -613,7 +615,7 @@ select:focus,
     color: #991B1B;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
     .pipeline-steps-grid {
         grid-template-columns: 1fr;
     }

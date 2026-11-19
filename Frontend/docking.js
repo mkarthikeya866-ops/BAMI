@@ -678,6 +678,74 @@
             });
         }
 
+        // Download PDF Report with docking data
+        const dockingDownloadBtn = document.getElementById("docking-download-pdf-btn");
+        if (dockingDownloadBtn) {
+            dockingDownloadBtn.addEventListener("click", async () => {
+                const smiles = smilesInput ? smilesInput.value.trim() : "";
+                if (!smiles) {
+                    alert("Please provide a valid molecule SMILES string.");
+                    return;
+                }
+                const originalHtml = dockingDownloadBtn.innerHTML;
+                dockingDownloadBtn.disabled = true;
+                dockingDownloadBtn.innerHTML = `<span>⏳ Compiling Scientific PDF with Docking Data…</span>`;
+
+                try {
+                    let authHeaders = {};
+                    if (typeof window.getFirebaseAuthHeaders === "function") {
+                        try {
+                            authHeaders = await window.getFirebaseAuthHeaders();
+                        } catch (_) {}
+                    }
+
+                    const resp = await apiFetch("/download-report", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            ...authHeaders
+                        },
+                        body: JSON.stringify({
+                            smiles: smiles,
+                            target: currentTarget,
+                            include_admet: true,
+                            include_docking: true,
+                            docking_data: currentDockingResult
+                        })
+                    });
+
+                    if (!resp.ok) {
+                        const err = await resp.json().catch(() => ({}));
+                        throw new Error(err.detail || `Server returned ${resp.status}`);
+                    }
+
+                    const blob = await resp.blob();
+                    let filename = `BAMI_Docking_Report_${currentTarget}.pdf`;
+                    const cd = resp.headers.get("Content-Disposition");
+                    if (cd) {
+                        const match = cd.match(/filename="?([^";]+)"?/);
+                        if (match && match[1]) filename = match[1].trim();
+                    }
+
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+
+                } catch (err) {
+                    console.error("PDF download failed:", err);
+                    alert(`Failed to download report: ${err.message}`);
+                } finally {
+                    dockingDownloadBtn.disabled = false;
+                    dockingDownloadBtn.innerHTML = originalHtml;
+                }
+            });
+        }
+
         // Check URL Parameters on load (e.g. redirected from active prediction or deep-link)
         const params = new URLSearchParams(window.location.search);
         const urlSmiles = params.get("smiles") || params.get("q");

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A beginner-friendly guide and dictionary for BAMI: computational bioactivity screening, biological targets (EGFR, COX-2), chemical fingerprints, scaffold analysis, and ADMET prediction.">
     <title>BAMI | Bioactive Molecule Intelligence — Platform</title>
-    <link rel="stylesheet" href="style.css?v=50">
-    <link rel="stylesheet" href="sidebar.css?v=50">
-    <link rel="stylesheet" href="landing.css?v=1">
-    <link rel="stylesheet" href="ui-enhancements.css?v=1">
+    <link rel="stylesheet" href="style.css?v=66">
+    <link rel="stylesheet" href="sidebar.css?v=66">
+    <link rel="stylesheet" href="landing.css?v=66">
+    <link rel="stylesheet" href="ui-enhancements.css?v=66">
 </head>
 
 <body>
@@ -60,6 +60,10 @@
                         <a href="admet.html" class="cta-btn-glass">
                             <span>ADMET Profiling</span>
                             <span aria-hidden="true">&rarr;</span>
+                        </a>
+                        <a href="#target-audience" class="cta-btn-glass">
+                            <span>Who It's For</span>
+                            <span aria-hidden="true">&darr;</span>
                         </a>
                         <a href="#dictionary" class="cta-btn-glass">
                             <span>Dictionary</span>
@@ -319,6 +323,156 @@
                             </li>
                         </ul>
                     </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================================
+             TARGET AUDIENCE & USE CASES (WHO IS BAMI FOR?)
+             Comprehensive Guide for Students, Researchers, Biotech & Data Scientists
+             ========================================================= -->
+        <section class="home-section" id="target-audience" aria-labelledby="audience-heading">
+            <div class="home-section-container">
+
+                <div class="home-section-header">
+                    <div class="section-badge">Target Audience &amp; Value</div>
+                    <h2 id="audience-heading">Who Is This Platform <span>Built For?</span></h2>
+                    <p>
+                        From university classrooms to biopharmaceutical startups, BAMI bridges the gap between molecular cheminformatics, machine learning inference, and authentic biophysical simulations.
+                    </p>
+                </div>
+
+                <div class="audience-grid">
+
+                    <!-- Card 1: Students & Academia -->
+                    <div class="audience-card">
+                        <div>
+                            <div class="audience-card-header">
+                                <div class="audience-icon-badge" aria-hidden="true">🎓</div>
+                                <span class="audience-type-tag">Students &amp; Education</span>
+                            </div>
+                            <h3>Students &amp; Academic Learners</h3>
+                            <p class="audience-card-desc">
+                                Undergraduates, Master's, and PhD students in Pharmacy, Biotechnology, Chemistry, Bioinformatics, and Computer Science.
+                            </p>
+                            <ul class="audience-benefits-list">
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Interactive Learning:</strong> Understand how chemical structures (SMILES) translate into 2048-bit Morgan topological fingerprints and bioactivity predictions.</span>
+                                </li>
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Visual Biophysics:</strong> Observe Lipinski's Rule of 5 and 3D protein-ligand docking in real time without complex command-line software.</span>
+                                </li>
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Academic Project Reference:</strong> Serves as a modern full-stack capstone example integrating FastAPI, XGBoost, RDKit, and AutoDock Vina.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="audience-use-case-box">
+                            <h4><span>✦</span> Real-World Student Scenario</h4>
+                            <p>Testing novel chemical derivative ideas for coursework, predicting drug-likeness, and exporting publication-ready PDF reports for academic theses.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Academic & Institutional Researchers -->
+                    <div class="audience-card">
+                        <div>
+                            <div class="audience-card-header">
+                                <div class="audience-icon-badge" aria-hidden="true">🔬</div>
+                                <span class="audience-type-tag">Research &amp; Discovery</span>
+                            </div>
+                            <h3>Medicinal Chemists &amp; Researchers</h3>
+                            <p class="audience-card-desc">
+                                University labs, Postdoctoral Scientists, and Principal Investigators (PIs) investigating anti-inflammatory and oncology targets.
+                            </p>
+                            <ul class="audience-benefits-list">
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Pre-Synthesis Triage:</strong> Prioritize which synthetic molecules to order or synthesize, saving thousands of dollars in wet-lab reagents.</span>
+                                </li>
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>SAR &amp; Scaffold Decomposition:</strong> Extract Bemis-Murcko core rings and analyze how peripheral substitutions impact binding affinity.</span>
+                                </li>
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Benchmark Comparisons:</strong> Directly compare leads against clinical reference inhibitors (Celecoxib for COX-2, Erlotinib for EGFR).</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="audience-use-case-box">
+                            <h4><span>✦</span> Real-World Lab Scenario</h4>
+                            <p>Screening 50 synthesized structural analogues to identify the top 5 high-affinity hits with zero cardiac hERG liability before running cellular assays.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Biotech Startups & Pharma Industry -->
+                    <div class="audience-card">
+                        <div>
+                            <div class="audience-card-header">
+                                <div class="audience-icon-badge" aria-hidden="true">🏢</div>
+                                <span class="audience-type-tag">Biotech &amp; Industry</span>
+                            </div>
+                            <h3>Biotech Startups &amp; Pharma CROs</h3>
+                            <p class="audience-card-desc">
+                                Early-stage biotechnology companies, virtual pharma ventures, and Contract Research Organizations operating under tight capital constraints.
+                            </p>
+                            <ul class="audience-benefits-list">
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>De-Risking Preclinical Pipelines:</strong> 90% of drugs fail due to poor ADMET profiles; BAMI tests 10 pharmacokinetic endpoints on Day 1.</span>
+                                </li>
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>High-Throughput Virtual Screening:</strong> Screen compound libraries up to 500 molecules via batch CSV upload with instantaneous cohort statistics.</span>
+                                </li>
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Dual Consensus Validation:</strong> Combines 2D statistical ML with 3D AutoDock Vina physics for high-confidence candidate selection.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="audience-use-case-box">
+                            <h4><span>✦</span> Real-World Industry Scenario</h4>
+                            <p>Triaging 500 commercial vendor building blocks to select the top 20 candidate leads for synthesis, reducing screening timeline from months to hours.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Computational Chemists & Data Scientists -->
+                    <div class="audience-card">
+                        <div>
+                            <div class="audience-card-header">
+                                <div class="audience-icon-badge" aria-hidden="true">💻</div>
+                                <span class="audience-type-tag">AI &amp; Data Science</span>
+                            </div>
+                            <h3>Bioinformaticians &amp; ML Engineers</h3>
+                            <p class="audience-card-desc">
+                                Computational biologists and AI practitioners developing predictive cheminformatics pipelines and generative molecular models.
+                            </p>
+                            <ul class="audience-benefits-list">
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Calibrated Statistical Models:</strong> Access probability-calibrated XGBoost classifiers with transparent ROC-AUC, PR-AUC, and thresholding.</span>
+                                </li>
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Headless REST API Integration:</strong> Programmatically query FastAPI endpoints from Python scripts, Jupyter notebooks, or generative models.</span>
+                                </li>
+                                <li>
+                                    <span class="check-icon" aria-hidden="true">✓</span>
+                                    <span><strong>Open-Source Standards:</strong> Built entirely on open scientific libraries (RDKit, AutoDock Vina, Scikit-learn, ReportLab) without vendor lock-in.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="audience-use-case-box">
+                            <h4><span>✦</span> Real-World Engineering Scenario</h4>
+                            <p>Plugging BAMI's REST API into an automated generative chemistry loop to evaluate, filter, and score generated de novo structures automatically.</p>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>

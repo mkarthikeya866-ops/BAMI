@@ -1352,7 +1352,9 @@ async function downloadScientificReport(smiles, moleculeName = "") {
             body: JSON.stringify({
                 smiles: targetSmiles,
                 name: moleculeName || (window.currentDrugName || ""),
-                include_admet: true
+                target: (targetSelect ? targetSelect.value : "COX-2"),
+                include_admet: true,
+                include_docking: true
             })
         });
 
@@ -1453,7 +1455,9 @@ async function downloadScientificReport(smiles, moleculeName = "") {
             body: JSON.stringify({
                 smiles: targetSmiles,
                 name: moleculeName || (window.currentDrugName || ""),
-                include_admet: true
+                target: (targetSelect ? targetSelect.value : "COX-2"),
+                include_admet: true,
+                include_docking: true
             })
         });
 

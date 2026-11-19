@@ -569,6 +569,16 @@
     font-size: 16.5px;
     font-weight: 600;
     color: #651FFF;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 320px;
+}
+
+@media (max-width: 1200px) {
+    .topbar-chips {
+        display: none;
+    }
 }
 
 .topbar-right {
