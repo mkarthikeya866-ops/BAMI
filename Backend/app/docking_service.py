@@ -99,13 +99,27 @@ DOCKING_LOCK = threading.Lock()
 
 def get_vina_binary() -> str:
     """Locate the AutoDock Vina binary (local bundle or system PATH)."""
+    # Windows executable check
+    if sys.platform.startswith("win"):
+        vina_win = os.path.join(BIN_DIR, "vina.exe")
+        if os.path.isfile(vina_win):
+            return vina_win
+        win_sys = shutil.which("vina.exe") or shutil.which("vina")
+        if win_sys:
+            return win_sys
+
+    # Unix/macOS bundled executable check
     if os.path.isfile(VINA_EXECUTABLE) and os.access(VINA_EXECUTABLE, os.X_OK):
         return VINA_EXECUTABLE
-    system_vina = shutil.which("vina")
+
+    # System PATH fallback
+    system_vina = shutil.which("vina") or shutil.which("vina.exe")
     if system_vina:
         return system_vina
+
     raise FileNotFoundError(
-        f"AutoDock Vina binary not found at '{VINA_EXECUTABLE}' or in system PATH."
+        f"AutoDock Vina binary not found at '{VINA_EXECUTABLE}' or in system PATH. "
+        "Please ensure AutoDock Vina is installed or placed in Backend/bin/."
     )
 
 

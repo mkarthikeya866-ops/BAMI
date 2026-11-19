@@ -8,28 +8,73 @@
 (function () {
     "use strict";
 
-    // Dynamic API Base Configuration (connects to FastAPI port 8000)
-    const API_HOST = window.location.hostname || "127.0.0.1";
-    const API_BASE = window.location.protocol.startsWith("http")
-        ? (window.location.port === "8000" ? "/api/v1" : `http://${API_HOST}:8000/api/v1`)
-        : "http://127.0.0.1:8000/api/v1";
+    // Dynamic API Base Configuration (connects to FastAPI backend across Localhost, LAN, and Cloud)
+    const localHosts = new Set(["localhost", "127.0.0.1"]);
+    const currentHost = window.location.hostname || "127.0.0.1";
+    const isLocal = localHosts.has(currentHost);
+
+    // Support custom backend URL via query param ?api=..., window.BAMI_API_URL, or localStorage
+    const urlParams = (typeof window !== "undefined" && window.location.search)
+        ? new URLSearchParams(window.location.search)
+        : null;
+    const customApi = urlParams?.get("api") || 
+        (typeof window !== "undefined" ? (window.BAMI_API_URL || localStorage.getItem("bami_api_url")) : null);
+
+    let API_BASE;
+    if (customApi) {
+        API_BASE = customApi.replace(/\/$/, "") + (customApi.endsWith("/api/v1") ? "" : "/api/v1");
+    } else if (isLocal) {
+        API_BASE = window.location.port === "8000" ? "/api/v1" : `http://${currentHost}:8000/api/v1`;
+    } else if (window.location.protocol.startsWith("http")) {
+        const port = window.location.port;
+        // If loaded over local network IP with a dev port (e.g. http://192.168.1.5:5501), target port 8000
+        if (port && port !== "80" && port !== "443" && port !== "8000") {
+            API_BASE = `${window.location.protocol}//${currentHost}:8000/api/v1`;
+        } else {
+            // Hosted cloud deployment (Render, AWS, etc.) -> use same-origin relative /api/v1 to avoid Mixed Content
+            API_BASE = `${window.location.origin}/api/v1`;
+        }
+    } else {
+        // file:/// protocol fallback
+        API_BASE = "http://127.0.0.1:8000/api/v1";
+    }
 
     /**
      * Resilient fetch helper that handles cross-origin localhost/127.0.0.1 fallbacks
+     * and cloud / relative fallbacks
      */
     async function apiFetch(endpoint, options = {}) {
         try {
             const resp = await fetch(`${API_BASE}${endpoint}`, options);
             return resp;
         } catch (err) {
-            // If primary host failed, try loopback alternate (localhost <-> 127.0.0.1)
-            const altHost = API_HOST === "localhost" ? "127.0.0.1" : "localhost";
-            const altBase = `http://${altHost}:8000/api/v1`;
-            if (altBase !== API_BASE) {
+            // Fallback 1: If primary host failed on localhost/127.0.0.1, try loopback alternate
+            if (isLocal) {
+                const altHost = currentHost === "localhost" ? "127.0.0.1" : "localhost";
+                const altBase = `http://${altHost}:8000/api/v1`;
+                if (altBase !== API_BASE) {
+                    try {
+                        const altResp = await fetch(`${altBase}${endpoint}`, options);
+                        return altResp;
+                    } catch (_) {}
+                }
+            }
+            // Fallback 2: If absolute URL failed on a hosted domain, try relative /api/v1
+            if (API_BASE !== "/api/v1" && window.location.protocol.startsWith("http")) {
                 try {
-                    const altResp = await fetch(`${altBase}${endpoint}`, options);
-                    return altResp;
+                    const fallbackResp = await fetch(`/api/v1${endpoint}`, options);
+                    return fallbackResp;
                 } catch (_) {}
+            }
+            // Fallback 3: If on LAN or localhost, try direct port 8000
+            if (window.location.protocol.startsWith("http")) {
+                const port8000Base = `${window.location.protocol}//${currentHost}:8000/api/v1`;
+                if (port8000Base !== API_BASE) {
+                    try {
+                        const altPortResp = await fetch(`${port8000Base}${endpoint}`, options);
+                        return altPortResp;
+                    } catch (_) {}
+                }
             }
             throw err;
         }
@@ -554,8 +599,15 @@
 
         } catch (err) {
             console.error("Docking launch failed:", err);
-            const userFriendlyMsg = err.message && err.message.includes("Failed to fetch")
-                ? "Cannot connect to FastAPI backend at http://127.0.0.1:8000. Please verify the backend server is running."
+            const targetDisplay = API_BASE.startsWith("/") ? `${window.location.origin}${API_BASE}` : API_BASE;
+            const isNetErr = !err.status && (
+                !err.message || 
+                err.message.includes("Failed to fetch") || 
+                err.message.includes("NetworkError") ||
+                err.message.includes("Cannot connect")
+            );
+            const userFriendlyMsg = isNetErr
+                ? `Cannot connect to FastAPI backend at ${targetDisplay}. Please verify the backend server is running (e.g. run 'npm run dev' or 'uvicorn app.main:app --app-dir Backend --host 0.0.0.0 --port 8000').`
                 : (err.message || "Failed to start docking simulation.");
             updateStatusUI("Failed", 0, `Unable to launch docking: ${userFriendlyMsg}`);
             if (runDockingBtn) {

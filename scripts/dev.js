@@ -48,11 +48,13 @@ function start(name, cwd, args) {
     });
 }
 
+const host = process.env.HOST || "0.0.0.0";
+
 start("Backend", path.join(root, "Backend"), [
-    "-m", "uvicorn", "app.main:app", "--reload", "--host", "127.0.0.1", "--port", "8000"
+    "-m", "uvicorn", "app.main:app", "--reload", "--host", host, "--port", "8000"
 ]);
 start("Frontend", path.join(root, "Frontend"), [
-    "-m", "http.server", "5501", "--bind", "127.0.0.1"
+    "-m", "http.server", "5501", "--bind", host
 ]);
 
 process.on("SIGINT", () => stop(0));

@@ -1,0 +1,189 @@
+MODEL 1
+REMARK VINA RESULT:    -7.137      0.000      0.000
+REMARK INTER + INTRA:          -7.137
+REMARK INTER:                  -7.137
+REMARK INTRA:                   0.000
+REMARK UNBOUND:                 0.000
+REMARK  Name = BAMI_LIGAND
+REMARK  Formula = C9H8O4
+REMARK  NumRotatableBonds = 2
+ROOT
+ATOM      1 C    LIG A   1      23.550  -0.360  53.490  1.00  0.00     0.034  C 
+ATOM      2 C    LIG A   1      24.979  -0.553  53.900  1.00  0.00     0.308  C 
+ATOM      3 O    LIG A   1      25.351  -0.725  55.054  1.00  0.00    -0.252  OA
+ATOM      4 O    LIG A   1      25.781  -0.529  52.765  1.00  0.00    -0.426  OA
+ATOM      5 C    LIG A   1      27.143  -0.611  53.067  1.00  0.00     0.145  A 
+ATOM      6 C    LIG A   1      27.744  -1.866  52.926  1.00  0.00    -0.018  A 
+ATOM      7 C    LIG A   1      29.106  -2.011  53.185  1.00  0.00    -0.059  A 
+ATOM      8 C    LIG A   1      29.864  -0.906  53.569  1.00  0.00    -0.061  A 
+ATOM      9 C    LIG A   1      29.263   0.351  53.690  1.00  0.00    -0.044  A 
+ATOM     10 C    LIG A   1      27.894   0.516  53.433  1.00  0.00     0.102  A 
+ATOM     11 C    LIG A   1      27.256   1.855  53.532  1.00  0.00     0.339  C 
+ATOM     12 O    LIG A   1      26.105   2.142  53.259  1.00  0.00    -0.246  OA
+ATOM     13 O    LIG A   1      28.105   2.801  53.974  1.00  0.00    -0.478  OA
+ATOM     14 H    LIG A   1      27.556   3.612  54.005  1.00  0.00     0.297  HD
+ENDROOT
+TORSDOF 2
+ENDMDL
+MODEL 2
+REMARK VINA RESULT:    -6.269      2.970      5.161
+REMARK INTER + INTRA:          -6.269
+REMARK INTER:                  -6.269
+REMARK INTRA:                   0.000
+REMARK UNBOUND:                 0.000
+REMARK  Name = BAMI_LIGAND
+REMARK  Formula = C9H8O4
+REMARK  NumRotatableBonds = 2
+ROOT
+ATOM      1 C    LIG A   1      26.091   2.139  51.761  1.00  0.00     0.034  C 
+ATOM      2 C    LIG A   1      24.922   1.739  52.611  1.00  0.00     0.308  C 
+ATOM      3 O    LIG A   1      24.422   2.446  53.477  1.00  0.00    -0.252  OA
+ATOM      4 O    LIG A   1      24.504   0.469  52.232  1.00  0.00    -0.426  OA
+ATOM      5 C    LIG A   1      23.472  -0.020  53.039  1.00  0.00     0.145  A 
+ATOM      6 C    LIG A   1      22.174   0.079  52.528  1.00  0.00    -0.018  A 
+ATOM      7 C    LIG A   1      21.102  -0.415  53.270  1.00  0.00    -0.059  A 
+ATOM      8 C    LIG A   1      21.329  -1.015  54.508  1.00  0.00    -0.061  A 
+ATOM      9 C    LIG A   1      22.630  -1.129  55.007  1.00  0.00    -0.044  A 
+ATOM     10 C    LIG A   1      23.721  -0.638  54.273  1.00  0.00     0.102  A 
+ATOM     11 C    LIG A   1      25.110  -0.782  54.784  1.00  0.00     0.339  C 
+ATOM     12 O    LIG A   1      26.139  -0.474  54.212  1.00  0.00    -0.246  OA
+ATOM     13 O    LIG A   1      25.154  -1.323  56.017  1.00  0.00    -0.478  OA
+ATOM     14 H    LIG A   1      26.110  -1.343  56.229  1.00  0.00     0.297  HD
+ENDROOT
+TORSDOF 2
+ENDMDL
+MODEL 3
+REMARK VINA RESULT:    -5.295      3.051      4.745
+REMARK INTER + INTRA:          -5.295
+REMARK INTER:                  -5.295
+REMARK INTRA:                   0.000
+REMARK UNBOUND:                 0.000
+REMARK  Name = BAMI_LIGAND
+REMARK  Formula = C9H8O4
+REMARK  NumRotatableBonds = 2
+ROOT
+ATOM      1 C    LIG A   1      20.533   2.459  51.891  1.00  0.00     0.034  C 
+ATOM      2 C    LIG A   1      21.714   1.537  51.822  1.00  0.00     0.308  C 
+ATOM      3 O    LIG A   1      21.798   0.576  51.067  1.00  0.00    -0.252  OA
+ATOM      4 O    LIG A   1      22.678   1.972  52.723  1.00  0.00    -0.426  OA
+ATOM      5 C    LIG A   1      23.779   1.113  52.789  1.00  0.00     0.145  A 
+ATOM      6 C    LIG A   1      24.916   1.491  52.067  1.00  0.00    -0.018  A 
+ATOM      7 C    LIG A   1      26.058   0.693  52.112  1.00  0.00    -0.059  A 
+ATOM      8 C    LIG A   1      26.066  -0.469  52.884  1.00  0.00    -0.061  A 
+ATOM      9 C    LIG A   1      24.934  -0.833  53.619  1.00  0.00    -0.044  A 
+ATOM     10 C    LIG A   1      23.776  -0.041  53.586  1.00  0.00     0.102  A 
+ATOM     11 C    LIG A   1      22.579  -0.407  54.388  1.00  0.00     0.339  C 
+ATOM     12 O    LIG A   1      21.550   0.233  54.507  1.00  0.00    -0.246  OA
+ATOM     13 O    LIG A   1      22.724  -1.584  55.025  1.00  0.00    -0.478  OA
+ATOM     14 H    LIG A   1      21.871  -1.704  55.492  1.00  0.00     0.297  HD
+ENDROOT
+TORSDOF 2
+ENDMDL
+MODEL 4
+REMARK VINA RESULT:    -4.582      4.809      6.562
+REMARK INTER + INTRA:          -4.582
+REMARK INTER:                  -4.582
+REMARK INTRA:                   0.000
+REMARK UNBOUND:                 0.000
+REMARK  Name = BAMI_LIGAND
+REMARK  Formula = C9H8O4
+REMARK  NumRotatableBonds = 2
+ROOT
+ATOM      1 C    LIG A   1      25.078   5.667  48.876  1.00  0.00     0.034  C 
+ATOM      2 C    LIG A   1      25.018   4.362  49.611  1.00  0.00     0.308  C 
+ATOM      3 O    LIG A   1      25.776   3.420  49.414  1.00  0.00    -0.252  OA
+ATOM      4 O    LIG A   1      23.994   4.420  50.549  1.00  0.00    -0.426  OA
+ATOM      5 C    LIG A   1      23.809   3.207  51.219  1.00  0.00     0.145  A 
+ATOM      6 C    LIG A   1      24.375   3.101  52.494  1.00  0.00    -0.018  A 
+ATOM      7 C    LIG A   1      24.204   1.927  53.228  1.00  0.00    -0.059  A 
+ATOM      8 C    LIG A   1      23.462   0.874  52.695  1.00  0.00    -0.061  A 
+ATOM      9 C    LIG A   1      22.883   0.992  51.427  1.00  0.00    -0.044  A 
+ATOM     10 C    LIG A   1      23.044   2.166  50.675  1.00  0.00     0.102  A 
+ATOM     11 C    LIG A   1      22.406   2.309  49.340  1.00  0.00     0.339  C 
+ATOM     12 O    LIG A   1      22.403   3.297  48.629  1.00  0.00    -0.246  OA
+ATOM     13 O    LIG A   1      21.781   1.184  48.943  1.00  0.00    -0.478  OA
+ATOM     14 H    LIG A   1      21.428   1.413  48.058  1.00  0.00     0.297  HD
+ENDROOT
+TORSDOF 2
+ENDMDL
+MODEL 5
+REMARK VINA RESULT:    -4.559      4.590      6.025
+REMARK INTER + INTRA:          -4.559
+REMARK INTER:                  -4.559
+REMARK INTRA:                   0.000
+REMARK UNBOUND:                 0.000
+REMARK  Name = BAMI_LIGAND
+REMARK  Formula = C9H8O4
+REMARK  NumRotatableBonds = 2
+ROOT
+ATOM      1 C    LIG A   1      20.816   2.328  50.081  1.00  0.00     0.034  C 
+ATOM      2 C    LIG A   1      22.212   2.572  49.592  1.00  0.00     0.308  C 
+ATOM      3 O    LIG A   1      22.712   2.018  48.621  1.00  0.00    -0.252  OA
+ATOM      4 O    LIG A   1      22.810   3.532  50.399  1.00  0.00    -0.426  OA
+ATOM      5 C    LIG A   1      24.150   3.754  50.068  1.00  0.00     0.145  A 
+ATOM      6 C    LIG A   1      24.425   4.878  49.282  1.00  0.00    -0.018  A 
+ATOM      7 C    LIG A   1      25.744   5.173  48.939  1.00  0.00    -0.059  A 
+ATOM      8 C    LIG A   1      26.781   4.355  49.389  1.00  0.00    -0.061  A 
+ATOM      9 C    LIG A   1      26.502   3.243  50.190  1.00  0.00    -0.044  A 
+ATOM     10 C    LIG A   1      25.181   2.932  50.546  1.00  0.00     0.102  A 
+ATOM     11 C    LIG A   1      24.881   1.768  51.421  1.00  0.00     0.339  C 
+ATOM     12 O    LIG A   1      23.795   1.443  51.863  1.00  0.00    -0.246  OA
+ATOM     13 O    LIG A   1      25.979   1.047  51.716  1.00  0.00    -0.478  OA
+ATOM     14 H    LIG A   1      25.637   0.318  52.273  1.00  0.00     0.297  HD
+ENDROOT
+TORSDOF 2
+ENDMDL
+MODEL 6
+REMARK VINA RESULT:    -4.475      5.856      8.152
+REMARK INTER + INTRA:          -4.475
+REMARK INTER:                  -4.475
+REMARK INTRA:                   0.000
+REMARK UNBOUND:                 0.000
+REMARK  Name = BAMI_LIGAND
+REMARK  Formula = C9H8O4
+REMARK  NumRotatableBonds = 2
+ROOT
+ATOM      1 C    LIG A   1      20.716   3.430  49.953  1.00  0.00     0.034  C 
+ATOM      2 C    LIG A   1      19.993   2.610  50.979  1.00  0.00     0.308  C 
+ATOM      3 O    LIG A   1      19.443   3.070  51.971  1.00  0.00    -0.252  OA
+ATOM      4 O    LIG A   1      20.035   1.274  50.599  1.00  0.00    -0.426  OA
+ATOM      5 C    LIG A   1      19.461   0.426  51.550  1.00  0.00     0.145  A 
+ATOM      6 C    LIG A   1      18.152  -0.002  51.302  1.00  0.00    -0.018  A 
+ATOM      7 C    LIG A   1      17.530  -0.872  52.198  1.00  0.00    -0.059  A 
+ATOM      8 C    LIG A   1      18.217  -1.319  53.326  1.00  0.00    -0.061  A 
+ATOM      9 C    LIG A   1      19.532  -0.904  53.559  1.00  0.00    -0.044  A 
+ATOM     10 C    LIG A   1      20.174  -0.030  52.668  1.00  0.00     0.102  A 
+ATOM     11 C    LIG A   1      21.581   0.392  52.895  1.00  0.00     0.339  C 
+ATOM     12 O    LIG A   1      22.271   1.076  52.161  1.00  0.00    -0.246  OA
+ATOM     13 O    LIG A   1      22.080  -0.074  54.056  1.00  0.00    -0.478  OA
+ATOM     14 H    LIG A   1      22.990   0.288  54.082  1.00  0.00     0.297  HD
+ENDROOT
+TORSDOF 2
+ENDMDL
+MODEL 7
+REMARK VINA RESULT:    -4.356      4.536      6.502
+REMARK INTER + INTRA:          -4.356
+REMARK INTER:                  -4.356
+REMARK INTRA:                   0.000
+REMARK UNBOUND:                 0.000
+REMARK  Name = BAMI_LIGAND
+REMARK  Formula = C9H8O4
+REMARK  NumRotatableBonds = 2
+ROOT
+ATOM      1 C    LIG A   1      19.148   3.902  50.939  1.00  0.00     0.034  C 
+ATOM      2 C    LIG A   1      20.490   3.237  51.009  1.00  0.00     0.308  C 
+ATOM      3 O    LIG A   1      21.038   2.680  50.066  1.00  0.00    -0.252  OA
+ATOM      4 O    LIG A   1      20.999   3.386  52.294  1.00  0.00    -0.426  OA
+ATOM      5 C    LIG A   1      22.212   2.714  52.473  1.00  0.00     0.145  A 
+ATOM      6 C    LIG A   1      23.376   3.487  52.398  1.00  0.00    -0.018  A 
+ATOM      7 C    LIG A   1      24.617   2.884  52.595  1.00  0.00    -0.059  A 
+ATOM      8 C    LIG A   1      24.693   1.521  52.877  1.00  0.00    -0.061  A 
+ATOM      9 C    LIG A   1      23.526   0.756  52.970  1.00  0.00    -0.044  A 
+ATOM     10 C    LIG A   1      22.268   1.346  52.776  1.00  0.00     0.102  A 
+ATOM     11 C    LIG A   1      21.022   0.545  52.902  1.00  0.00     0.339  C 
+ATOM     12 O    LIG A   1      19.877   0.952  52.837  1.00  0.00    -0.246  OA
+ATOM     13 O    LIG A   1      21.267  -0.762  53.114  1.00  0.00    -0.478  OA
+ATOM     14 H    LIG A   1      20.374  -1.163  53.159  1.00  0.00     0.297  HD
+ENDROOT
+TORSDOF 2
+ENDMDL
