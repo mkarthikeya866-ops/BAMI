@@ -444,10 +444,6 @@ if (typeof initMoleculeAutocomplete === "function") {
         }
     });
 }
-            smilesInput.value = molecule.name;
-        }
-    });
-}
 
 /* =========================================================
    AUTO-ANALYZE WHEN REDIRECTED FROM AN ACTIVE PREDICTION
