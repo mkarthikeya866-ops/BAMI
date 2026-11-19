@@ -439,6 +439,141 @@
     box-shadow: 0 6px 16px rgba(101, 31, 255, 0.28);
 }
 
+.preset-pill.active {
+    background: #651FFF;
+    border-color: #651FFF;
+    color: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(101, 31, 255, 0.35);
+}
+
+/* =========================================================
+   INLINE SUGGESTION BANNER (DOCKING PAGE)
+   ========================================================= */
+.inline-suggestion-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+    padding: 10px 18px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #F5EEFD 0%, #EBE1FB 100%);
+    border: 1.5px solid #D4C3F3;
+    box-shadow: 0 4px 16px rgba(101, 31, 255, 0.12);
+    cursor: pointer;
+    box-sizing: border-box;
+    width: 100%;
+    transition: all 0.18s ease;
+}
+
+.inline-suggestion-bar:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 20px rgba(101, 31, 255, 0.2);
+    border-color: #8B5CF6;
+}
+
+.inline-suggestion-content {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 16px;
+    color: #2D1F47;
+}
+
+.inline-sparkle {
+    color: #8B5CF6;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.inline-label {
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6D28D9;
+}
+
+.inline-name {
+    font-size: 17.5px;
+    font-weight: 800;
+    color: #1E1530;
+}
+
+.inline-formula-chip {
+    font-size: 14px;
+    font-weight: 700;
+    color: #5B21B6;
+    background: #FFFFFF;
+    border: 1px solid #D8C7F5;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+
+.inline-target-chip {
+    font-size: 13.5px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+
+.inline-target-chip.badge-egfr {
+    background: #E0E7FF;
+    color: #3730A3;
+    border: 1px solid #C7D2FE;
+}
+
+.inline-target-chip.badge-cox2 {
+    background: #FCE7F3;
+    color: #9D174D;
+    border: 1px solid #FBCFE8;
+}
+
+.inline-suggestion-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.inline-apply-btn,
+.inline-predict-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.inline-apply-btn {
+    background: #FFFFFF;
+    border: 1px solid #C4B5FD;
+    color: #5B21B6;
+}
+
+.inline-apply-btn:hover {
+    background: #EDE9FE;
+    border-color: #8B5CF6;
+}
+
+.inline-predict-btn {
+    background: #651FFF;
+    color: #FFFFFF;
+}
+
+.inline-predict-btn:hover {
+    background: #4E0ED8;
+    box-shadow: 0 4px 12px rgba(101, 31, 255, 0.35);
+}
+
 .exhaustiveness-control {
     margin-bottom: 24px;
     width: 100%;

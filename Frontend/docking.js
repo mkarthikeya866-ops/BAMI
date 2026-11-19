@@ -127,6 +127,13 @@
         "gefitinib": "COC1=C(C=C2C(=C1)N=CN=C2NC3=CC(=C(C=C3)F)Cl)OCCCN4CCOCC4",
         "ibuprofen": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
         "indomethacin": "CC1=C(C2=C(N1C(=O)C3=CC=C(C=C3)Cl)C=CC(=C2)OC)CC(=O)O",
+        "naproxen": "CC(C1=CC2=C(C=C1)C=C(C=C2)OC)C(=O)O",
+        "diclofenac": "O=C(O)Cc1ccccc1Nc1c(Cl)cccc1Cl",
+        "osimertinib": "CN(C)CC=CC(=O)Nc1cc(Nc2ncccn2)c(Nc2ccccc2)cc1OC",
+        "lapatinib": "CS(=O)(=O)CCNCc1ccc(o1)c2ccc3c(c2)c(ncn3)Nc4ccc(c(c4)Cl)OCc5cccc(c5)F",
+        "afatinib": "CN(C)C/C=C/C(=O)Nc1cc2c(Nc3ccc(c(c3)Cl)F)ncnc2cc1O[C@H]3CCOC3",
+        "meloxicam": "Cc1nc(ns1)NC(=O)C2=C(O)c3ccccc3S(=O)(=O)N2C",
+        "rofecoxib": "O=S(=O)(c1ccc(cc1)C2=C(CO2)c3ccccc3)C",
         "sc-558": "CC1=CC=C(C=C1)C2=CC(=NN2C3=CC=C(C=C3)S(=O)(=O)N)C(Br)(F)F",
         "paracetamol": "CC(=O)NC1=CC=C(C=C1)O",
         "acetaminophen": "CC(=O)NC1=CC=C(C=C1)O"
@@ -241,6 +248,10 @@
             resetStatusUI();
         }
     }
+
+    // Expose setTarget globally for autocomplete & external integrations
+    window.BAMI = window.BAMI || {};
+    window.BAMI.setDockingTarget = setTarget;
 
     /**
      * Update Live Status Panel
@@ -644,19 +655,94 @@
             retryBtn.addEventListener("click", runDockingSimulation);
         }
 
-        // Preset Lead Pills
-        document.querySelectorAll(".lead-pill").forEach(pill => {
-            pill.addEventListener("click", () => {
-                const smiles = pill.dataset.smiles;
-                const target = pill.dataset.target;
-                if (smiles && smilesInput) {
-                    smilesInput.value = smiles;
+        // Autocomplete & Inline Suggestions for Docking Input
+        const dockingContainer = document.getElementById("docking-search-container") || (smilesInput ? smilesInput.parentElement : null);
+        const dockingDropdown = document.getElementById("docking-suggestions-dropdown");
+
+        if (typeof initMoleculeAutocomplete === "function" && smilesInput) {
+            window.dockingAutocomplete = initMoleculeAutocomplete({
+                input: smilesInput,
+                container: dockingContainer,
+                dropdown: dockingDropdown,
+                onSelect: (molecule) => {
+                    smilesInput.value = molecule.name;
+                    if (molecule.target) {
+                        if (molecule.target.toUpperCase().includes("EGFR")) {
+                            setTarget("EGFR");
+                        } else if (molecule.target.toUpperCase().includes("COX-2")) {
+                            setTarget("COX-2");
+                        }
+                    }
+                    // Update active pill state
+                    document.querySelectorAll(".preset-pill, .lead-pill").forEach(p => {
+                        const isMatch = (p.dataset.name && p.dataset.name.toLowerCase() === molecule.name.toLowerCase()) ||
+                                        (p.dataset.smiles && molecule.smiles && p.dataset.smiles === molecule.smiles);
+                        p.classList.toggle("active", !!isMatch);
+                    });
                 }
-                if (target) {
-                    setTarget(target);
+            });
+        }
+
+        // Preset Quick Pills Click Handlers
+        document.querySelectorAll(".preset-pill, .lead-pill").forEach(pill => {
+            pill.addEventListener("click", () => {
+                const molName = pill.dataset.name || "";
+                const molTarget = pill.dataset.target || "";
+                const molSmiles = pill.dataset.smiles || "";
+
+                // 1. Fill molecule name automatically in the input
+                if (smilesInput) {
+                    smilesInput.value = molName || molSmiles;
+                }
+
+                // 2. Automatically select corresponding target
+                if (molTarget) {
+                    setTarget(molTarget);
+                }
+
+                // 3. Highlight this pill as active
+                document.querySelectorAll(".preset-pill, .lead-pill").forEach(p => p.classList.remove("active"));
+                pill.classList.add("active");
+
+                // 4. Render the inline suggestion banner (just like in single prediction!)
+                const curated = (window.BAMI && typeof window.BAMI.findBioactiveMoleculeByName === "function")
+                    ? window.BAMI.findBioactiveMoleculeByName(molName)
+                    : null;
+
+                const moleculeData = curated || {
+                    name: molName,
+                    target: molTarget,
+                    smiles: molSmiles,
+                    formula: molName.toLowerCase() === "aspirin" ? "C9H8O4"
+                        : molName.toLowerCase() === "celecoxib" ? "C17H14F3N3O2S"
+                        : molName.toLowerCase() === "erlotinib" ? "C22H23N3O4"
+                        : molName.toLowerCase() === "gefitinib" ? "C22H24ClFN4O3" : ""
+                };
+
+                const ac = window.dockingAutocomplete || window._bamiDockingAutocompleteInstance;
+                if (ac && typeof ac.renderInlineBar === "function") {
+                    ac.renderInlineBar(moleculeData);
                 }
             });
         });
+
+        // Sync active state when user manually types in the input
+        if (smilesInput) {
+            smilesInput.addEventListener("input", () => {
+                const val = smilesInput.value.trim().toLowerCase();
+                document.querySelectorAll(".preset-pill, .lead-pill").forEach(p => {
+                    const nameMatch = p.dataset.name && p.dataset.name.toLowerCase() === val;
+                    const smilesMatch = p.dataset.smiles && p.dataset.smiles.toLowerCase() === val;
+                    p.classList.toggle("active", !!(nameMatch || smilesMatch));
+                });
+                if (!val) {
+                    const ac = window.dockingAutocomplete || window._bamiDockingAutocompleteInstance;
+                    if (ac && typeof ac.clearInlineBar === "function") {
+                        ac.clearInlineBar();
+                    }
+                }
+            });
+        }
 
         // 3D Viewport Controls
         if (focusLigandBtn) {

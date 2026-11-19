@@ -788,6 +788,10 @@
                 formulaHtml = `<span class="inline-formula-chip">${formatMolecularFormula(topMolecule.formula)}</span>`;
             }
 
+            const isDockingPage = !document.getElementById("predict-btn") && !!document.getElementById("run-docking-btn");
+            const actionLabel = isDockingPage ? "Dock Now" : "Screen Now";
+            const actionTitle = isDockingPage ? "Fill and Run AutoDock Vina" : "Fill and Screen";
+
             this.inlineBar.innerHTML = `
                 <div class="inline-suggestion-content">
                     <span class="inline-sparkle">✦</span>
@@ -801,8 +805,8 @@
                         <span>Fill (Tab)</span>
                         <span aria-hidden="true">↵</span>
                     </button>
-                    <button type="button" class="inline-predict-btn" title="Fill and Screen">
-                        <span>Screen Now</span>
+                    <button type="button" class="inline-predict-btn" title="${actionTitle}">
+                        <span>${actionLabel}</span>
                         <span aria-hidden="true">→</span>
                     </button>
                 </div>
@@ -820,15 +824,15 @@
                 });
             }
 
-            // Click on Screen Now button
+            // Click on Screen / Dock Now button
             const screenBtn = this.inlineBar.querySelector(".inline-predict-btn");
             if (screenBtn) {
                 screenBtn.addEventListener("click", (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     this.selectItem(topMolecule);
-                    const predictBtn = document.getElementById("predict-btn");
-                    if (predictBtn) predictBtn.click();
+                    const actionBtn = document.getElementById("predict-btn") || document.getElementById("run-docking-btn") || document.getElementById("admet-screen-btn");
+                    if (actionBtn) actionBtn.click();
                 });
             }
 
@@ -1134,6 +1138,31 @@
                     drugInput.value = molecule.name;
                 }
             });
+        }
+
+        // Also check docking input if on docking page
+        const dockingInput = document.getElementById("docking-smiles-input");
+        const dockingContainer = document.getElementById("docking-search-container") || dockingInput?.parentElement;
+        const dockingDropdown = document.getElementById("docking-suggestions-dropdown");
+
+        if (dockingInput && !window._bamiDockingAutocompleteInstance) {
+            window._bamiDockingAutocompleteInstance = new MoleculeAutocomplete({
+                input: dockingInput,
+                container: dockingContainer,
+                dropdown: dockingDropdown,
+                onSelect: (molecule) => {
+                    dockingInput.value = molecule.name;
+                    if (molecule.target && typeof window.BAMI?.setDockingTarget === "function") {
+                        window.BAMI.setDockingTarget(molecule.target);
+                    }
+                    document.querySelectorAll(".preset-pill, .lead-pill").forEach(p => {
+                        const isMatch = (p.dataset.name && p.dataset.name.toLowerCase() === molecule.name.toLowerCase()) ||
+                                        (p.dataset.smiles && molecule.smiles && p.dataset.smiles === molecule.smiles);
+                        p.classList.toggle("active", !!isMatch);
+                    });
+                }
+            });
+            window.dockingAutocomplete = window._bamiDockingAutocompleteInstance;
         }
     }
 
