@@ -5,46 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Bioactive Molecule Intelligence | Bioactivity Prediction</title>
+    <title>BAMI | Bioactivity Prediction</title>
 
-    <link rel="stylesheet" href="style.css?v=35">
+    <link rel="stylesheet" href="style.css?v=45">
+    <link rel="stylesheet" href="sidebar.css?v=50">
+    <link rel="stylesheet" href="ui-enhancements.css?v=1">
 </head>
 
-<body data-auth-page="protected">
-    <div class="auth-guard-overlay" id="auth-guard-overlay" role="status" aria-live="polite">
-        <div class="auth-guard-card">
-            <h2>Checking your session</h2>
-            <p data-guard-message>Verifying your sign-in before opening the workspace…</p>
-            <a href="login.html">Go to sign in</a>
-        </div>
-    </div>
+<body>
 
-    <!-- Header UI: brand and link to the prediction tool. -->
-
-    <header class="navbar">
-        <div class="nav-container">
-
-            <a href="#prediction" class="logo">
-                <span class="logo-icon">✦</span>
-                <span>Bioactive Molecule Intelligence</span>
-            </a>
-
-            <nav class="site-navigation" aria-label="Main navigation">
-                <a href="#prediction" class="nav-button">Predict</a>
-                <a href="#batch-screening" class="nav-button">Batch Screen</a>
-                <a href="drug-likeness.html" class="nav-button nav-button-secondary">
-                    Drug-Likeness
-                </a>
-                <div class="nav-auth" data-auth-user-container hidden>
-                    <span class="nav-user-name" data-auth-user></span>
-                    <button class="nav-button nav-button-secondary" type="button" data-auth-logout>
-                        Sign out
-                    </button>
-                </div>
-            </nav>
-
-        </div>
-    </header>
+    <div id="bami-layout" class="app-layout">
+        <div id="bami-sidebar-placeholder"></div>
+        <div class="app-main-content">
+            <div id="bami-topbar-placeholder"></div>
 
 
     <!-- Prediction UI: title, molecule input, structure preview, and results. -->
@@ -64,7 +37,8 @@
 
             <p>
                 Select a biological target, then enter a compound name or SMILES
-                to predict its bioactivity.
+                to predict its bioactivity. New to bioactivity screening?
+                <a href="home.html" style="color: #651FFF; font-weight: 600; text-decoration: underline;">Explore our Beginner's Guide &rarr;</a>
             </p>
 
         </div>
@@ -161,6 +135,21 @@
 
                 </div>
 
+                <!-- Molecule Name & Chemical Formula Identity Header -->
+                <div class="structure-molecule-header" id="structure-molecule-header" style="display: none;">
+                    <div class="molecule-identity-group">
+                        <span class="molecule-identity-icon" aria-hidden="true">🧪</span>
+                        <div class="molecule-name-box">
+                            <div class="molecule-title-row">
+                                <h4 class="molecule-display-name" id="molecule-display-name">--</h4>
+                                <span class="molecule-formula-badge" id="molecule-display-formula" style="display: none;">--</span>
+                            </div>
+                            <p class="molecule-display-iupac" id="molecule-display-iupac"></p>
+                        </div>
+                    </div>
+                    <span class="molecule-class-tag" id="molecule-display-class" style="display: none;"></span>
+                </div>
+
                 <div class="structure-display" id="structure-display">
 
                     <div class="structure-placeholder">
@@ -192,6 +181,92 @@
         </div>
 
 
+        <!-- =========================================================
+             PREDICTION INFERENCE PIPELINE STEPPER
+             Animated Molecular Graphic & Connected API Request Stages
+             ========================================================= -->
+        <div id="prediction-pipeline-container" class="prediction-pipeline-card" hidden role="status" aria-live="polite">
+            <div class="pipeline-card-header">
+                <div class="pipeline-header-title">
+                    <div class="molecular-spinner" aria-hidden="true">
+                        <div class="spinner-nucleus"></div>
+                        <div class="spinner-orbit orbit-1"><div class="spinner-electron"></div></div>
+                        <div class="spinner-orbit orbit-2"><div class="spinner-electron"></div></div>
+                        <div class="spinner-orbit orbit-3"><div class="spinner-electron"></div></div>
+                    </div>
+                    <div>
+                        <h4>ML Inference Pipeline</h4>
+                        <p id="pipeline-target-label">Target: COX-2 • XGBoost Classifier</p>
+                    </div>
+                </div>
+                <span id="pipeline-overall-status" class="pipeline-overall-badge badge-running">In Progress</span>
+            </div>
+
+            <!-- Stepper Steps Grid -->
+            <div class="pipeline-steps-grid">
+                <!-- Step 1 -->
+                <div class="pipeline-step-item" id="pipeline-step-1" data-status="pending">
+                    <div class="step-icon-wrapper">
+                        <span class="step-indicator-number">1</span>
+                        <span class="step-indicator-spinner" aria-hidden="true"></span>
+                        <span class="step-indicator-success" aria-hidden="true">✓</span>
+                        <span class="step-indicator-error" aria-hidden="true">✕</span>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title-row">
+                            <span class="step-title">Structure Validation</span>
+                            <span class="step-status-pill">Waiting</span>
+                        </div>
+                        <p class="step-desc" id="step-1-desc">Verifying SMILES syntax, valence rules, and aromaticity</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="pipeline-step-item" id="pipeline-step-2" data-status="pending">
+                    <div class="step-icon-wrapper">
+                        <span class="step-indicator-number">2</span>
+                        <span class="step-indicator-spinner" aria-hidden="true"></span>
+                        <span class="step-indicator-success" aria-hidden="true">✓</span>
+                        <span class="step-indicator-error" aria-hidden="true">✕</span>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title-row">
+                            <span class="step-title">Morgan Fingerprints</span>
+                            <span class="step-status-pill">Waiting</span>
+                        </div>
+                        <p class="step-desc" id="step-2-desc">Generating 2048-bit ECFP4-equivalent topological descriptors</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="pipeline-step-item" id="pipeline-step-3" data-status="pending">
+                    <div class="step-icon-wrapper">
+                        <span class="step-indicator-number">3</span>
+                        <span class="step-indicator-spinner" aria-hidden="true"></span>
+                        <span class="step-indicator-success" aria-hidden="true">✓</span>
+                        <span class="step-indicator-error" aria-hidden="true">✕</span>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title-row">
+                            <span class="step-title" id="step-3-title">XGBoost Inference</span>
+                            <span class="step-status-pill">Waiting</span>
+                        </div>
+                        <p class="step-desc" id="step-3-desc">Executing trained model on FastAPI backend (port 8000)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real Error Alert Banner (Hidden by default, shown only on real error) -->
+            <div id="pipeline-error-alert" class="pipeline-error-banner" hidden>
+                <span class="error-alert-icon" aria-hidden="true">⚠️</span>
+                <div class="error-alert-content">
+                    <strong id="pipeline-error-title">Pipeline Interrupted</strong>
+                    <p id="pipeline-error-message"></p>
+                </div>
+            </div>
+        </div>
+
+
         <!-- Result UI: script.js fills the classification and descriptors. -->
 
         <div class="result-section" id="result-section">
@@ -203,7 +278,13 @@
                     <h3>Prediction Results</h3>
                 </div>
 
-                <span class="result-tag">XGBoost Model</span>
+                <div class="result-header-actions">
+                    <span class="result-tag">XGBoost Model</span>
+                    <button type="button" id="download-pdf-btn" class="download-pdf-btn" title="Download comprehensive scientific PDF report" disabled>
+                        <span class="btn-icon">📄</span>
+                        <span class="btn-text">Download Report (PDF)</span>
+                    </button>
+                </div>
 
             </div>
 
@@ -426,7 +507,7 @@
 
             <div class="footer-bottom">
                 <span>
-                    Bioactive Molecule Intelligence · COX-2 &amp; EGFR bioactivity prediction
+                    BAMI <sub>Bioactive Molecule Intelligence</sub> · COX-2 &amp; EGFR bioactivity prediction
                 </span>
 
             </div>
@@ -435,6 +516,11 @@
 
     </footer>
 
+        </div><!-- /.app-main-content -->
+    </div><!-- /.app-layout -->
+
+   <!-- Unified Workspace Sidebar -->
+   <script src="sidebar.js?v=50"></script>
 
    <!-- RDKit.js for Molecular Structure Rendering -->
 <script src="https://unpkg.com/@rdkit/rdkit/dist/RDKit_minimal.js"></script>
@@ -442,8 +528,11 @@
 <!-- Molecule Autocomplete & Suggestion Engine -->
 <script src="molecule-suggestions.js?v=35"></script>
 
+<!-- Prediction History Storage Service -->
+<script src="history-service.js?v=1"></script>
+
 <!-- Main JavaScript -->
-<script src="script.js?v=35"></script>
+<script src="script.js?v=36"></script>
 <script src="batch-screening.js?v=3"></script>
 <script type="module" src="auth.js?v=2"></script>
 <script type="module" src="particle-wave.js?v=8"></script>

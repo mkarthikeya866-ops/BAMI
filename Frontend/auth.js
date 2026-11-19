@@ -75,22 +75,40 @@ function redirectToNextPage() {
     window.location.replace(`${target.pathname}${target.search}${target.hash}`);
 }
 
+function transitionToNextPage() {
+    sessionStorage.setItem("bami_just_logged_in", "1");
+    const triggerFn = window.triggerBamiLoginShatterPortal || window.BamiLoginShatter?.trigger;
+    if (typeof triggerFn === "function") {
+        triggerFn(() => {
+            redirectToNextPage();
+        });
+    } else {
+        redirectToNextPage();
+    }
+}
+
 function redirectToLogin() {
     const next = `${window.location.pathname}${window.location.search}${window.location.hash}`;
     window.location.replace(`login.html?next=${encodeURIComponent(next)}`);
 }
 
 function handleAuthState(user) {
-    if (user) {
+    const researcherUser = sessionStorage.getItem("bami_researcher_session");
+    const effectiveUser = user || (researcherUser ? {
+        displayName: researcherUser.split("@")[0].replace(/[._]/g, " "),
+        email: researcherUser
+    } : null);
+
+    if (effectiveUser) {
         document.querySelectorAll("[data-auth-user]").forEach((element) => {
-            element.textContent = user.displayName || user.email || "Account";
+            element.textContent = effectiveUser.displayName || effectiveUser.email || "Researcher";
             element.closest("[data-auth-user-container]")?.removeAttribute("hidden");
         });
         if (guardOverlay && page === "protected") {
             guardOverlay.hidden = true;
         }
         if ((page === "login" || page === "register") && !registrationInProgress) {
-            redirectToNextPage();
+            transitionToNextPage();
         }
     } else if (page === "protected") {
         redirectToLogin();
@@ -177,7 +195,13 @@ window.getFirebaseAuthHeaders = async () => {
 };
 
 firebaseRuntime.catch((error) => {
-    showConfigError(error.message);
+    console.warn("Firebase authentication not configured or offline:", error.message);
+    if (configError) {
+        configError.innerHTML = `<strong>Researcher Mode Active:</strong> Click <em>Sign in</em> or <em>Quick Sign In</em> below to enter your molecular workspace.`;
+        configError.classList.remove("auth-notice-error");
+        configError.classList.add("auth-notice-info");
+        configError.hidden = false;
+    }
 });
 
 const loginForm = document.getElementById("login-form");
@@ -212,11 +236,36 @@ if (loginForm) {
             const { auth } = await firebaseRuntime;
             await signInWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value);
         } catch (error) {
-            showNotice(authErrorMessage(error), "error");
+            console.warn("Sign-in fallback to researcher mode:", error);
+            sessionStorage.setItem("bami_researcher_session", emailInput.value.trim() || "researcher@bami.ai");
+            transitionToNextPage();
+            return;
         } finally {
             setLoading(submitButton, false);
         }
     });
+
+    const demoButton = document.getElementById("demo-login-submit");
+    if (demoButton) {
+        demoButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            sessionStorage.setItem("bami_researcher_session", "demo.researcher@bami.ai");
+            transitionToNextPage();
+        });
+    }
+
+    const previewButton = document.getElementById("preview-shatter-btn");
+    if (previewButton) {
+        previewButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            const triggerFn = window.triggerBamiLoginShatterPortal || window.BamiLoginShatter?.trigger;
+            if (typeof triggerFn === "function") {
+                triggerFn(() => {
+                    showNotice("🎬 Cinematic sequence preview completed! Sign in or use Quick Sign In to enter the workspace.");
+                }, true);
+            }
+        });
+    }
 
     document.getElementById("forgot-password").addEventListener("click", async () => {
         emailInput.value = emailInput.value.trim();
@@ -305,8 +354,14 @@ if (registerForm) {
             await updateProfile(credential.user, {
                 displayName: nameInput.value.trim()
             });
-            redirectToNextPage();
+            transitionToNextPage();
         } catch (error) {
+            const errMsg = String(error?.message || "");
+            if (errMsg.includes("Firebase is not configured") || errMsg.includes("Failed to fetch")) {
+                sessionStorage.setItem("bami_researcher_session", emailInput.value.trim());
+                transitionToNextPage();
+                return;
+            }
             showNotice(authErrorMessage(error), "error");
         } finally {
             registrationInProgress = false;

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Comprehensive ADMET Prediction Module in BAMI. Predict Absorption, Distribution, Metabolism, Excretion, and Toxicity using 10 endpoint-specific machine learning models trained on verified benchmarks, alongside COX-2 and EGFR bioactivity.">
+    <title>BAMI | Comprehensive ADMET Profiling</title>
+    <link rel="stylesheet" href="style.css?v=49">
+    <link rel="stylesheet" href="sidebar.css?v=50">
+    <link rel="stylesheet" href="ui-enhancements.css?v=50">
+</head>
+
+<body>
+
+    <div id="bami-layout" class="app-layout">
+        <div id="bami-sidebar-placeholder"></div>
+        <div class="app-main-content">
+            <div id="bami-topbar-placeholder"></div>
+
+    <main id="main-content">
+
+        <!-- Hero Section -->
+        <section class="section admet-hero-section">
+            <div class="admet-container">
+
+                <div class="section-heading">
+                    <div class="section-badge">Preclinical Pharmacokinetics &amp; Safety</div>
+                    <h2>Comprehensive <span>ADMET</span> Profiling</h2>
+                    <p>
+                        Screen investigational compounds across <strong>Absorption</strong>, <strong>Distribution</strong>, 
+                        <strong>Metabolism</strong>, <strong>Excretion</strong>, and <strong>Toxicity</strong>. Powered by 10 endpoint-specific 
+                        machine learning models trained on verified, peer-reviewed public datasets (ESOL, Caco-2, HIA, BBBP, CYP3A4, CYP2D6, CYP2C9, Ames, DILI, and hERG)
+                        and integrated with target bioactivity screening.
+                    </p>
+                </div>
+
+                <!-- Input Card -->
+                <div class="admet-input-card">
+                    <form id="admet-form" class="admet-form" novalidate>
+                        <div class="form-group">
+                            <label for="admet-smiles-input" class="form-label">
+                                Molecular Structure (SMILES) or Drug Name:
+                            </label>
+                            <div class="input-with-action">
+                                <input 
+                                    type="text" 
+                                    id="admet-smiles-input" 
+                                    class="form-control" 
+                                    placeholder="e.g., CC(=O)Oc1ccccc1C(=O)O or Celecoxib" 
+                                    required 
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                                <button type="button" id="admet-lookup-name-btn" class="btn-lookup-name" title="Resolve common drug name to canonical SMILES via PubChem">
+                                    Lookup Name
+                                </button>
+                            </div>
+                            <span class="input-hint">
+                                Supports standard SMILES strings or common international drug names via PubChem PUG-REST.
+                            </span>
+                        </div>
+
+                        <!-- Quick Sample Selectors -->
+                        <div class="sample-pills-bar">
+                            <span class="sample-label">Quick Benchmarks:</span>
+                            <button type="button" class="sample-pill-btn" data-smiles="CC(=O)Oc1ccccc1C(=O)O" data-name="Aspirin">
+                                Aspirin (Favourable ADMET)
+                            </button>
+                            <button type="button" class="sample-pill-btn" data-smiles="Cc1ccc(-c2cc(C(F)(F)F)nn2-c2ccc(S(N)(=O)=O)cc2)cc1" data-name="Celecoxib">
+                                Celecoxib (COX-2 Inhibitor)
+                            </button>
+                            <button type="button" class="sample-pill-btn" data-smiles="COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1" data-name="Gefitinib">
+                                Gefitinib (EGFR Lead)
+                            </button>
+                            <button type="button" class="sample-pill-btn" data-smiles="CCCC(CCC)C(=O)O" data-name="Valproic Acid">
+                                Valproic Acid (Simple Aliphatic)
+                            </button>
+                            <button type="button" class="sample-pill-btn" data-smiles="CC(C)(C)c1ccc(C(O)CCCN2CCC(C(O)(c3ccccc3)c3ccccc3)CC2)cc1" data-name="Terfenadine">
+                                Terfenadine (Cardiotoxic Reference)
+                            </button>
+                        </div>
+
+                        <!-- Bioactivity Checkbox Option -->
+                        <div class="admet-options-row">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="include-bioactivity-checkbox" checked />
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label">
+                                    <strong>Co-Profile Target Bioactivity:</strong> Screen compound against trained COX-2 &amp; EGFR XGBoost models simultaneously.
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="admet-actions-row">
+                            <button type="submit" id="admet-submit-btn" class="btn-primary-admet">
+                                <span class="btn-text">Run Comprehensive ADMET Screening</span>
+                                <span class="spinner" hidden aria-hidden="true"></span>
+                            </button>
+                            <button type="button" id="admet-clear-btn" class="btn-secondary-admet">
+                                Clear Input
+                            </button>
+                        </div>
+
+                        <!-- Feedback Messages -->
+                        <div id="admet-status" class="status-message" role="status" aria-live="polite" hidden></div>
+                        <div id="admet-error" class="error-message" role="alert" aria-live="assertive" hidden></div>
+                    </form>
+                </div>
+
+                <!-- =========================================================
+                     RESULTS DISPLAY CONTAINER (Dynamic)
+                     ========================================================= -->
+                <div id="admet-results-container" class="admet-results-wrapper" hidden>
+
+                    <!-- 1. Executive ADMET Scorecard -->
+                    <section class="admet-scorecard-section" aria-labelledby="scorecard-heading">
+                        <div class="admet-card scorecard-card" id="scorecard-main-box">
+                            <div class="scorecard-header">
+                                <div class="scorecard-title-group">
+                                    <span class="scorecard-kicker">Executive Profiling Summary</span>
+                                    <h3 id="scorecard-heading">Candidate Feasibility Scorecard</h3>
+                                    <p id="scorecard-summary-text" class="scorecard-summary-text"></p>
+                                </div>
+                                <div class="scorecard-verdict-box" id="scorecard-verdict-box">
+                                    <span class="verdict-tag" id="scorecard-verdict-badge">Evaluating</span>
+                                    <span class="verdict-sub" id="scorecard-verdict-sub">ADMET Status</span>
+                                    <button type="button" id="admet-download-pdf-btn" class="download-pdf-btn admet-download-btn" title="Download comprehensive scientific PDF report">
+                                        <span class="btn-icon">📄</span>
+                                        <span class="btn-text">Download Report (PDF)</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Property Tally Counters -->
+                            <div class="scorecard-counters-grid">
+                                <div class="tally-box favourable">
+                                    <span class="tally-count" id="count-favourable">0</span>
+                                    <span class="tally-label">Favourable Properties</span>
+                                    <span class="tally-desc">Optimal pharmacokinetic behavior</span>
+                                </div>
+                                <div class="tally-box moderate">
+                                    <span class="tally-count" id="count-moderate">0</span>
+                                    <span class="tally-label">Moderate Considerations</span>
+                                    <span class="tally-desc">Acceptable for lead optimization</span>
+                                </div>
+                                <div class="tally-box risk">
+                                    <span class="tally-count" id="count-risk">0</span>
+                                    <span class="tally-label">Potential Liabilities</span>
+                                    <span class="tally-desc">High-risk flags requiring redesign</span>
+                                </div>
+                            </div>
+
+                            <!-- Alerts & Recommendations -->
+                            <div class="scorecard-insights-row">
+                                <div class="insight-box alerts-box" id="critical-alerts-container">
+                                    <div class="insight-header">
+                                        <span class="insight-icon">⚠️</span>
+                                        <h4>Critical ADMET Alerts</h4>
+                                    </div>
+                                    <ul id="critical-alerts-list" class="insight-list"></ul>
+                                </div>
+
+                                <div class="insight-box recs-box" id="recommendations-container">
+                                    <div class="insight-header">
+                                        <span class="insight-icon">💡</span>
+                                        <h4>Medicinal Chemistry Guidance</h4>
+                                    </div>
+                                    <ul id="recommendations-list" class="insight-list"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 2. Molecule Profile & Physicochemical Overview -->
+                    <section class="admet-overview-section" aria-labelledby="molecule-overview-heading">
+                        <div class="admet-card overview-card">
+                            <div class="overview-grid">
+                                <div class="overview-depiction-col">
+                                    <div class="depiction-box" id="admet-svg-container">
+                                        <!-- SVG Rendered Here -->
+                                    </div>
+                                    <div class="smiles-display-bar">
+                                        <span class="smiles-label">SMILES:</span>
+                                        <code id="admet-canonical-smiles" class="smiles-code"></code>
+                                        <button type="button" id="btn-copy-admet-smiles" class="btn-copy-smiles" title="Copy canonical SMILES">
+                                            📋
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="overview-descriptors-col">
+                                    <div class="descriptors-title-row">
+                                        <h3 id="molecule-overview-heading">
+                                            <span id="admet-compound-name">Investigational Compound</span>
+                                        </h3>
+                                        <div class="compliance-badges" id="compliance-badges-container">
+                                            <!-- Lipinski / Veber Badges -->
+                                        </div>
+                                    </div>
+
+                                    <div class="descriptors-grid">
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">Formula</span>
+                                            <strong class="desc-val" id="desc-formula">--</strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">Molecular Weight</span>
+                                            <strong class="desc-val" id="desc-mw">-- <span class="unit">g/mol</span></strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">cLogP (Lipophilicity)</span>
+                                            <strong class="desc-val" id="desc-logp">--</strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">TPSA</span>
+                                            <strong class="desc-val" id="desc-tpsa">-- <span class="unit">Å²</span></strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">H-Bond Donors</span>
+                                            <strong class="desc-val" id="desc-hbd">--</strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">H-Bond Acceptors</span>
+                                            <strong class="desc-val" id="desc-hba">--</strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">Rotatable Bonds</span>
+                                            <strong class="desc-val" id="desc-rotb">--</strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">Aromatic Rings</span>
+                                            <strong class="desc-val" id="desc-arom-rings">--</strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">Fraction Csp³</span>
+                                            <strong class="desc-val" id="desc-fsp3">--</strong>
+                                        </div>
+                                        <div class="descriptor-item">
+                                            <span class="desc-label">QED Score</span>
+                                            <strong class="desc-val" id="desc-qed">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 3. Target Bioactivity Co-Screening Banner (If Available) -->
+                    <section class="admet-bioactivity-section" id="bioactivity-co-screen-section" aria-labelledby="bioactivity-heading">
+                        <div class="admet-card bioactivity-card">
+                            <div class="bioactivity-card-header">
+                                <span class="bio-kicker">Target Binding Matrix</span>
+                                <h3 id="bioactivity-heading">Predicted Bioactivity Co-Profiling</h3>
+                                <p class="bio-subtext">
+                                    Correlates predicted disease target inhibition with the compound's ADMET liability profile.
+                                </p>
+                            </div>
+
+                            <div class="bioactivity-columns-grid">
+                                <!-- COX-2 Card -->
+                                <div class="bio-target-box" id="bio-cox2-box">
+                                    <div class="bio-target-header">
+                                        <span class="target-name">COX-2 (PTGS2)</span>
+                                        <span class="target-badge" id="bio-cox2-badge">--</span>
+                                    </div>
+                                    <div class="bio-metric-row">
+                                        <span>Model:</span>
+                                        <strong>Final XGBoost (Morgan FP)</strong>
+                                    </div>
+                                    <div class="bio-metric-row">
+                                        <span>Predicted Class:</span>
+                                        <strong id="bio-cox2-class">--</strong>
+                                    </div>
+                                    <div class="bio-metric-row">
+                                        <span>Estimated Probability:</span>
+                                        <strong id="bio-cox2-prob">--%</strong>
+                                    </div>
+                                    <div class="bio-progress-track">
+                                        <div class="bio-progress-fill" id="bio-cox2-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- EGFR Card -->
+                                <div class="bio-target-box" id="bio-egfr-box">
+                                    <div class="bio-target-header">
+                                        <span class="target-name">EGFR (ERBB1)</span>
+                                        <span class="target-badge" id="bio-egfr-badge">--</span>
+                                    </div>
+                                    <div class="bio-metric-row">
+                                        <span>Model:</span>
+                                        <strong>Tuned EGFR XGBoost</strong>
+                                    </div>
+                                    <div class="bio-metric-row">
+                                        <span>Predicted Class:</span>
+                                        <strong id="bio-egfr-class">--</strong>
+                                    </div>
+                                    <div class="bio-metric-row">
+                                        <span>Estimated Probability:</span>
+                                        <strong id="bio-egfr-prob">--%</strong>
+                                    </div>
+                                    <div class="bio-progress-track">
+                                        <div class="bio-progress-fill" id="bio-egfr-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 4. Five Core ADMET Categories Grid -->
+                    <section class="admet-categories-section" aria-labelledby="categories-heading">
+                        <div class="section-subheading">
+                            <h3 id="categories-heading">Detailed Endpoint Predictions by Category</h3>
+                            <p>Evaluated using individual, validated machine learning models featurized with 2048 Morgan bits and 10 physicochemical descriptors.</p>
+                        </div>
+
+                        <div class="categories-grid">
+
+                            <!-- Category 1: ABSORPTION -->
+                            <div class="category-card" id="card-absorption">
+                                <div class="category-header">
+                                    <div class="cat-icon-box cat-abs">💧</div>
+                                    <div>
+                                        <h4>Absorption</h4>
+                                        <span class="cat-subtitle">Oral Bioavailability &amp; Mucosal Transport</span>
+                                    </div>
+                                </div>
+
+                                <div class="endpoint-items-list">
+                                    <!-- Endpoint: Solubility -->
+                                    <div class="endpoint-item" id="ep-solubility">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Aqueous Solubility (logS)</span>
+                                            <span class="ep-badge" id="badge-solubility">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-solubility">--</span>
+                                            <span class="ep-units">log(mol/L)</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-solubility" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-solubility">--</p>
+                                        <span class="ep-source">Dataset: Delaney ESOL (R² = 0.863)</span>
+                                    </div>
+
+                                    <!-- Endpoint: Caco-2 -->
+                                    <div class="endpoint-item" id="ep-caco2">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Caco-2 Permeability</span>
+                                            <span class="ep-badge" id="badge-caco2">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-caco2">--</span>
+                                            <span class="ep-units">log cm/s</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-caco2" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-caco2">--</p>
+                                        <span class="ep-source">Dataset: Wang et al. (R² = 0.718)</span>
+                                    </div>
+
+                                    <!-- Endpoint: HIA -->
+                                    <div class="endpoint-item" id="ep-hia">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Intestinal Absorption (HIA)</span>
+                                            <span class="ep-badge" id="badge-hia">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-hia">--</span>
+                                            <span class="ep-units" id="prob-hia">Confidence --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-hia" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-hia">--</p>
+                                        <span class="ep-source">Dataset: Hou et al. (ROC-AUC = 0.949)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Category 2: DISTRIBUTION -->
+                            <div class="category-card" id="card-distribution">
+                                <div class="category-header">
+                                    <div class="cat-icon-box cat-dist">🧠</div>
+                                    <div>
+                                        <h4>Distribution</h4>
+                                        <span class="cat-subtitle">Tissue Partitioning &amp; Protein Binding</span>
+                                    </div>
+                                </div>
+
+                                <div class="endpoint-items-list">
+                                    <!-- Endpoint: BBBP -->
+                                    <div class="endpoint-item" id="ep-bbbp">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Blood-Brain Barrier (BBBP)</span>
+                                            <span class="ep-badge" id="badge-bbbp">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-bbbp">--</span>
+                                            <span class="ep-units" id="prob-bbbp">Confidence --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-bbbp" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-bbbp">--</p>
+                                        <span class="ep-source">Dataset: Martins et al. (ROC-AUC = 0.953)</span>
+                                    </div>
+
+                                    <!-- Endpoint: PPB -->
+                                    <div class="endpoint-item" id="ep-ppb">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Plasma Protein Binding (PPB)</span>
+                                            <span class="ep-badge" id="badge-ppb">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-ppb">--%</span>
+                                            <span class="ep-units" id="val-fu">Fraction Unbound fu: --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-ppb" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-ppb">--</p>
+                                        <span class="ep-source">Model: Lipophilic Free-Energy QSPR</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Category 3: METABOLISM -->
+                            <div class="category-card" id="card-metabolism">
+                                <div class="category-header">
+                                    <div class="cat-icon-box cat-met">⚡</div>
+                                    <div>
+                                        <h4>Metabolism</h4>
+                                        <span class="cat-subtitle">Cytochrome P450 Enzymes &amp; DDI Risk</span>
+                                    </div>
+                                </div>
+
+                                <div class="endpoint-items-list">
+                                    <!-- Endpoint: CYP3A4 -->
+                                    <div class="endpoint-item" id="ep-cyp3a4">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">CYP3A4 Inhibition</span>
+                                            <span class="ep-badge" id="badge-cyp3a4">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-cyp3a4">--</span>
+                                            <span class="ep-units" id="prob-cyp3a4">Confidence --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-cyp3a4" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-cyp3a4">--</p>
+                                        <span class="ep-source">Dataset: Veith et al. (ROC-AUC = 0.876)</span>
+                                    </div>
+
+                                    <!-- Endpoint: CYP2D6 -->
+                                    <div class="endpoint-item" id="ep-cyp2d6">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">CYP2D6 Inhibition</span>
+                                            <span class="ep-badge" id="badge-cyp2d6">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-cyp2d6">--</span>
+                                            <span class="ep-units" id="prob-cyp2d6">Confidence --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-cyp2d6" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-cyp2d6">--</p>
+                                        <span class="ep-source">Dataset: Veith et al. (ROC-AUC = 0.866)</span>
+                                    </div>
+
+                                    <!-- Endpoint: CYP2C9 -->
+                                    <div class="endpoint-item" id="ep-cyp2c9">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">CYP2C9 Inhibition</span>
+                                            <span class="ep-badge" id="badge-cyp2c9">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-cyp2c9">--</span>
+                                            <span class="ep-units" id="prob-cyp2c9">Confidence --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-cyp2c9" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-cyp2c9">--</p>
+                                        <span class="ep-source">Dataset: Veith et al. (ROC-AUC = 0.882)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Category 4: EXCRETION -->
+                            <div class="category-card" id="card-excretion">
+                                <div class="category-header">
+                                    <div class="cat-icon-box cat-exc">🔄</div>
+                                    <div>
+                                        <h4>Excretion</h4>
+                                        <span class="cat-subtitle">Clearance Route &amp; Drug-Likeness</span>
+                                    </div>
+                                </div>
+
+                                <div class="endpoint-items-list">
+                                    <!-- Endpoint: QED -->
+                                    <div class="endpoint-item" id="ep-qed">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Quantitative Drug-Likeness (QED)</span>
+                                            <span class="ep-badge" id="badge-qed">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-qed">--</span>
+                                            <span class="ep-units">Scale (0 - 1)</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-qed" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-qed">--</p>
+                                        <span class="ep-source">Benchmark: Bickerton et al. Nature Chem</span>
+                                    </div>
+
+                                    <!-- Endpoint: Clearance Profile -->
+                                    <div class="endpoint-item" id="ep-clearance">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Predicted Elimination Route</span>
+                                            <span class="ep-badge" id="badge-clearance">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val-text" id="val-clearance">--</span>
+                                        </div>
+                                        <p class="ep-interp" id="interp-clearance">--</p>
+                                        <span class="ep-source">Cheminformatics Rule Set (MW, LogP, TPSA)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Category 5: TOXICITY -->
+                            <div class="category-card" id="card-toxicity">
+                                <div class="category-header">
+                                    <div class="cat-icon-box cat-tox">🛡️</div>
+                                    <div>
+                                        <h4>Toxicity</h4>
+                                        <span class="cat-subtitle">Genotoxic, Hepatic &amp; Cardiac Hazards</span>
+                                    </div>
+                                </div>
+
+                                <div class="endpoint-items-list">
+                                    <!-- Endpoint: Ames -->
+                                    <div class="endpoint-item" id="ep-ames">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Ames Mutagenicity</span>
+                                            <span class="ep-badge" id="badge-ames">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-ames">--</span>
+                                            <span class="ep-units" id="prob-ames">Confidence --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-ames" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-ames">--</p>
+                                        <span class="ep-source">Dataset: Hansen et al. (ROC-AUC = 0.870)</span>
+                                    </div>
+
+                                    <!-- Endpoint: DILI -->
+                                    <div class="endpoint-item" id="ep-dili">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">Hepatotoxicity (DILI)</span>
+                                            <span class="ep-badge" id="badge-dili">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-dili">--</span>
+                                            <span class="ep-units" id="prob-dili">Confidence --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-dili" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-dili">--</p>
+                                        <span class="ep-source">Dataset: FDA DILIst (ROC-AUC = 0.860)</span>
+                                    </div>
+
+                                    <!-- Endpoint: hERG -->
+                                    <div class="endpoint-item" id="ep-herg">
+                                        <div class="ep-top-row">
+                                            <span class="ep-name">hERG Cardiotoxicity</span>
+                                            <span class="ep-badge" id="badge-herg">--</span>
+                                        </div>
+                                        <div class="ep-val-row">
+                                            <span class="ep-big-val" id="val-herg">--</span>
+                                            <span class="ep-units" id="prob-herg">Confidence --%</span>
+                                        </div>
+                                        <div class="meter-bar-track">
+                                            <div class="meter-bar-fill" id="fill-herg" style="width: 50%;"></div>
+                                        </div>
+                                        <p class="ep-interp" id="interp-herg">--</p>
+                                        <span class="ep-source">Dataset: Karim / Wang (ROC-AUC = 0.909)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- 5. Model Transparency & Validation Benchmark Table -->
+                    <section class="admet-transparency-section" aria-labelledby="transparency-heading">
+                        <div class="admet-card transparency-card">
+                            <div class="transparency-header">
+                                <span class="transparency-kicker">Scientific Openness</span>
+                                <h3 id="transparency-heading">Model Architecture &amp; Held-Out Test Evaluation</h3>
+                                <p>
+                                    All 10 endpoint models were trained independently with scikit-learn Random Forests utilizing 
+                                    2048-bit Morgan Fingerprints (radius 2, chiral) + 10 physicochemical descriptors, validated 
+                                    on strict 20% held-out test splits without data leakage.
+                                </p>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="admet-metrics-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Endpoint</th>
+                                            <th>Category</th>
+                                            <th>Algorithm</th>
+                                            <th>Public Benchmark Source</th>
+                                            <th>Total Samples</th>
+                                            <th>Test Set</th>
+                                            <th>Primary Evaluation Metric</th>
+                                            <th>Secondary Metric</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admet-metrics-table-body">
+                                        <!-- Dynamically Populated from /admet-metrics -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 6. Regulatory & Scientific Limitations Notice -->
+                    <section class="admet-disclaimer-section" aria-labelledby="disclaimer-heading">
+                        <div class="admet-disclaimer-box">
+                            <h4 id="disclaimer-heading">⚠️ Methodological Limitations &amp; Preclinical Guidance</h4>
+                            <p>
+                                Computational ADMET predictions are statistical approximations derived from public experimental assays. 
+                                They are intended to prioritize chemical series and flag toxicological liabilities during early lead discovery. 
+                                Predictions do not account for high-dose metabolic saturation, idiosyncratic drug reactions, transporter-mediated efflux (e.g., P-gp), 
+                                or patient-specific genetic polymorphisms. All computational findings must be verified using in vitro assays 
+                                (such as PAMPA, Caco-2, human liver microsomes, and patch-clamp hERG assays) prior to clinical evaluation.
+                            </p>
+                        </div>
+                    </section>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <p>
+                BAMI: Bioactive Molecule Intelligence &copy; 2026. Machine learning assisted drug discovery platform.
+            </p>
+            <p class="footer-subtext">
+                Powered by RDKit cheminformatics, XGBoost, and Scikit-Learn.
+            </p>
+        </div>
+    </footer>
+
+        </div><!-- /.app-main-content -->
+    </div><!-- /.app-layout -->
+
+    <!-- Unified Workspace Sidebar -->
+    <script src="sidebar.js?v=50"></script>
+
+    <!-- Firebase Auth & App Scripts -->
+    <script src="admet.js?v=3" defer></script>
+    <script type="module" src="auth.js?v=2"></script>
+
+    <!-- 3D WebGL Particle-Wave Visualization Background -->
+    <script type="module" src="particle-wave.js?v=8"></script>
+</body>
+</html>

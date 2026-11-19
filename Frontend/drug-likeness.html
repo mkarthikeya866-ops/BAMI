@@ -5,41 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Analyze molecular descriptors and Lipinski Rule of Five properties from a SMILES string.">
-    <title>Bioactive Molecule Intelligence | Drug-Likeness Analysis</title>
-    <link rel="stylesheet" href="style.css?v=35">
+    <title>BAMI | Drug-Likeness Analysis</title>
+    <link rel="stylesheet" href="style.css?v=45">
+    <link rel="stylesheet" href="sidebar.css?v=50">
+    <link rel="stylesheet" href="ui-enhancements.css?v=50">
 </head>
 
-<body data-auth-page="protected">
-    <div class="auth-guard-overlay" id="auth-guard-overlay" role="status" aria-live="polite">
-        <div class="auth-guard-card">
-            <h2>Checking your session</h2>
-            <p data-guard-message>Verifying your sign-in before opening the workspace…</p>
-            <a href="login.html">Go to sign in</a>
-        </div>
-    </div>
-    <!-- Primary navigation between prediction and drug-likeness tools. -->
-    <header class="navbar">
-        <div class="nav-container">
-            <a href="index.html#prediction" class="logo">
-                <span class="logo-icon">✦</span>
-                <span>Bioactive Molecule Intelligence</span>
-            </a>
-            <nav class="site-navigation" aria-label="Main navigation">
-                <a href="index.html#prediction" class="nav-button nav-button-secondary">
-                    Predict
-                </a>
-                <a href="drug-likeness.html" class="nav-button" aria-current="page">
-                    Drug-Likeness
-                </a>
-                <div class="nav-auth" data-auth-user-container hidden>
-                    <span class="nav-user-name" data-auth-user></span>
-                    <button class="nav-button nav-button-secondary" type="button" data-auth-logout>
-                        Sign out
-                    </button>
-                </div>
-            </nav>
-        </div>
-    </header>
+<body>
+
+    <div id="bami-layout" class="app-layout">
+        <div id="bami-sidebar-placeholder"></div>
+        <div class="app-main-content">
+            <div id="bami-topbar-placeholder"></div>
 
     <main>
         <!-- Drug-likeness input and analysis results. -->
@@ -161,10 +138,16 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-bottom">
-                <span>Bioactive Molecule Intelligence · Molecular drug-likeness analysis</span>
+                <span>BAMI <sub>Bioactive Molecule Intelligence</sub> · Molecular drug-likeness analysis</span>
             </div>
         </div>
     </footer>
+
+        </div><!-- /.app-main-content -->
+    </div><!-- /.app-layout -->
+
+    <!-- Unified Workspace Sidebar -->
+    <script src="sidebar.js?v=50"></script>
 
     <!-- Molecule Autocomplete & Suggestion Engine -->
     <script src="molecule-suggestions.js?v=35"></script>

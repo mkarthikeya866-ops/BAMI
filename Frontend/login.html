@@ -3,20 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sign in to Bioactive Molecule Intelligence.">
-    <title>Sign In | Bioactive Molecule Intelligence</title>
-    <link rel="stylesheet" href="style.css?v=24">
-    <link rel="stylesheet" href="auth.css?v=3">
+    <meta name="description" content="Sign in to BAMI.">
+    <title>Sign In | BAMI</title>
+    <link rel="stylesheet" href="style.css?v=42">
+    <link rel="stylesheet" href="auth.css?v=7">
+    <style id="bami-font-scale">
+        html { font-size: 21px !important; }
+        body { font-size: 21px !important; line-height: 1.7 !important; }
+        .auth-brand, .auth-mobile-brand { font-size: 22px !important; }
+        .auth-brand sub, .auth-mobile-brand sub, .logo-subscript { font-size: 13.5px !important; font-weight: 600 !important; color: var(--text-light, #766986) !important; vertical-align: baseline !important; position: relative !important; bottom: -0.12em !important; margin-left: 6px !important; letter-spacing: 0.01em !important; }
+        .auth-intro-copy h1 { font-size: clamp(3.2rem, 6vw, 5.2rem) !important; }
+        .auth-intro-copy p { font-size: 21px !important; }
+        .auth-heading h2 { font-size: 32px !important; }
+        .auth-heading p { font-size: 19px !important; }
+        .auth-field label { font-size: 18.5px !important; }
+        .auth-field input { font-size: 20px !important; }
+        .auth-submit { font-size: 19px !important; }
+        .auth-switch, .auth-notice, .auth-kicker, .auth-eyebrow { font-size: 17px !important; }
+        .auth-security-note, .auth-legal { font-size: 15px !important; }
+    </style>
 </head>
 <body class="auth-body" data-auth-page="login">
     <main class="auth-layout">
         <section class="auth-intro" aria-labelledby="auth-brand">
             <a class="auth-brand" href="index.html">
                 <span class="logo-icon" aria-hidden="true">✦</span>
-                <span id="auth-brand">Bioactive Molecule Intelligence</span>
+                <span id="auth-brand">BAMI <sub class="logo-subscript">Bioactive Molecule Intelligence</sub></span>
             </a>
             <div class="auth-intro-copy">
-                <span class="auth-kicker"><span></span> MOLECULAR AI WORKSPACE</span>
+                <span class="auth-kicker"><span></span> MOLECULAR WORKSPACE</span>
                 <h1>Research starts with a <span>molecule.</span></h1>
                 <p>Sign in to continue exploring bioactivity, molecular structure, and drug-likeness insights.</p>
             </div>
@@ -39,7 +54,7 @@
         <section class="auth-panel" aria-labelledby="login-heading">
             <a class="auth-mobile-brand" href="index.html">
                 <span class="logo-icon" aria-hidden="true">✦</span>
-                <span>Bioactive Molecule Intelligence</span>
+                <span>BAMI <sub class="logo-subscript">Bioactive Molecule Intelligence</sub></span>
             </a>
             <div class="auth-card">
                 <div class="auth-heading">
@@ -93,6 +108,12 @@
                         <span class="auth-submit-label">Sign in</span>
                         <span class="auth-submit-arrow" aria-hidden="true">→</span>
                     </button>
+                    <button class="auth-quick-btn" id="demo-login-submit" type="button" title="Sign in immediately and experience the molecular shatter portal">
+                        <span>⚡ Quick Sign In (Researcher Mode)</span>
+                    </button>
+                    <button class="auth-preview-btn" id="preview-shatter-btn" type="button" title="Test the BAMI Falling &amp; Shatter Molecular Portal Sequence" onclick="if(window.triggerBamiLoginShatterPortal){window.triggerBamiLoginShatterPortal(null, true);}">
+                        <span>🎬 Preview Cinematic Sequence</span>
+                    </button>
                 </div>
 
                 <p class="auth-switch">New to the workspace? <a href="register.html">Create an account</a></p>
@@ -101,7 +122,8 @@
             <p class="auth-legal">For research and educational use. Predictions are not medical advice.</p>
         </section>
     </main>
-    <script type="module" src="auth.js?v=2"></script>
+    <script src="login-shatter.js?v=4"></script>
+    <script type="module" src="auth.js?v=4"></script>
     <script type="module" src="particle-wave.js?v=8"></script>
 </body>
 </html>

@@ -1,0 +1,840 @@
+/* =========================================================
+   BAMI MOLECULAR DOCKING SIMULATION STYLES
+   ========================================================= */
+
+.docking-main {
+    padding: 30px 40px 60px;
+    max-width: 1560px;
+    margin: 0 auto;
+}
+
+.docking-hero-section {
+    margin-bottom: 20px;
+}
+
+/* Two-column layout */
+.docking-grid-container {
+    display: grid;
+    grid-template-columns: minmax(460px, 540px) 1fr;
+    gap: 30px;
+    align-items: start;
+    margin-top: 25px;
+}
+
+/* Standard Docking Card */
+.docking-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(200, 168, 233, 0.45);
+    border-radius: 20px;
+    padding: 26px 30px;
+    box-shadow: 0 10px 30px rgba(50, 20, 90, 0.04);
+    margin-bottom: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.docking-card:hover {
+    box-shadow: 0 14px 38px rgba(50, 20, 90, 0.08);
+}
+
+.docking-card .card-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.docking-card .card-heading h3 {
+    font-size: 21px;
+    font-weight: 700;
+    color: #1E1530;
+    margin: 4px 0 0;
+}
+
+.dock-tag {
+    font-size: 11.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #F3E8FF;
+    color: #6D28D9;
+}
+
+.dock-tag.success-tag {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+/* =========================================================
+   1. TARGET SELECTION CONTROLS
+   ========================================================= */
+.target-toggle-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.target-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 2px solid #E9D5FF;
+    border-radius: 14px;
+    background: #FAF7FD;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.target-toggle-btn:hover {
+    border-color: #A855F7;
+    background: #F6EDFF;
+    transform: translateY(-1.5px);
+}
+
+.target-toggle-btn.active {
+    border-color: #651FFF;
+    background: #FFFFFF;
+    box-shadow: 0 6px 20px rgba(101, 31, 255, 0.16);
+}
+
+.target-radio-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #C4B5FD;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease;
+}
+
+.target-toggle-btn.active .target-radio-indicator {
+    border-color: #651FFF;
+}
+
+.target-toggle-btn.active .target-radio-indicator::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #651FFF;
+}
+
+.target-btn-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.target-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.target-title-row strong {
+    font-size: 18px;
+    color: #1E1530;
+}
+
+.pdb-pill {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 12px;
+    background: #EDE9FE;
+    color: #5B21B6;
+}
+
+.target-subtitle {
+    font-size: 13.5px;
+    color: #6B5E87;
+    display: block;
+}
+
+/* Receptor Metadata Panel */
+.receptor-meta-panel {
+    background: #FAF8FE;
+    border: 1px solid #E7DDF7;
+    border-radius: 14px;
+    padding: 16px 20px;
+}
+
+.receptor-meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.receptor-id-badge {
+    font-size: 15px;
+    font-weight: 800;
+    color: #4C1D95;
+    background: #EDE9FE;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+
+.rcsb-link {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #651FFF;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rcsb-link:hover {
+    text-decoration: underline;
+    color: #4B00D1;
+}
+
+.receptor-desc {
+    font-size: 14.5px;
+    color: #4B3B69;
+    line-height: 1.5;
+    margin: 0 0 12px;
+}
+
+.receptor-coords-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    border-top: 1px dashed #DDD2F2;
+    padding-top: 12px;
+}
+
+.coord-item {
+    font-size: 12.5px;
+}
+
+.coord-label {
+    display: block;
+    color: #796C97;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+
+.coord-item strong {
+    font-size: 13.5px;
+    color: #1E1530;
+    word-break: break-all;
+}
+
+/* =========================================================
+   2. MOLECULE INPUT & PRESETS
+   ========================================================= */
+.field-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #2D1F47;
+    margin-bottom: 8px;
+}
+
+.docking-presets-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 16px;
+}
+
+.presets-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #796C97;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.preset-pill {
+    background: #F4EFFF;
+    border: 1px solid #DDD0F7;
+    border-radius: 16px;
+    padding: 5px 12px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #5B21B6;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.preset-pill:hover {
+    background: #651FFF;
+    border-color: #651FFF;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+}
+
+.exhaustiveness-control {
+    margin-bottom: 20px;
+}
+
+.exhaustiveness-control label {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #493B66;
+    margin-bottom: 6px;
+}
+
+.exhaustiveness-control select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #DDD0F7;
+    border-radius: 10px;
+    font-size: 14.5px;
+    background: #FFFFFF;
+    color: #1E1530;
+}
+
+.run-docking-btn {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 17px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #651FFF 0%, #4E0ED8 100%);
+    box-shadow: 0 6px 20px rgba(101, 31, 255, 0.35);
+}
+
+.run-docking-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(101, 31, 255, 0.45);
+}
+
+/* =========================================================
+   3. LIVE SIMULATION STATUS PANEL
+   ========================================================= */
+.status-indicator-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+/* Status variants */
+.status-indicator-badge.not-started {
+    background: #F1F5F9;
+    color: #475569;
+}
+.status-indicator-badge.not-started .status-dot {
+    background: #94A3B8;
+}
+
+.status-indicator-badge.preparing-ligand,
+.status-indicator-badge.preparing-protein {
+    background: #FEF3C7;
+    color: #92400E;
+    animation: statusPulse 1.8s infinite;
+}
+.status-indicator-badge.preparing-ligand .status-dot,
+.status-indicator-badge.preparing-protein .status-dot {
+    background: #F59E0B;
+}
+
+.status-indicator-badge.running {
+    background: #EDE9FE;
+    color: #5B21B6;
+    animation: statusPulse 1.5s infinite;
+}
+.status-indicator-badge.running .status-dot {
+    background: #8B5CF6;
+}
+
+.status-indicator-badge.completed {
+    background: #DCFCE7;
+    color: #15803D;
+}
+.status-indicator-badge.completed .status-dot {
+    background: #16A34A;
+}
+
+.status-indicator-badge.failed {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+.status-indicator-badge.failed .status-dot {
+    background: #EF4444;
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Animated Progress Bar */
+.docking-progress-track {
+    width: 100%;
+    height: 9px;
+    background: #EDE5F8;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    margin: 14px 0 8px;
+}
+
+.docking-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #651FFF 0%, #8B5CF6 50%, #10B981 100%);
+    border-radius: 6px;
+    transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.docking-progress-fill.running-shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    animation: progressShimmer 1.5s infinite linear;
+}
+
+@keyframes progressShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-labels-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #645582;
+}
+
+.progress-percent {
+    font-weight: 800;
+    color: #4A1D96;
+}
+
+.progress-stage-name {
+    font-weight: 600;
+}
+
+.docking-stage-box {
+    background: #F8F5FD;
+    border-left: 4px solid #8B5CF6;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 14px;
+}
+
+.stage-text {
+    font-size: 14px;
+    color: #382A54;
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* Error Box */
+.docking-error-box {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: #FEF2F2;
+    border: 1.5px solid #FCA5A5;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.error-icon {
+    font-size: 22px;
+}
+
+.error-body h4 {
+    color: #991B1B;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.error-body p {
+    color: #B91C1C;
+    font-size: 13.5px;
+    margin: 0 0 10px;
+    line-height: 1.5;
+}
+
+.retry-docking-btn {
+    background: #DC2626;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.retry-docking-btn:hover {
+    background: #B91C1C;
+}
+
+/* =========================================================
+   4. AUTODOCK VINA BINDING RESULTS CARD
+   ========================================================= */
+.affinity-hero-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 28px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 45%, #FAF5FF 100%);
+    border: 1.5px solid #86EFAC;
+    margin-bottom: 22px;
+}
+
+.affinity-kicker {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #166534;
+    margin-bottom: 4px;
+}
+
+.affinity-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.affinity-number {
+    font-size: 3.4rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #14532D;
+    line-height: 1;
+}
+
+.affinity-unit {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #166534;
+}
+
+.affinity-badge-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    background: #16A34A;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+}
+
+.affinity-meta-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: right;
+}
+
+.meta-stat-item .stat-lbl {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #166534;
+    font-weight: 700;
+}
+
+.meta-stat-item strong {
+    font-size: 16px;
+    color: #0F3E22;
+}
+
+/* Ranked Modes Table */
+.modes-table-container h4,
+.contacts-container h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1E1530;
+    margin: 0 0 10px;
+}
+
+.vina-modes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.vina-modes-table th {
+    background: #F5EEFD;
+    color: #4C1D95;
+    font-weight: 700;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1.5px solid #E5D5F9;
+}
+
+.vina-modes-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #F1E8FB;
+    color: #2D1F47;
+}
+
+.vina-modes-table tr:hover td {
+    background: #FAF7FE;
+}
+
+.vina-modes-table tr.active-mode td {
+    background: #EDE9FE;
+    font-weight: 700;
+}
+
+.pose-select-btn {
+    background: #EDE9FE;
+    border: 1px solid #C4B5FD;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6D28D9;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pose-select-btn:hover {
+    background: #651FFF;
+    color: #FFFFFF;
+    border-color: #651FFF;
+}
+
+/* Contact Pills */
+.contact-pills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.contact-pill {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: #F3E8FF;
+    border: 1px solid #DDD0F7;
+    color: #5B21B6;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.contact-pill:hover {
+    background: #8B5CF6;
+    color: #FFFFFF;
+    border-color: #8B5CF6;
+}
+
+/* =========================================================
+   5. 3D WEBGL PROTEIN-LIGAND VIEWPORT
+   ========================================================= */
+.viewer-3d-wrapper {
+    position: relative;
+    width: 100%;
+    height: 540px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #13092A 0%, #080314 100%);
+    border: 1.5px solid #2B184F;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.docking-3dmol-viewport {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Placeholder when not active */
+.viewport-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(12, 5, 26, 0.88);
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    transition: opacity 0.3s ease;
+}
+
+.viewport-placeholder.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.placeholder-content {
+    text-align: center;
+    max-width: 380px;
+    padding: 24px;
+}
+
+.placeholder-icon {
+    font-size: 44px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.placeholder-content h4 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 8px;
+}
+
+.placeholder-content p {
+    font-size: 14.5px;
+    color: #A78BFA;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Floating Toolbar */
+.viewport-toolbar {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+}
+
+.view-btn {
+    background: rgba(28, 16, 56, 0.75);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    color: #EDE9FE;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.18s ease;
+}
+
+.view-btn:hover {
+    background: #651FFF;
+    border-color: #651FFF;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+}
+
+/* Floating Legend */
+.viewport-legend {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    display: flex;
+    gap: 12px;
+    background: rgba(15, 8, 30, 0.82);
+    border: 1px solid rgba(167, 139, 250, 0.25);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #D8B4FE;
+    backdrop-filter: blur(6px);
+    z-index: 20;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.ribbon-color { background: linear-gradient(135deg, #38BDF8, #818CF8); }
+.pocket-color { background: #FACC15; }
+.ligand-color { background: #10B981; }
+
+.viewport-instructions {
+    font-size: 13px;
+    color: #6B5E87;
+    margin: 10px 0 0;
+    line-height: 1.5;
+}
+
+.viewport-tech-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #0F172A;
+    color: #38BDF8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Fullscreen mode for 3Dmol viewer */
+.viewer-3d-wrapper.fullscreen-mode {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 999999;
+    border-radius: 0;
+    border: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1100px) {
+    .docking-grid-container {
+        grid-template-columns: 1fr;
+    }
+    .viewer-3d-wrapper {
+        height: 480px;
+    }
+}
+
+@media (max-width: 600px) {
+    .docking-main {
+        padding: 20px 16px 40px;
+    }
+    .target-toggle-group {
+        grid-template-columns: 1fr;
+    }
+    .affinity-hero-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .affinity-meta-stats {
+        text-align: left;
+    }
+    .receptor-coords-grid {
+        grid-template-columns: 1fr;
+    }
+}

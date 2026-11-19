@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Review your 50 most recent molecular bioactivity evaluations with BAMI. Stored locally in your browser on this device.">
+    <title>BAMI | Prediction History</title>
+    <link rel="stylesheet" href="style.css?v=48">
+    <link rel="stylesheet" href="sidebar.css?v=50">
+    <link rel="stylesheet" href="ui-enhancements.css?v=50">
+</head>
+
+<body>
+
+    <div id="bami-layout" class="app-layout">
+        <div id="bami-sidebar-placeholder"></div>
+        <div class="app-main-content">
+            <div id="bami-topbar-placeholder"></div>
+
+    <main id="main-content">
+
+        <!-- History Hero & Intro -->
+        <section class="section history-section">
+            <div class="history-container">
+
+                <div class="section-heading history-header">
+                    <div class="section-badge">Recent Activity</div>
+                    <h2>Prediction <span>History</span></h2>
+                    <p>
+                        Review your 50 most recent molecule evaluations, newest first. 
+                        Inspect saved probabilities, Lipinski descriptors, and targets without re-running models.
+                    </p>
+
+                    <div class="history-storage-pill" role="note">
+                        <span class="storage-indicator-dot" aria-hidden="true"></span>
+                        <span>Stored locally in your browser on this device (up to 50 most recent predictions).</span>
+                    </div>
+                </div>
+
+                <!-- History Toolbar: Search & Filters -->
+                <div class="history-toolbar" role="region" aria-label="History filters">
+                    <div class="history-search-wrap">
+                        <span class="search-icon" aria-hidden="true">🔍</span>
+                        <input 
+                            type="search" 
+                            id="history-search" 
+                            class="history-search-input" 
+                            placeholder="Search by compound name, SMILES, target..." 
+                            aria-label="Search prediction history by molecule name or SMILES"
+                        >
+                    </div>
+
+                    <div class="history-filters-wrap">
+                        <select id="history-target-filter" class="history-select" aria-label="Filter by target protein">
+                            <option value="all">All Targets (EGFR &amp; COX-2)</option>
+                            <option value="EGFR">EGFR</option>
+                            <option value="COX-2">COX-2</option>
+                        </select>
+
+                        <select id="history-outcome-filter" class="history-select" aria-label="Filter by prediction class">
+                            <option value="all">All Outcomes</option>
+                            <option value="Active">Active only</option>
+                            <option value="Inactive">Inactive only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Summary Counter Bar -->
+                <div class="history-summary-bar">
+                    <div id="history-count" class="history-count-text" aria-live="polite">
+                        Loading saved predictions...
+                    </div>
+                    <div class="history-actions-group">
+                        <button type="button" id="history-load-samples-toolbar" class="history-secondary-link" title="Load sample test predictions for demonstration">
+                            Load Samples
+                        </button>
+                        <button type="button" id="history-clear-all-btn" class="history-secondary-link danger-link" title="Clear all saved prediction history on this device" hidden style="display: none;">
+                            Clear All
+                        </button>
+                        <a href="index.html#prediction" class="history-quick-link">
+                            + New Prediction
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Main Cards Container -->
+                <div id="history-cards-container" class="history-cards-container">
+
+                    <!-- Loading State -->
+                    <div id="history-loading" class="history-state-card" aria-live="polite">
+                        <div class="history-spinner" aria-hidden="true"></div>
+                        <h3>Loading prediction history...</h3>
+                        <p>Reading saved records from local device storage.</p>
+                    </div>
+
+                    <!-- Empty State (No predictions saved yet) -->
+                    <div id="history-empty" class="history-state-card" hidden style="display: none;">
+                        <div class="state-icon" aria-hidden="true">📋</div>
+                        <h3>No Predictions Recorded Yet</h3>
+                        <p>
+                            You haven't run any molecule bioactivity predictions on this device yet.
+                            Test a compound against EGFR or COX-2 to start building your screening history.
+                        </p>
+                        <div class="state-actions">
+                            <a href="index.html#prediction" class="primary-button">
+                                Open Predictor &rarr;
+                            </a>
+                            <button type="button" class="secondary-button" id="load-sample-btn">
+                                Load Sample Aspirin Test
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- No Search Matches State -->
+                    <div id="history-no-matches" class="history-state-card" hidden style="display: none;">
+                        <div class="state-icon" aria-hidden="true">🔍</div>
+                        <h3>No Matching Predictions Found</h3>
+                        <p id="no-matches-text">Try adjusting your search query or reset the target/outcome filters.</p>
+                        <button type="button" class="secondary-button" id="reset-filters-btn">
+                            Clear Filters
+                        </button>
+                    </div>
+
+                    <!-- Populated History Grid -->
+                    <div id="history-list" class="history-grid" role="feed" aria-busy="false"></div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer UI: small project and target label -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-bottom">
+                <span>
+                    BAMI <sub>Bioactive Molecule Intelligence</sub> · Computational screening estimates are research leads, not medical proof.
+                </span>
+            </div>
+        </div>
+    </footer>
+
+        </div><!-- /.app-main-content -->
+    </div><!-- /.app-layout -->
+
+    <!-- Unified Workspace Sidebar -->
+    <script src="sidebar.js?v=50"></script>
+
+    <!-- History Service Script -->
+    <script src="history-service.js?v=2"></script>
+
+    <!-- History Page Controller -->
+    <script src="history.js?v=2"></script>
+
+    <!-- Auth Integration -->
+    <script type="module" src="auth.js?v=2"></script>
+
+    <!-- 3D WebGL Particle-Wave Visualization Background -->
+    <script type="module" src="particle-wave.js?v=8"></script>
+
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Molecular Scaffold Analysis with BAMI. Extract Bemis-Murcko cores, decompose peripheral substituents, compare structural analogues, and inspect COX-2 and EGFR structure-activity relationships.">
+    <title>BAMI | Molecular Scaffold Analysis</title>
+    <link rel="stylesheet" href="style.css?v=48">
+    <link rel="stylesheet" href="sidebar.css?v=50">
+    <link rel="stylesheet" href="ui-enhancements.css?v=50">
+</head>
+
+<body>
+
+    <div id="bami-layout" class="app-layout">
+        <div id="bami-sidebar-placeholder"></div>
+        <div class="app-main-content">
+            <div id="bami-topbar-placeholder"></div>
+
+    <main id="main-content">
+
+        <!-- Hero Section -->
+        <section class="section scaffold-hero-section">
+            <div class="scaffold-container">
+
+                <div class="section-heading">
+                    <div class="section-badge">Medicinal Chemistry Core</div>
+                    <h2>Molecular Scaffold <span>Analysis</span></h2>
+                    <p>
+                        Decompose molecules into their Bemis-Murcko core ring assemblies and linkers.
+                        Highlight core structures, identify peripheral substituents, cluster structural analogues,
+                        and investigate machine-learning predicted bioactivity against COX-2 and EGFR.
+                    </p>
+                </div>
+
+                <!-- Analysis Mode Selector Tabs -->
+                <div class="scaffold-tabs-bar" role="tablist" aria-label="Scaffold analysis mode">
+                    <button 
+                        type="button" 
+                        class="scaffold-tab-btn active" 
+                        id="tab-btn-single" 
+                        role="tab" 
+                        aria-selected="true" 
+                        aria-controls="scaffold-single-panel"
+                    >
+                        <span class="tab-icon">🔬</span> Single Molecule Deep-Dive
+                    </button>
+                    <button 
+                        type="button" 
+                        class="scaffold-tab-btn" 
+                        id="tab-btn-multi" 
+                        role="tab" 
+                        aria-selected="false" 
+                        aria-controls="scaffold-multi-panel"
+                    >
+                        <span class="tab-icon">🧬</span> Multi-Molecule Series Comparison
+                    </button>
+                </div>
+
+                <!-- =========================================================
+                     PANEL 1: SINGLE MOLECULE SCAFFOLD EXTRACTION
+                     ========================================================= -->
+                <div id="scaffold-single-panel" class="scaffold-panel" role="tabpanel" aria-labelledby="tab-btn-single">
+                    <div class="scaffold-input-card">
+                        <div class="card-heading">
+                            <div>
+                                <span class="card-number">01</span>
+                                <h3>Molecule Specification</h3>
+                            </div>
+                            <span class="input-tag">SMILES OR NAME</span>
+                        </div>
+
+                        <form id="scaffold-single-form" class="scaffold-form">
+                            <label for="single-smiles-input" class="scaffold-label">
+                                Enter a molecule SMILES string or common drug name:
+                            </label>
+                            
+                            <div class="molecule-search-container" id="scaffold-search-container">
+                                <textarea
+                                    id="single-smiles-input"
+                                    name="smiles"
+                                    rows="3"
+                                    class="scaffold-textarea"
+                                    placeholder="e.g. Gefitinib, Aspirin, Celecoxib, or COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1"
+                                    required
+                                    spellcheck="false"
+                                ></textarea>
+                                <div id="scaffold-suggestions-dropdown" class="molecule-suggestions-dropdown" hidden></div>
+                            </div>
+
+                            <!-- Sample Quick Picks -->
+                            <div class="quick-samples-row">
+                                <span class="quick-label">Try a sample molecule:</span>
+                                <div class="quick-pills-wrap">
+                                    <button type="button" class="quick-sample-pill" data-smiles="COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1" data-name="Gefitinib">
+                                        Gefitinib (EGFR)
+                                    </button>
+                                    <button type="button" class="quick-sample-pill" data-smiles="C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1" data-name="Erlotinib">
+                                        Erlotinib (EGFR)
+                                    </button>
+                                    <button type="button" class="quick-sample-pill" data-smiles="CC(=O)Oc1ccccc1C(=O)O" data-name="Aspirin">
+                                        Aspirin (NSAID)
+                                    </button>
+                                    <button type="button" class="quick-sample-pill" data-smiles="CC1=CC=C(C=C1)C2=CC(=NN2C3=CC=C(C=C3)S(=O)(=O)N)C(F)(F)F" data-name="Celecoxib">
+                                        Celecoxib (COX-2)
+                                    </button>
+                                    <button type="button" class="quick-sample-pill" data-smiles="CCCC(CCC)C(=O)O" data-name="Valproic Acid">
+                                        Valproic Acid (Acyclic)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="primary-button scaffold-submit-btn" id="single-submit-btn">
+                                <span class="btn-text">Extract Bemis-Murcko Scaffold</span>
+                                <span aria-hidden="true">&rarr;</span>
+                            </button>
+
+                            <div id="single-status" class="scaffold-status" role="status" aria-live="polite"></div>
+                            <div id="single-error" class="scaffold-error" role="alert" hidden style="display: none;"></div>
+                        </form>
+                    </div>
+
+                    <!-- Single Molecule Results Container -->
+                    <div id="single-results-container" class="scaffold-results-container" hidden style="display: none;">
+                        
+                        <!-- Header Overview Bar -->
+                        <div class="scaffold-result-banner">
+                            <div class="banner-title-wrap">
+                                <h3 id="res-compound-title" class="banner-title">Compound Name</h3>
+                                <div class="banner-meta-row">
+                                    <span id="res-scaffold-type-badge" class="scaffold-badge badge-ring">Ring-containing Scaffold</span>
+                                    <span id="res-ring-counts-badge" class="scaffold-badge badge-neutral">4 Rings Total</span>
+                                </div>
+                            </div>
+                            <div class="banner-actions">
+                                <button type="button" class="secondary-button" id="open-in-predictor-btn">
+                                    Open in Predictor &rarr;
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 3-Way Interactive Visual Display Grid -->
+                        <div class="scaffold-visual-grid">
+                            
+                            <!-- 1. Original Structure -->
+                            <div class="scaffold-visual-card">
+                                <div class="visual-card-header">
+                                    <h4>1. Original Molecule</h4>
+                                    <span class="visual-subtag">Full Structure</span>
+                                </div>
+                                <div id="vis-original-svg" class="visual-svg-container" aria-label="Original molecular structure"></div>
+                                <div class="visual-card-footer">
+                                    <span class="canonical-smiles-label">SMILES</span>
+                                    <code id="vis-original-smiles" class="mono-code">--</code>
+                                </div>
+                            </div>
+
+                            <!-- 2. Extracted Scaffold -->
+                            <div class="scaffold-visual-card highlight-card">
+                                <div class="visual-card-header">
+                                    <h4>2. Bemis-Murcko Scaffold</h4>
+                                    <span class="visual-subtag badge-purple">Core Framework</span>
+                                </div>
+                                <div id="vis-scaffold-svg" class="visual-svg-container" aria-label="Extracted Bemis-Murcko scaffold"></div>
+                                <div class="visual-card-footer">
+                                    <span class="canonical-smiles-label">Scaffold</span>
+                                    <code id="vis-scaffold-smiles" class="mono-code">--</code>
+                                    <button type="button" class="history-copy-btn" id="copy-scaffold-btn" aria-label="Copy scaffold SMILES">
+                                        <span>📋 Copy</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 3. Highlighted Substructure -->
+                            <div class="scaffold-visual-card">
+                                <div class="visual-card-header">
+                                    <h4>3. Core Highlighted</h4>
+                                    <span class="visual-subtag">Scaffold in Context</span>
+                                </div>
+                                <div id="vis-highlighted-svg" class="visual-svg-container" aria-label="Scaffold highlighted in original molecule"></div>
+                                <div class="visual-card-footer">
+                                    <span class="highlight-caption">Violet shading indicates the extracted Bemis-Murcko core.</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Scaffold Metrics & Generic Framework Row -->
+                        <div class="scaffold-metrics-card">
+                            <div class="metrics-card-grid">
+                                <div class="scaffold-stat-item">
+                                    <span class="stat-label">Scaffold Heavy Atoms</span>
+                                    <strong id="stat-scaff-atoms" class="stat-value">--</strong>
+                                    <span class="stat-sub">of total molecule</span>
+                                </div>
+                                <div class="scaffold-stat-item">
+                                    <span class="stat-label">Core Mass Fraction</span>
+                                    <strong id="stat-scaff-fraction" class="stat-value">--%</strong>
+                                    <span class="stat-sub">scaffold ratio</span>
+                                </div>
+                                <div class="scaffold-stat-item">
+                                    <span class="stat-label">Scaffold Ring Systems</span>
+                                    <strong id="stat-scaff-rings" class="stat-value">--</strong>
+                                    <span class="stat-sub">linked rings</span>
+                                </div>
+                                <div class="scaffold-stat-item">
+                                    <span class="stat-label">Peripheral Substituents</span>
+                                    <strong id="stat-substituent-count" class="stat-value">--</strong>
+                                    <span class="stat-sub">detached R-groups</span>
+                                </div>
+                            </div>
+
+                            <div class="generic-framework-box">
+                                <span class="framework-tag">Generic Carbon Framework:</span>
+                                <code id="generic-framework-code" class="framework-code">--</code>
+                                <span class="framework-help">All heteroatoms normalized to Carbon; all bonds converted to single bonds (Murcko carbon skeleton).</span>
+                            </div>
+                        </div>
+
+                        <!-- Peripheral Substituents (R-Groups) Section -->
+                        <div class="scaffold-substituents-section">
+                            <div class="substituents-header">
+                                <div>
+                                    <h3>Peripheral Substituents (R-Groups)</h3>
+                                    <p>Side chains that modify bioactivity, solubility, and selectivity without altering the core scaffold.</p>
+                                </div>
+                            </div>
+
+                            <div id="substituents-grid" class="substituents-grid">
+                                <!-- Dynamic substituent cards rendered here -->
+                            </div>
+                        </div>
+
+                        <!-- Bioactivity Predictions & Descriptors Row -->
+                        <div class="scaffold-sar-predictions-row">
+                            
+                            <!-- COX-2 Card -->
+                            <div class="prediction-target-card" id="card-cox2">
+                                <div class="target-card-header">
+                                    <span class="target-badge-pill badge-cox2">COX-2</span>
+                                    <span id="cox2-outcome-badge" class="outcome-badge">--</span>
+                                </div>
+                                <h4 class="target-model-name">Final XGBoost Model</h4>
+                                <div class="target-score-display">
+                                    <span class="score-label">Model Score:</span>
+                                    <strong id="cox2-score-val" class="score-val">--%</strong>
+                                </div>
+                                <div class="target-threshold-row">
+                                    <span>Decision Threshold:</span>
+                                    <strong>50.0%</strong>
+                                </div>
+                                <p class="target-note">Target: Prostaglandin G/H Synthase 2 (UniProt P35354)</p>
+                            </div>
+
+                            <!-- EGFR Card -->
+                            <div class="prediction-target-card" id="card-egfr">
+                                <div class="target-card-header">
+                                    <span class="target-badge-pill badge-egfr">EGFR</span>
+                                    <span id="egfr-outcome-badge" class="outcome-badge">--</span>
+                                </div>
+                                <h4 class="target-model-name">Tuned EGFR XGBoost Model</h4>
+                                <div class="target-score-display">
+                                    <span class="score-label">Calibrated Probability:</span>
+                                    <strong id="egfr-score-val" class="score-val">--%</strong>
+                                </div>
+                                <div class="target-threshold-row">
+                                    <span>Decision Threshold:</span>
+                                    <strong>44.0%</strong>
+                                </div>
+                                <p class="target-note">Target: Epidermal Growth Factor Receptor (UniProt P00533)</p>
+                            </div>
+
+                            <!-- Molecular Descriptors Card -->
+                            <div class="scaffold-descriptors-card">
+                                <h4>Molecular Descriptors</h4>
+                                <div class="descriptors-mini-grid" id="single-descriptors-grid">
+                                    <div class="mini-desc-item">
+                                        <span class="d-k">MW</span>
+                                        <strong class="d-v" id="desc-mw">--</strong>
+                                        <span class="d-sub">g/mol</span>
+                                    </div>
+                                    <div class="mini-desc-item">
+                                        <span class="d-k">LogP</span>
+                                        <strong class="d-v" id="desc-logp">--</strong>
+                                        <span class="d-sub">lipophilicity</span>
+                                    </div>
+                                    <div class="mini-desc-item">
+                                        <span class="d-k">TPSA</span>
+                                        <strong class="d-v" id="desc-tpsa">--</strong>
+                                        <span class="d-sub">&Aring;&sup2;</span>
+                                    </div>
+                                    <div class="mini-desc-item">
+                                        <span class="d-k">HBD</span>
+                                        <strong class="d-v" id="desc-hbd">--</strong>
+                                        <span class="d-sub">donors</span>
+                                    </div>
+                                    <div class="mini-desc-item">
+                                        <span class="d-k">HBA</span>
+                                        <strong class="d-v" id="desc-hba">--</strong>
+                                        <span class="d-sub">acceptors</span>
+                                    </div>
+                                    <div class="mini-desc-item">
+                                        <span class="d-k">RotB</span>
+                                        <strong class="d-v" id="desc-rotb">--</strong>
+                                        <span class="d-sub">rotatable</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- =========================================================
+                     PANEL 2: MULTI-MOLECULE SERIES COMPARISON
+                     ========================================================= -->
+                <div id="scaffold-multi-panel" class="scaffold-panel" role="tabpanel" aria-labelledby="tab-btn-multi" hidden style="display: none;">
+                    <div class="scaffold-input-card">
+                        <div class="card-heading">
+                            <div>
+                                <span class="card-number">02</span>
+                                <h3>Multi-Molecule Library Comparison</h3>
+                            </div>
+                            <span class="input-tag">SAR &amp; CLUSTERING</span>
+                        </div>
+
+                        <form id="scaffold-multi-form" class="scaffold-form">
+                            <label for="multi-smiles-input" class="scaffold-label">
+                                Enter multiple molecules (one per line, format: <code>SMILES CompoundName</code> or common drug names):
+                            </label>
+
+                            <textarea
+                                id="multi-smiles-input"
+                                name="multi_smiles"
+                                rows="6"
+                                class="scaffold-textarea multi-textarea"
+                                placeholder="Example:
+COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1 Gefitinib
+C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1 Erlotinib
+CC(=O)Oc1ccccc1C(=O)O Aspirin
+OC(=O)c1ccccc1O Salicylic Acid
+CC1=CC=C(C=C1)C2=CC(=NN2C3=CC=C(C=C3)S(=O)(=O)N)C(F)(F)F Celecoxib"
+                                required
+                                spellcheck="false"
+                            ></textarea>
+
+                            <!-- Pre-loaded Series Buttons -->
+                            <div class="quick-samples-row">
+                                <span class="quick-label">Load curated series:</span>
+                                <div class="quick-pills-wrap">
+                                    <button type="button" class="quick-sample-pill series-pill" id="load-series-egfr">
+                                        EGFR Quinazoline Series (Gefitinib, Erlotinib, Lapatinib)
+                                    </button>
+                                    <button type="button" class="quick-sample-pill series-pill" id="load-series-cox2">
+                                        COX-2 Diarylpyrazoles (Celecoxib, Mavacoxib, Valdecoxib)
+                                    </button>
+                                    <button type="button" class="quick-sample-pill series-pill" id="load-series-salicylate">
+                                        NSAID Salicylates (Aspirin, Salicylic Acid, Diflunisal)
+                                    </button>
+                                    <button type="button" class="quick-sample-pill series-pill" id="load-series-diverse">
+                                        Cross-Target Diverse Library (4 Chemotypes)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="primary-button scaffold-submit-btn" id="multi-submit-btn">
+                                <span class="btn-text">Group by Scaffold &amp; Analyze SAR</span>
+                                <span aria-hidden="true">&rarr;</span>
+                            </button>
+
+                            <div id="multi-status" class="scaffold-status" role="status" aria-live="polite"></div>
+                            <div id="multi-error" class="scaffold-error" role="alert" hidden style="display: none;"></div>
+                        </form>
+                    </div>
+
+                    <!-- Multi-Molecule Results Container -->
+                    <div id="multi-results-container" class="scaffold-results-container" hidden style="display: none;">
+                        
+                        <!-- Summary Bar -->
+                        <div class="multi-summary-bar">
+                            <div class="summary-metric">
+                                <span class="sum-label">Molecules Analyzed</span>
+                                <strong id="multi-total-count" class="sum-val">0</strong>
+                            </div>
+                            <div class="summary-metric">
+                                <span class="sum-label">Unique Scaffolds</span>
+                                <strong id="multi-scaffold-count" class="sum-val">0</strong>
+                            </div>
+                            <div class="summary-metric">
+                                <span class="sum-label">Scaffold Clusters</span>
+                                <strong id="multi-cluster-count" class="sum-val">0</strong>
+                            </div>
+                        </div>
+
+                        <!-- Scaffold Group Clusters -->
+                        <div class="scaffold-clusters-wrap">
+                            <div class="section-subheading">
+                                <h3>Scaffold Chemotype Clusters</h3>
+                                <p>Molecules grouped by 100% identical Bemis-Murcko core. Compares substituent modifications and predicted bioactivity shifts.</p>
+                            </div>
+
+                            <div id="scaffold-groups-list" class="scaffold-groups-list">
+                                <!-- Dynamic cluster cards generated here -->
+                            </div>
+                        </div>
+
+                        <!-- Topological Similarity Matrix (Tanimoto Similarity) -->
+                        <div class="tanimoto-matrix-card">
+                            <div class="matrix-card-header">
+                                <div>
+                                    <h3>Morgan Fingerprint Tanimoto Similarity Matrix</h3>
+                                    <p>Whole-molecule topological structural similarity calculated across all pairs using 2048-bit Morgan fingerprints (radius 2).</p>
+                                </div>
+                            </div>
+
+                            <div class="matrix-table-wrap">
+                                <table class="tanimoto-table" id="tanimoto-matrix-table">
+                                    <!-- Rendered dynamically -->
+                                </table>
+                            </div>
+
+                            <div class="scientific-distinction-callout" role="note">
+                                <div class="callout-icon" aria-hidden="true">💡</div>
+                                <div class="callout-body">
+                                    <h4>Scientific Distinction: Scaffold Matching vs. Molecular Similarity</h4>
+                                    <p id="distinction-note-text">
+                                        <strong>Scaffold matching</strong> identifies 100% equivalence of the central ring-and-linker core. 
+                                        In contrast, <strong>Morgan Fingerprint Tanimoto similarity</strong> measures whole-molecule topological bit overlap, 
+                                        which includes peripheral substituents and functional groups. Two molecules can share an identical core yet have modest whole-molecule 
+                                        similarity if their substituents differ significantly in size, polarity, or branching.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- =========================================================
+                     SCIENTIFIC BACKGROUND & EDUCATIONAL GUIDE
+                     ========================================================= -->
+                <section class="section scaffold-guide-section">
+                    <div class="section-subheading">
+                        <div class="section-badge">Educational Primer</div>
+                        <h3>Understanding Bemis-Murcko <span>Scaffold Analysis</span></h3>
+                        <p>How computational chemists partition molecular architectures into cores and substituents.</p>
+                    </div>
+
+                    <div class="scaffold-primer-grid">
+                        <div class="primer-card">
+                            <div class="primer-icon">🏛️</div>
+                            <h4>What is a Bemis-Murcko Scaffold?</h4>
+                            <p>
+                                Introduced in 1996 by Guy Bemis and Mark Murcko, a scaffold is defined as the 
+                                <strong>all-ring systems plus the connecting linkers between rings</strong> in a molecule. 
+                                Terminal non-ring chains (such as methyl, hydroxyl, or halogen groups) are classified as peripheral substituents.
+                            </p>
+                        </div>
+
+                        <div class="primer-card">
+                            <div class="primer-icon">🔄</div>
+                            <h4>What is Scaffold Hopping?</h4>
+                            <p>
+                                Scaffold hopping involves replacing a molecule's core framework with a structurally distinct ring system 
+                                while preserving key functional groups that interact with the biological target. It is used to overcome patent barriers, 
+                                improve metabolic stability, or reduce off-target toxicity.
+                            </p>
+                        </div>
+
+                        <div class="primer-card">
+                            <div class="primer-icon">🎯</div>
+                            <h4>Structure-Activity Relationships (SAR)</h4>
+                            <p>
+                                Investigating a series of molecules with a shared scaffold allows researchers to observe how small peripheral substituent 
+                                changes correlate with changes in biological potency or machine-learning model scores, identifying optimal R-group substitutions.
+                            </p>
+                        </div>
+
+                        <div class="primer-card warning-primer">
+                            <div class="primer-icon">⚠️</div>
+                            <h4>Important Limitations</h4>
+                            <p>
+                                An identical scaffold does not guarantee identical biological activity. A single halogen substitution can create an 
+                                <em>activity cliff</em> that eliminates binding. Predictions presented in BAMI are computational machine-learning estimates 
+                                and must be confirmed with wet-lab experimental validation.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Project Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-bottom">
+                <span>
+                    BAMI <sub>Bioactive Molecule Intelligence</sub> · Molecular Scaffold Analysis Engine. Computational predictions are research leads, not medical proof.
+                </span>
+            </div>
+        </div>
+    </footer>
+
+        </div><!-- /.app-main-content -->
+    </div><!-- /.app-layout -->
+
+    <!-- Unified Workspace Sidebar -->
+    <script src="sidebar.js?v=50"></script>
+
+    <!-- Molecule Autocomplete & Suggestion Engine -->
+    <script src="molecule-suggestions.js?v=35"></script>
+
+    <!-- Scaffold Analysis Page Controller -->
+    <script src="scaffold-analysis.js?v=1"></script>
+
+    <!-- Authentication Integration -->
+    <script type="module" src="auth.js?v=2"></script>
+
+    <!-- 3D WebGL Particle-Wave Visualization Background -->
+    <script type="module" src="particle-wave.js?v=8"></script>
+
+</body>
+</html>

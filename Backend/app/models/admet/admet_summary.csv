@@ -1,0 +1,11 @@
+Endpoint,Category,Task,Total Compounds,Primary Metric,Secondary Metric,Tertiary Metric,Source
+Aqueous Solubility (logS),Absorption,Regression,1128,R2 = 0.863,RMSE = 0.806,MAE = 0.554,"Delaney (2004) ESOL, J. Chem. Inf. Comput. Sci."
+Caco-2 Permeability,Absorption,Regression,910,R2 = 0.718,RMSE = 0.423,MAE = 0.319,Wang et al. (2016) / TDC Benchmark
+Human Intestinal Absorption (HIA),Absorption,Classification,578,ROC-AUC = 0.949,PR-AUC = 0.992,F1 = 0.955,Hou et al. / TDC Benchmark
+Blood-Brain Barrier Penetration (BBBP),Distribution,Classification,2039,ROC-AUC = 0.953,PR-AUC = 0.984,F1 = 0.939,Martins et al. (2012) / MoleculeNet
+CYP3A4 Inhibition,Metabolism,Classification,12328,ROC-AUC = 0.876,PR-AUC = 0.844,F1 = 0.756,Veith et al. (2009) / PubChem AID 1851 / TDC
+CYP2D6 Inhibition,Metabolism,Classification,13130,ROC-AUC = 0.866,PR-AUC = 0.692,F1 = 0.618,Veith et al. (2009) / PubChem AID 1851 / TDC
+CYP2C9 Inhibition,Metabolism,Classification,12092,ROC-AUC = 0.882,PR-AUC = 0.781,F1 = 0.727,Veith et al. (2009) / PubChem AID 1851 / TDC
+Ames Mutagenicity,Toxicity,Classification,7278,ROC-AUC = 0.870,PR-AUC = 0.879,F1 = 0.783,Hansen et al. (2009) / TDC Benchmark
+Drug-Induced Liver Injury (DILI),Toxicity,Classification,475,ROC-AUC = 0.860,PR-AUC = 0.851,F1 = 0.787,FDA DILIst Benchmark / TDC
+hERG Cardiotoxicity,Toxicity,Classification,655,ROC-AUC = 0.909,PR-AUC = 0.959,F1 = 0.872,Karim et al. / Wang et al. / TDC Benchmark

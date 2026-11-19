@@ -541,6 +541,32 @@
         return null;
     }
 
+    function findBioactiveMoleculeBySmiles(smiles) {
+        if (!smiles) return null;
+        const clean = smiles.trim();
+        for (const mol of BIOACTIVE_MOLECULES) {
+            if (mol.smiles === clean) return mol;
+        }
+        if (window.RDKitModule) {
+            try {
+                const m1 = window.RDKitModule.get_mol(clean);
+                if (m1) {
+                    const canon1 = m1.get_smiles();
+                    m1.delete();
+                    for (const mol of BIOACTIVE_MOLECULES) {
+                        const m2 = window.RDKitModule.get_mol(mol.smiles);
+                        if (m2) {
+                            const canon2 = m2.get_smiles();
+                            m2.delete();
+                            if (canon1 === canon2) return mol;
+                        }
+                    }
+                }
+            } catch (_) {}
+        }
+        return null;
+    }
+
     /* =========================================================
        4. MOLECULE AUTOCOMPLETE CONTROLLER CLASS
        Features:
@@ -1124,6 +1150,7 @@
     global.BAMI = global.BAMI || {};
     global.BAMI.BIOACTIVE_MOLECULES = BIOACTIVE_MOLECULES;
     global.BAMI.findBioactiveMoleculeByName = findBioactiveMoleculeByName;
+    global.BAMI.findBioactiveMoleculeBySmiles = findBioactiveMoleculeBySmiles;
     global.BAMI.initMoleculeAutocomplete = initMoleculeAutocomplete;
     global.initMoleculeAutocomplete = initMoleculeAutocomplete;
 

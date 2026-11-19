@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simulate authentic AutoDock Vina molecular docking against COX-2 (PDB 6COX) and EGFR (PDB 1M17) with 3D protein-ligand visualization.">
+    <title>BAMI | Molecular Docking Simulation</title>
+    <link rel="stylesheet" href="style.css?v=48">
+    <link rel="stylesheet" href="sidebar.css?v=50">
+    <link rel="stylesheet" href="ui-enhancements.css?v=50">
+    <link rel="stylesheet" href="docking.css?v=50">
+    <!-- 3Dmol.js for WebGL Protein-Ligand Molecular Rendering -->
+    <script src="assets/3Dmol-min.js"></script>
+</head>
+
+<body>
+    <div id="bami-layout" class="app-layout">
+        <!-- Unified BAMI Workspace Sidebar (loaded by sidebar.js) -->
+        <div id="bami-sidebar-placeholder"></div>
+
+        <div class="app-main-content">
+            <!-- Topbar (loaded by sidebar.js) -->
+            <div id="bami-topbar-placeholder"></div>
+
+            <main class="docking-main">
+                <!-- Page Section Header -->
+                <section class="section docking-hero-section">
+                    <div class="section-heading">
+                        <div class="section-badge">Structural Biophysics</div>
+                        <h2>Molecular Docking <span>Simulation</span></h2>
+                        <p>
+                            Execute authentic <strong>AutoDock Vina</strong> physics-based ligand-protein docking against 
+                            crystallographic targets <strong>COX-2 (PDB: 6COX)</strong> and <strong>EGFR (PDB: 1M17)</strong>. 
+                            Live physics execution, binding affinity calculation, and 3D WebGL binding site visualization.
+                        </p>
+                    </div>
+
+                    <!-- Main Docking Grid -->
+                    <div class="docking-grid-container">
+
+                        <!-- Left Column: Controls & Simulation Status -->
+                        <div class="docking-controls-col">
+
+                            <!-- Target Selection Card -->
+                            <div class="docking-card target-selection-card">
+                                <div class="card-heading">
+                                    <div>
+                                        <span class="card-number">01</span>
+                                        <h3>Target Receptor Selection</h3>
+                                    </div>
+                                    <span class="dock-tag">CRYSTALLOGRAPHIC RECEPTORS</span>
+                                </div>
+
+                                <div class="target-toggle-group" role="radiogroup" aria-label="Receptor Target">
+                                    <button type="button" class="target-toggle-btn active" data-target="COX-2" id="target-cox2-btn">
+                                        <span class="target-radio-indicator"></span>
+                                        <div class="target-btn-info">
+                                            <div class="target-title-row">
+                                                <strong>COX-2</strong>
+                                                <span class="pdb-pill">PDB: 6COX</span>
+                                            </div>
+                                            <span class="target-subtitle">Cyclooxygenase-2 · 2.80 Å</span>
+                                        </div>
+                                    </button>
+
+                                    <button type="button" class="target-toggle-btn" data-target="EGFR" id="target-egfr-btn">
+                                        <span class="target-radio-indicator"></span>
+                                        <div class="target-btn-info">
+                                            <div class="target-title-row">
+                                                <strong>EGFR</strong>
+                                                <span class="pdb-pill">PDB: 1M17</span>
+                                            </div>
+                                            <span class="target-subtitle">Kinase Domain · 2.60 Å</span>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                <!-- Dynamic Receptor Metadata Summary -->
+                                <div class="receptor-meta-panel" id="receptor-meta-panel">
+                                    <div class="receptor-meta-header">
+                                        <div class="receptor-id-badge" id="receptor-pdb-id">PDB: 6COX</div>
+                                        <a href="https://www.rcsb.org/structure/6COX" target="_blank" rel="noopener noreferrer" class="rcsb-link" id="rcsb-external-link">
+                                            <span>RCSB PDB Record</span>
+                                            <span aria-hidden="true">↗</span>
+                                        </a>
+                                    </div>
+                                    <p class="receptor-desc" id="receptor-desc">
+                                        Murine Cyclooxygenase-2 in complex with selective inhibitor SC-558. Active site pocket is 100% homologous to human COX-2.
+                                    </p>
+                                    <div class="receptor-coords-grid">
+                                        <div class="coord-item">
+                                            <span class="coord-label">Pocket Center</span>
+                                            <strong id="pocket-center-text">X: 23.67, Y: 23.31, Z: 47.83</strong>
+                                        </div>
+                                        <div class="coord-item">
+                                            <span class="coord-label">Grid Box</span>
+                                            <strong id="pocket-box-text">18.0 × 18.0 × 18.0 Å</strong>
+                                        </div>
+                                        <div class="coord-item">
+                                            <span class="coord-label">Reference Inhibitor</span>
+                                            <strong id="reference-inhibitor-text">SC-558 / Celecoxib</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Molecule Input Card -->
+                            <div class="docking-card molecule-input-card">
+                                <div class="card-heading">
+                                    <div>
+                                        <span class="card-number">02</span>
+                                        <h3>Ligand Molecule</h3>
+                                    </div>
+                                    <span class="dock-tag">SMILES OR COMPOUND</span>
+                                </div>
+
+                                <label for="docking-smiles-input" class="field-label">Enter Molecule Name or SMILES</label>
+                                <div class="molecule-search-container" id="docking-search-container">
+                                    <textarea
+                                        id="docking-smiles-input"
+                                        name="smiles"
+                                        placeholder="Example: aspirin, celecoxib, erlotinib, or CC(=O)Oc1ccccc1C(=O)O"
+                                        rows="3"
+                                        required
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                    ></textarea>
+                                    <div id="docking-suggestions-dropdown" class="molecule-suggestions-dropdown" hidden></div>
+                                </div>
+
+                                <!-- Preset Quick Pills -->
+                                <div class="docking-presets-row">
+                                    <span class="presets-label">Reference Leads:</span>
+                                    <button type="button" class="preset-pill" data-smiles="CC(=O)Oc1ccccc1C(=O)O" data-target="COX-2" data-name="Aspirin">Aspirin (COX-2)</button>
+                                    <button type="button" class="preset-pill" data-smiles="CC1=CC=C(C=C1)C2=CC(=NN2C3=CC=C(C=C3)S(=O)(=O)N)C(F)(F)F" data-target="COX-2" data-name="Celecoxib">Celecoxib (COX-2)</button>
+                                    <button type="button" class="preset-pill" data-smiles="COCCOC1=C(C=C2C(=C1)C(=NC=N2)NC3=CC=CC(=C3)C#C)OCCOC" data-target="EGFR" data-name="Erlotinib">Erlotinib (EGFR)</button>
+                                    <button type="button" class="preset-pill" data-smiles="COC1=C(C=C2C(=C1)N=CN=C2NC3=CC(=C(C=C3)F)Cl)OCCCN4CCOCC4" data-target="EGFR" data-name="Gefitinib">Gefitinib (EGFR)</button>
+                                </div>
+
+                                <!-- Search options: Exhaustiveness -->
+                                <div class="exhaustiveness-control">
+                                    <label for="exhaustiveness-select">Search Exhaustiveness</label>
+                                    <select id="exhaustiveness-select">
+                                        <option value="2">Fast Screening (Exhaustiveness: 2 · ~2-3s)</option>
+                                        <option value="4" selected>Standard Vina Search (Exhaustiveness: 4 · ~4-6s)</option>
+                                        <option value="8">Rigorous Optimization (Exhaustiveness: 8 · ~8-12s)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Run Docking Button -->
+                                <div class="docking-actions">
+                                    <button type="button" class="primary-button run-docking-btn" id="run-docking-btn">
+                                        <span class="btn-icon">🚀</span>
+                                        <span class="btn-text">Run AutoDock Vina Simulation</span>
+                                        <span class="btn-arrow" aria-hidden="true">→</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Live Simulation Status Panel -->
+                            <div class="docking-card status-card" id="docking-status-card">
+                                <div class="card-heading">
+                                    <div>
+                                        <span class="card-number">03</span>
+                                        <h3>Docking Simulation Status</h3>
+                                    </div>
+                                    <span class="status-indicator-badge not-started" id="docking-status-badge">
+                                        <span class="status-dot"></span>
+                                        <span id="docking-status-label">Not Started</span>
+                                    </span>
+                                </div>
+
+                                <!-- Progress Bar Track -->
+                                <div class="docking-progress-track">
+                                    <div class="docking-progress-fill" id="docking-progress-bar" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress-labels-row">
+                                    <span class="progress-percent" id="docking-progress-percent">0%</span>
+                                    <span class="progress-stage-name" id="docking-stage-title">Waiting to start simulation…</span>
+                                </div>
+
+                                <!-- Live Stage Log Message -->
+                                <div class="docking-stage-box" id="docking-stage-box">
+                                    <p class="stage-text" id="docking-stage-msg">
+                                        Select a protein target and provide a ligand SMILES, then click "Run AutoDock Vina Simulation".
+                                    </p>
+                                </div>
+
+                                <!-- Error Alert Box (Hidden unless Failed) -->
+                                <div class="docking-error-box" id="docking-error-box" hidden>
+                                    <div class="error-icon">⚠️</div>
+                                    <div class="error-body">
+                                        <h4>Simulation Error</h4>
+                                        <p id="docking-error-message">Error details</p>
+                                        <button type="button" class="retry-docking-btn" id="retry-docking-btn">
+                                            <span>🔄 Retry Docking Simulation</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><!-- /.docking-controls-col -->
+
+                        <!-- Right Column: 3D Visualization & Binding Results -->
+                        <div class="docking-visuals-col">
+
+                            <!-- Binding Affinity & Metric Card (Visible when Completed) -->
+                            <div class="docking-card affinity-results-card" id="affinity-results-card" hidden>
+                                <div class="card-heading">
+                                    <div>
+                                        <span class="card-number">04</span>
+                                        <h3>AutoDock Vina Results</h3>
+                                    </div>
+                                    <span class="dock-tag success-tag">COMPLETED</span>
+                                </div>
+
+                                <div class="affinity-hero-banner">
+                                    <div class="affinity-metric-group">
+                                        <span class="affinity-kicker">Predicted Free Energy of Binding (&Delta;G)</span>
+                                        <div class="affinity-value-row">
+                                            <span class="affinity-number" id="best-affinity-val">--</span>
+                                            <span class="affinity-unit">kcal/mol</span>
+                                        </div>
+                                        <div class="affinity-badge-pill" id="affinity-strength-badge">Strong Binding</div>
+                                    </div>
+
+                                    <div class="affinity-meta-stats">
+                                        <div class="meta-stat-item">
+                                            <span class="stat-lbl">Target Receptor</span>
+                                            <strong id="results-target-pdb">--</strong>
+                                        </div>
+                                        <div class="meta-stat-item">
+                                            <span class="stat-lbl">Docking Completion Time</span>
+                                            <strong id="docking-time-val">--</strong>
+                                        </div>
+                                        <div class="meta-stat-item">
+                                            <span class="stat-lbl">Contact Residues</span>
+                                            <strong id="contact-residues-count">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Binding Modes Ranking Table -->
+                                <div class="modes-table-container">
+                                    <h4>Ranked Binding Poses</h4>
+                                    <table class="vina-modes-table" id="vina-modes-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Mode</th>
+                                                <th>Affinity (&Delta;G)</th>
+                                                <th>RMSD l.b.</th>
+                                                <th>RMSD u.b.</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="vina-modes-tbody">
+                                            <!-- Dynamically filled -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Contact Residues Tags -->
+                                <div class="contacts-container">
+                                    <h4>Active Site Contact Residues (&le; 4.5 Å)</h4>
+                                    <div class="contact-pills-list" id="contact-pills-list">
+                                        <!-- Dynamically filled -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3D WebGL Molecular Viewer Card -->
+                            <div class="docking-card viewport-card">
+                                <div class="card-heading">
+                                    <div>
+                                        <span class="card-number">05</span>
+                                        <h3>3D Protein-Ligand Complex Viewer</h3>
+                                    </div>
+                                    <span class="viewer-tech-badge">WebGL · 3Dmol.js</span>
+                                </div>
+
+                                <!-- 3Dmol.js Canvas Viewport -->
+                                <div class="viewer-3d-wrapper">
+                                    <div id="docking-3dmol-viewport" class="docking-3dmol-viewport"></div>
+
+                                    <!-- Placeholder Overlay when Not Started or Loading -->
+                                    <div class="viewport-placeholder" id="viewport-placeholder">
+                                        <div class="placeholder-content">
+                                            <span class="placeholder-icon">🧬</span>
+                                            <h4 id="placeholder-title">3D Molecular Viewport Ready</h4>
+                                            <p id="placeholder-msg">Run docking to visualize the crystallographic protein receptor and the lowest-energy ligand binding pose in 3D.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Viewport Overlay Toolbar -->
+                                    <div class="viewport-toolbar" id="viewport-toolbar">
+                                        <button type="button" class="view-btn" id="view-focus-ligand-btn" title="Focus camera on docked ligand">🎯 Focus Ligand</button>
+                                        <button type="button" class="view-btn" id="view-toggle-surface-btn" title="Toggle receptor molecular surface">🌐 Surface</button>
+                                        <button type="button" class="view-btn" id="view-style-btn" title="Cycle cartoon / wireframe / sticks">🎨 Style</button>
+                                        <button type="button" class="view-btn" id="view-reset-camera-btn" title="Reset camera view">↺ Reset View</button>
+                                        <button type="button" class="view-btn" id="view-fullscreen-btn" title="Toggle full window view">⛶ Fullscreen</button>
+                                    </div>
+
+                                    <!-- Legend Overlay -->
+                                    <div class="viewport-legend" id="viewport-legend">
+                                        <div class="legend-item"><span class="legend-color ribbon-color"></span> Receptor Ribbon</div>
+                                        <div class="legend-item"><span class="legend-color pocket-color"></span> Active Pocket Residues</div>
+                                        <div class="legend-item"><span class="legend-color ligand-color"></span> Docked Ligand Pose</div>
+                                    </div>
+                                </div>
+
+                                <p class="viewport-instructions">
+                                    <strong>Interactive Orbit Controls:</strong> Left-click &amp; drag to rotate · Scroll or Right-click &amp; drag to zoom · Middle-click to pan.
+                                </p>
+                            </div>
+
+                        </div><!-- /.docking-visuals-col -->
+
+                    </div><!-- /.docking-grid-container -->
+                </section>
+            </main>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <div class="footer-bottom">
+                    <span>BAMI <sub>Bioactive Molecule Intelligence</sub> · Molecular Docking Engine (AutoDock Vina v1.2.7)</span>
+                </div>
+            </footer>
+        </div><!-- /.app-main-content -->
+    </div><!-- /.app-layout -->
+
+    <!-- Scripts -->
+    <script src="sidebar.js?v=50"></script>
+    <script src="molecule-suggestions.js?v=50"></script>
+    <script src="docking.js?v=50"></script>
+    <script type="module" src="particle-wave.js?v=8"></script>
+</body>
+</html>

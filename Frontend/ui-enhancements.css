@@ -1,0 +1,890 @@
+/* =========================================================
+   BAMI REFINED UI ENHANCEMENTS
+   Lightweight, professional micro-interactions, smooth page
+   transitions, tactile button responses, card hover lifts,
+   and layered subtle shadows.
+   Zero backend impact. Pure CSS hardware-accelerated animations.
+   ========================================================= */
+
+/* =========================================================
+   1. PAGE ENTRANCE & CONTAINER TRANSITIONS
+   ========================================================= */
+@keyframes bamiPageFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.app-main-content {
+    animation: bamiPageFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: opacity, transform;
+}
+
+/* Smooth reveal for dynamically calculated result containers */
+@keyframes bamiResultReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+#result-section:not([hidden]),
+#single-results-container:not([hidden]),
+#multi-results-container:not([hidden]),
+#admet-results-container:not([hidden]),
+#batch-results:not([hidden]),
+#drug-results:not([hidden]) {
+    animation: bamiResultReveal 0.36s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: opacity, transform;
+}
+
+/* =========================================================
+   2. CARD HOVER LIFTS & LAYERED SUBTLE SHADOWS
+   ========================================================= */
+.input-card,
+.structure-card,
+.result-card,
+.descriptors-card,
+.batch-screening-card,
+.scaffold-card,
+.visual-card,
+.group-card,
+.matrix-card,
+.admet-card,
+.admet-pillar-card,
+.scorecard-panel,
+.category-panel,
+.history-card,
+.bento-card,
+.target-card,
+.pipeline-step-card,
+.concept-card,
+.substituent-card,
+.descriptors-summary-card {
+    transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 26px rgba(48, 35, 71, 0.05), 0 1px 3px rgba(48, 35, 71, 0.02);
+}
+
+.input-card:hover,
+.structure-card:hover,
+.descriptors-card:hover,
+.batch-screening-card:hover,
+.scaffold-card:hover,
+.visual-card:hover,
+.group-card:hover,
+.matrix-card:hover,
+.admet-card:hover,
+.history-card:hover,
+.target-card:hover,
+.substituent-card:hover {
+    transform: translateY(-3.5px);
+    box-shadow: 0 18px 42px rgba(48, 35, 71, 0.095), 0 4px 12px rgba(48, 35, 71, 0.04);
+    border-color: rgba(167, 139, 250, 0.55);
+}
+
+/* =========================================================
+   3. BUTTON ANIMATIONS & TACTILE PRESS
+   ========================================================= */
+.primary-button,
+.secondary-button,
+.cta-btn-get-started,
+.cta-btn-primary,
+.cta-btn-secondary,
+.cta-btn-glass,
+.sample-pill-btn,
+.quick-suggestion-pill,
+.scaffold-tab-btn,
+.btn-primary,
+.btn-secondary,
+.topbar-action-btn,
+.sidebar-auth-btn {
+    transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.18s ease,
+                border-color 0.18s ease,
+                color 0.18s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Subtle elevation lift on hover */
+.primary-button:hover,
+.cta-btn-primary:hover,
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(101, 31, 255, 0.32);
+}
+
+.secondary-button:hover,
+.cta-btn-secondary:hover,
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(48, 35, 71, 0.08);
+}
+
+/* Tactile button press feedback */
+.primary-button:active,
+.secondary-button:active,
+.cta-btn-get-started:active,
+.cta-btn-primary:active,
+.cta-btn-secondary:active,
+.cta-btn-glass:active,
+.sample-pill-btn:active,
+.quick-suggestion-pill:active,
+.btn-primary:active,
+.btn-secondary:active,
+.topbar-action-btn:active {
+    transform: translateY(1.5px) scale(0.975) !important;
+    box-shadow: 0 2px 6px rgba(101, 31, 255, 0.18) !important;
+}
+
+/* Sample pill buttons refinement */
+.sample-pill-btn,
+.quick-suggestion-pill {
+    cursor: pointer;
+    border: 1px solid rgba(200, 168, 233, 0.55);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 2px 6px rgba(48, 35, 71, 0.04);
+}
+
+.sample-pill-btn:hover,
+.quick-suggestion-pill:hover {
+    transform: translateY(-2px);
+    background: #FFFFFF;
+    border-color: #8B5CF6;
+    color: #5B21B6;
+    box-shadow: 0 6px 16px rgba(101, 31, 255, 0.14);
+}
+
+/* =========================================================
+   4. FORM INPUTS & INTERACTIVE FOCUS STATES
+   ========================================================= */
+input[type="text"],
+input[type="file"],
+textarea,
+select,
+.smiles-input {
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus,
+.smiles-input:focus {
+    border-color: #651FFF !important;
+    box-shadow: 0 0 0 3.5px rgba(101, 31, 255, 0.16), 0 4px 16px rgba(101, 31, 255, 0.06) !important;
+    background-color: #FFFFFF !important;
+}
+
+/* =========================================================
+   5. TABS & SEGMENTED SWITCHERS
+   ========================================================= */
+.scaffold-tabs-bar {
+    display: inline-flex;
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(238, 232, 250, 0.7);
+    border: 1px solid rgba(200, 168, 233, 0.4);
+    box-shadow: inset 0 2px 4px rgba(48, 35, 71, 0.04);
+}
+
+.scaffold-tab-btn {
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-weight: 600;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+}
+
+.scaffold-tab-btn.active {
+    background: linear-gradient(135deg, #651FFF 0%, #8B5CF6 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(101, 31, 255, 0.32) !important;
+}
+
+/* =========================================================
+   6. STATUS PILLS & BADGE BREATHING ANIMATION
+   ========================================================= */
+@keyframes bamiStatusPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+}
+
+.status-indicator-dot,
+.caption-dot,
+.hud-chip-dot {
+    animation: bamiStatusPulse 2.4s infinite ease-in-out;
+}
+
+/* =========================================================
+   7. TABLE ROW MICRO-INTERACTIONS
+   ========================================================= */
+.batch-results-table tbody tr,
+.admet-metrics-table tbody tr,
+.matrix-table tbody tr,
+.history-table tbody tr {
+    transition: background-color 0.16s ease, transform 0.16s ease;
+}
+
+.batch-results-table tbody tr:hover,
+.admet-metrics-table tbody tr:hover,
+.matrix-table tbody tr:hover,
+.history-table tbody tr:hover {
+    background-color: rgba(101, 31, 255, 0.035);
+}
+
+/* =========================================================
+   PREDICTION INFERENCE PIPELINE STEPPER
+   Animated Molecular Spinner & Real API Request Stages
+   ========================================================= */
+.prediction-pipeline-card {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(200, 168, 233, 0.65);
+    border-radius: 22px;
+    padding: 26px 30px;
+    margin: 30px auto 35px;
+    box-shadow: 0 14px 40px rgba(48, 35, 71, 0.08);
+    position: relative;
+    overflow: hidden;
+    animation: bamiResultReveal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pipeline-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(229, 221, 242, 0.6);
+    margin-bottom: 22px;
+}
+
+.pipeline-header-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.pipeline-header-title h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1E1530;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.pipeline-header-title p {
+    font-size: 13.5px;
+    color: #654E82;
+    margin: 3px 0 0;
+}
+
+/* Animated Molecular Graphic Spinner */
+.molecular-spinner {
+    width: 44px;
+    height: 44px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 200px;
+}
+
+.spinner-nucleus {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #651FFF 0%, #A855F7 100%);
+    box-shadow: 0 0 12px #651FFF;
+    animation: nucleusPulse 1.8s infinite ease-in-out;
+    z-index: 2;
+}
+
+@keyframes nucleusPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.82); opacity: 0.75; }
+}
+
+.spinner-orbit {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(139, 92, 246, 0.4);
+}
+
+.orbit-1 {
+    transform: rotateX(70deg) rotateZ(0deg);
+    animation: orbitSpin1 3s linear infinite;
+}
+
+.orbit-2 {
+    transform: rotateX(70deg) rotateZ(60deg);
+    animation: orbitSpin2 2.6s linear infinite reverse;
+}
+
+.orbit-3 {
+    transform: rotateX(70deg) rotateZ(120deg);
+    animation: orbitSpin3 3.4s linear infinite;
+}
+
+@keyframes orbitSpin1 {
+    from { transform: rotateX(70deg) rotateZ(0deg); }
+    to { transform: rotateX(70deg) rotateZ(360deg); }
+}
+
+@keyframes orbitSpin2 {
+    from { transform: rotateX(70deg) rotateZ(60deg); }
+    to { transform: rotateX(70deg) rotateZ(420deg); }
+}
+
+@keyframes orbitSpin3 {
+    from { transform: rotateX(70deg) rotateZ(120deg); }
+    to { transform: rotateX(70deg) rotateZ(480deg); }
+}
+
+.spinner-electron {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #651FFF;
+    box-shadow: 0 0 6px #651FFF;
+    position: absolute;
+    top: -2.5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.pipeline-overall-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.badge-running {
+    background: rgba(101, 31, 255, 0.1);
+    color: #651FFF;
+    border: 1px solid rgba(101, 31, 255, 0.25);
+    animation: badgePulse 1.8s infinite ease-in-out;
+}
+
+.badge-completed {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-failed {
+    background: rgba(239, 68, 68, 0.12);
+    color: #B91C1C;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Stepper Steps Grid */
+.pipeline-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.pipeline-step-item {
+    background: rgba(247, 245, 252, 0.65);
+    border: 1px solid rgba(229, 221, 242, 0.7);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    gap: 14px;
+    transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.step-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+    position: relative;
+    background: #EDE8F8;
+    color: #654E82;
+    border: 1px solid rgba(200, 168, 233, 0.5);
+    transition: all 0.22s ease;
+}
+
+.step-indicator-spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(101, 31, 255, 0.25);
+    border-top-color: #651FFF;
+    border-radius: 50%;
+    animation: stepSpin 0.75s linear infinite;
+}
+
+@keyframes stepSpin {
+    to { transform: rotate(360deg); }
+}
+
+.step-indicator-success,
+.step-indicator-error {
+    display: none;
+}
+
+.step-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.step-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.step-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #1E1530;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.step-status-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.05);
+    color: #71628A;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.step-desc {
+    font-size: 12.5px;
+    color: #554A6F;
+    line-height: 1.45;
+    margin: 0;
+}
+
+/* Step State: Active */
+.pipeline-step-item[data-status="active"] {
+    background: #FFFFFF;
+    border-color: #8B5CF6;
+    box-shadow: 0 6px 20px rgba(101, 31, 255, 0.12);
+    transform: translateY(-2px);
+}
+
+.pipeline-step-item[data-status="active"] .step-icon-wrapper {
+    background: rgba(101, 31, 255, 0.1);
+    border-color: #8B5CF6;
+}
+
+.pipeline-step-item[data-status="active"] .step-indicator-number {
+    display: none;
+}
+
+.pipeline-step-item[data-status="active"] .step-indicator-spinner {
+    display: block;
+}
+
+.pipeline-step-item[data-status="active"] .step-status-pill {
+    background: rgba(101, 31, 255, 0.14);
+    color: #5B21B6;
+}
+
+/* Step State: Completed */
+.pipeline-step-item[data-status="completed"] {
+    background: rgba(240, 253, 244, 0.85);
+    border-color: rgba(74, 222, 128, 0.5);
+}
+
+.pipeline-step-item[data-status="completed"] .step-icon-wrapper {
+    background: #10B981;
+    color: #FFFFFF;
+    border-color: #10B981;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.pipeline-step-item[data-status="completed"] .step-indicator-number,
+.pipeline-step-item[data-status="completed"] .step-indicator-spinner {
+    display: none;
+}
+
+.pipeline-step-item[data-status="completed"] .step-indicator-success {
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.pipeline-step-item[data-status="completed"] .step-status-pill {
+    background: rgba(16, 185, 129, 0.15);
+    color: #047857;
+}
+
+/* Step State: Failed */
+.pipeline-step-item[data-status="failed"] {
+    background: rgba(254, 242, 242, 0.9);
+    border-color: rgba(248, 113, 113, 0.6);
+}
+
+.pipeline-step-item[data-status="failed"] .step-icon-wrapper {
+    background: #EF4444;
+    color: #FFFFFF;
+    border-color: #EF4444;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+}
+
+.pipeline-step-item[data-status="failed"] .step-indicator-number,
+.pipeline-step-item[data-status="failed"] .step-indicator-spinner {
+    display: none;
+}
+
+.pipeline-step-item[data-status="failed"] .step-indicator-error {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.pipeline-step-item[data-status="failed"] .step-status-pill {
+    background: rgba(239, 68, 68, 0.15);
+    color: #B91C1C;
+}
+
+/* Error Alert Banner */
+.pipeline-error-banner {
+    margin-top: 20px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    color: #991B1B;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    animation: bamiResultReveal 0.25s ease-out;
+}
+
+.error-alert-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+
+.error-alert-content strong {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #7F1D1D;
+}
+
+.error-alert-content p {
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin: 0;
+    color: #991B1B;
+}
+
+@media (max-width: 900px) {
+    .pipeline-steps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   8. ACCESSIBILITY: REDUCED MOTION PREFERENCE
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* =========================================================
+   9. SCIENTIFIC REPORT LAB DOWNLOAD BUTTON STYLES
+   ========================================================= */
+.result-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.download-pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #5E35B1 0%, #7E57C2 100%);
+    color: #FFFFFF !important;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(94, 53, 177, 0.25);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.2s ease,
+                opacity 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.download-pdf-btn .btn-icon {
+    font-size: 15px;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.download-pdf-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #512DA8 0%, #673AB7 100%);
+    box-shadow: 0 6px 18px rgba(94, 53, 177, 0.35);
+}
+
+.download-pdf-btn:hover:not(:disabled) .btn-icon {
+    transform: scale(1.15) rotate(-4deg);
+}
+
+.download-pdf-btn:active:not(:disabled) {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 6px rgba(94, 53, 177, 0.2);
+}
+
+.download-pdf-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    background: #9E9E9E;
+    border-color: transparent;
+}
+
+.download-pdf-btn.loading {
+    cursor: wait;
+    opacity: 0.88;
+}
+
+.pdf-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    animation: pdfSpin 0.75s linear infinite;
+    display: inline-block;
+}
+
+@keyframes pdfSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.admet-download-btn {
+    margin-top: 10px;
+    font-size: 12.5px;
+    padding: 6px 14px;
+}
+
+/* =========================================================
+   10. POST-LOGIN WELCOME TOAST
+   ========================================================= */
+.bami-login-welcome-toast {
+    position: fixed;
+    top: 24px;
+    right: 28px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(22, 14, 38, 0.94);
+    border: 1px solid rgba(167, 139, 250, 0.4);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #FFFFFF;
+    padding: 14px 22px;
+    border-radius: 14px;
+    box-shadow: 0 12px 36px rgba(10, 5, 24, 0.45), 0 0 20px rgba(101, 31, 255, 0.25);
+    animation: toastSlideDown 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    user-select: none;
+}
+
+.bami-login-welcome-toast.fade-out {
+    opacity: 0;
+    transform: translateY(-16px);
+}
+
+.welcome-toast-icon {
+    font-size: 26px;
+    color: #A78BFA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: spinSlow 12s linear infinite;
+}
+
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.welcome-toast-text strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.01em;
+}
+
+.welcome-toast-text span {
+    display: block;
+    font-size: 13px;
+    color: #C8BAE5;
+    margin-top: 2px;
+}
+
+@keyframes toastSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-24px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =========================================================
+   11. MOLECULE IDENTITY HEADER (NAME, FORMULA & 2D STRUCTURE)
+   ========================================================= */
+.structure-molecule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 18px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(245, 240, 251, 0.95) 0%, rgba(238, 232, 250, 0.95) 100%);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    box-shadow: 0 4px 14px rgba(78, 69, 100, 0.05);
+    animation: bamiResultReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.molecule-identity-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.molecule-identity-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7D68AA 0%, #651FFF 100%);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(101, 31, 255, 0.25);
+}
+
+.molecule-name-box {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.molecule-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.molecule-display-name {
+    font-size: 21px;
+    font-weight: 800;
+    color: #241442;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.molecule-formula-badge {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #651FFF;
+    background: rgba(101, 31, 255, 0.1);
+    border: 1px solid rgba(101, 31, 255, 0.25);
+    padding: 2px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.03em;
+}
+
+.molecule-display-iupac {
+    font-size: 13px;
+    color: #6E5D87;
+    margin: 3px 0 0;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 480px;
+}
+
+.molecule-class-tag {
+    font-size: 12px;
+    font-weight: 700;
+    color: #5E35B1;
+    background: #EDE7F6;
+    border: 1px solid rgba(94, 53, 177, 0.2);
+    padding: 4px 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+}

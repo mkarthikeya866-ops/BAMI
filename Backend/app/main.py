@@ -187,12 +187,66 @@ def get_firebase_user(
         ) from error
 
 
+def get_firebase_user_optional(
+    authorization: HTTPAuthorizationCredentials | None = Depends(firebase_bearer),
+) -> dict | None:
+    if authorization is None or authorization.scheme.casefold() != "bearer":
+        return None
+
+    try:
+        from google.auth import exceptions as google_auth_exceptions
+        from google.auth.transport.requests import Request
+        from google.oauth2 import id_token
+    except ImportError:
+        return None
+
+    project_id = os.getenv("FIREBASE_PROJECT_ID")
+    if not project_id:
+        return None
+
+    try:
+        return id_token.verify_firebase_token(
+            authorization.credentials,
+            Request(),
+            audience=project_id,
+        )
+    except Exception:
+        return None
+
+
 # ==================================================
 # REQUEST SCHEMA
 # ==================================================
 
 class PredictRequest(BaseModel):
     smiles: str
+
+
+class ScaffoldAnalysisRequest(BaseModel):
+    smiles: str | None = None
+    name: str | None = None
+    molecules: list[dict[str, str]] | None = None
+
+
+class AdmetPredictRequest(BaseModel):
+    smiles: str
+    name: str | None = None
+    include_bioactivity: bool = True
+
+
+class DockingRunRequest(BaseModel):
+    smiles: str
+    target: str = "COX-2"
+    exhaustiveness: int = 4
+
+
+class ReportDownloadRequest(BaseModel):
+    smiles: str
+    name: str | None = None
+    target: str | None = None
+    include_admet: bool = True
+    include_docking: bool = True
+    docking_data: dict | None = None
 
 
 class BatchPredictRequest(BaseModel):
@@ -1894,6 +1948,324 @@ def batch_predict(
         ),
         "results": results,
     }
+
+
+# ==================================================
+# MOLECULAR SCAFFOLD ANALYSIS API
+# ==================================================
+
+@app.post("/scaffold-analysis")
+@app.post("/api/v1/scaffold-analysis")
+@app.post("/api/v1/scaffold/compare")
+def analyze_scaffold_endpoint(
+    request: ScaffoldAnalysisRequest,
+    _user: dict | None = Depends(get_firebase_user_optional),
+):
+    """
+    Extracts Bemis-Murcko molecular scaffolds, highlights cores, decomposes
+    peripheral substituents, groups matching chemotypes, and estimates COX-2 and EGFR bioactivity.
+    """
+    from app.scaffold import analyze_single_scaffold, analyze_scaffold_dataset
+
+    # Multi-molecule batch scaffold analysis and SAR grouping
+    if request.molecules and len(request.molecules) > 0:
+        if len(request.molecules) > 100:
+            raise HTTPException(
+                status_code=422,
+                detail="Scaffold comparison supports at most 100 molecules per request."
+            )
+        return analyze_scaffold_dataset(
+            molecules=request.molecules,
+            cox2_model_fn=load_final_xgb_model,
+            egfr_bundle_fn=load_egfr_xgb_bundle,
+            cox2_fp_fn=smiles_to_morgan_fingerprint,
+            egfr_fp_fn=smiles_to_egfr_morgan_fingerprint,
+        )
+
+    # Single-molecule scaffold extraction
+    smiles = (request.smiles or "").strip()
+    if not smiles:
+        raise HTTPException(
+            status_code=422,
+            detail="Either a valid 'smiles' string or a list of 'molecules' is required."
+        )
+
+    result = analyze_single_scaffold(
+        smiles=smiles,
+        name=request.name or "",
+        cox2_model_fn=load_final_xgb_model,
+        egfr_bundle_fn=load_egfr_xgb_bundle,
+        cox2_fp_fn=smiles_to_morgan_fingerprint,
+        egfr_fp_fn=smiles_to_egfr_morgan_fingerprint,
+    )
+
+    if result.get("status") == "error":
+        raise HTTPException(
+            status_code=422,
+            detail=result.get("error", "Invalid SMILES structure.")
+        )
+
+    return result
+
+
+# ==================================================
+# ADMET PREDICTION API
+# ==================================================
+
+@app.get("/admet-metrics")
+@app.get("/api/v1/admet-metrics")
+def get_admet_metrics_endpoint():
+    """Returns held-out test evaluation metrics for all 10 trained ADMET models."""
+    from app.admet import get_admet_metrics
+    return get_admet_metrics()
+
+
+@app.post("/admet-predict")
+@app.post("/api/v1/admet-predict")
+def predict_admet_endpoint(
+    request: AdmetPredictRequest,
+    _user: dict | None = Depends(get_firebase_user_optional),
+):
+    """
+    Predicts Absorption, Distribution, Metabolism, Excretion, and Toxicity properties
+    using 10 endpoint-specific machine learning models and correlates with COX-2 and EGFR bioactivity.
+    """
+    from app.admet import predict_admet_for_smiles
+
+    smiles = (request.smiles or "").strip()
+    if not smiles:
+        raise HTTPException(
+            status_code=422,
+            detail="A valid 'smiles' string is required for ADMET prediction."
+        )
+
+    result = predict_admet_for_smiles(
+        smiles=smiles,
+        name=request.name or "",
+        include_bioactivity=request.include_bioactivity,
+        cox2_model_fn=load_final_xgb_model,
+        egfr_bundle_fn=load_egfr_xgb_bundle,
+        cox2_fp_fn=smiles_to_morgan_fingerprint,
+        egfr_fp_fn=smiles_to_egfr_morgan_fingerprint,
+    )
+
+    if result.get("status") == "error":
+        raise HTTPException(
+            status_code=422,
+            detail=result.get("message", "Invalid SMILES structure.")
+        )
+
+    return result
+
+
+# ==================================================
+# DOWNLOADABLE SCIENTIFIC PDF REPORT API
+# ==================================================
+
+@app.post("/download-report")
+@app.post("/api/v1/download-report")
+def download_report_endpoint(
+    request: ReportDownloadRequest,
+    _user: dict | None = Depends(get_firebase_user_optional),
+):
+    """
+    Generates a publication-grade scientific PDF report for a molecule,
+    including 2D chemical structure, Lipinski descriptors, dual-target bioactivity (COX-2 & EGFR),
+    Bemis-Murcko core scaffold SAR, and preclinical ADMET profiling.
+    """
+    from fastapi.responses import Response
+    from app.report_generator import generate_bami_pdf_report
+    from app.scaffold import analyze_single_scaffold
+    from app.admet import predict_admet_for_smiles
+
+    smiles = (request.smiles or "").strip()
+    if not smiles:
+        raise HTTPException(
+            status_code=422,
+            detail="A valid 'smiles' string is required to generate a scientific report."
+        )
+
+    clean_mol = Chem.MolFromSmiles(smiles)
+    if clean_mol is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Invalid SMILES structure. Cannot generate chemical report."
+        )
+
+    # 1. Gather bioactivity predictions for both targets
+    bioactivity_data = {}
+    try:
+        cox2_res = predict_final_xgb(smiles)
+        bioactivity_data["COX-2"] = cox2_res
+    except Exception as e:
+        bioactivity_data["COX-2"] = {"prediction": "Error", "error": str(e)}
+
+    try:
+        egfr_res = predict_egfr_xgb(smiles)
+        bioactivity_data["EGFR"] = egfr_res
+    except Exception as e:
+        bioactivity_data["EGFR"] = {"prediction": "Error", "error": str(e)}
+
+    # 2. Gather scaffold data
+    scaffold_data = None
+    try:
+        scaffold_data = analyze_single_scaffold(
+            smiles=smiles,
+            name=request.name or "",
+            cox2_model_fn=load_final_xgb_model,
+            egfr_bundle_fn=load_egfr_xgb_bundle,
+            cox2_fp_fn=smiles_to_morgan_fingerprint,
+            egfr_fp_fn=smiles_to_egfr_morgan_fingerprint
+        )
+    except Exception:
+        pass
+
+    # 3. Gather ADMET data if requested
+    admet_data = None
+    if request.include_admet:
+        try:
+            admet_data = predict_admet_for_smiles(
+                smiles=smiles,
+                name=request.name or "",
+                include_bioactivity=False
+            )
+        except Exception:
+            pass
+
+    # 4. Generate publication-grade PDF report
+    try:
+        pdf_bytes = generate_bami_pdf_report(
+            smiles=smiles,
+            compound_name=request.name or "",
+            include_admet=request.include_admet,
+            bioactivity_data=bioactivity_data,
+            admet_data=admet_data,
+            scaffold_data=scaffold_data
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to compile scientific PDF report: {str(e)}"
+        )
+
+    safe_name = re.sub(r"[^a-zA-Z0-9_-]", "_", (request.name or "Molecule")[:24]).strip("_") or "Molecule"
+    filename = f"BAMI_Scientific_Report_{safe_name}.pdf"
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Access-Control-Expose-Headers": "Content-Disposition"
+        }
+    )
+
+
+# ==================================================
+# MOLECULAR DOCKING (AUTODOCK VINA) API
+# ==================================================
+
+@app.get("/docking/targets")
+@app.get("/api/v1/docking/targets")
+def get_docking_targets_endpoint():
+    """Returns available crystallographic protein targets and active site coordinates."""
+    from app.docking_service import TARGET_CONFIGS
+    targets = []
+    for key, cfg in TARGET_CONFIGS.items():
+        targets.append({
+            "target": key,
+            "target_name": cfg["target_name"],
+            "gene_symbol": cfg["gene_symbol"],
+            "uniprot": cfg["uniprot"],
+            "pdb_id": cfg["pdb_id"],
+            "resolution": cfg["resolution"],
+            "organism": cfg["organism"],
+            "description": cfg["description"],
+            "center": {"x": cfg["center_x"], "y": cfg["center_y"], "z": cfg["center_z"]},
+            "box_size": {"x": cfg["size_x"], "y": cfg["size_y"], "z": cfg["size_z"]},
+            "known_inhibitor": cfg["known_inhibitor"],
+            "active_residues": cfg["active_residues"]
+        })
+    return {"targets": targets}
+
+
+@app.post("/docking/run")
+@app.post("/api/v1/docking/run")
+def start_docking_endpoint(
+    request: DockingRunRequest,
+    _user: dict | None = Depends(get_firebase_user_optional)
+):
+    """Start an asynchronous AutoDock Vina molecular docking physics simulation."""
+    smiles = (request.smiles or "").strip()
+    if not smiles:
+        raise HTTPException(status_code=422, detail="A valid 'smiles' string is required.")
+    
+    clean_mol = Chem.MolFromSmiles(smiles)
+    if clean_mol is None:
+        raise HTTPException(status_code=422, detail="Invalid chemical SMILES structure.")
+
+    from app.docking_service import start_docking_job, get_docking_job_status
+    try:
+        job_id = start_docking_job(
+            smiles=smiles,
+            target=request.target,
+            exhaustiveness=request.exhaustiveness
+        )
+        status_info = get_docking_job_status(job_id)
+        return status_info or {"job_id": job_id, "status": "Preparing Ligand", "progress_percent": 25}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to initiate docking: {str(e)}")
+
+
+@app.get("/docking/status/{job_id}")
+@app.get("/api/v1/docking/status/{job_id}")
+def get_docking_status_endpoint(job_id: str):
+    """Poll live execution status and retrieve docking results."""
+    from app.docking_service import get_docking_job_status
+    status_info = get_docking_job_status(job_id)
+    if not status_info:
+        raise HTTPException(status_code=404, detail=f"Docking job '{job_id}' not found.")
+    return status_info
+
+
+@app.post("/docking/dock")
+@app.post("/api/v1/docking/dock")
+def run_docking_sync_endpoint(
+    request: DockingRunRequest,
+    _user: dict | None = Depends(get_firebase_user_optional)
+):
+    """Execute AutoDock Vina docking simulation synchronously."""
+    smiles = (request.smiles or "").strip()
+    if not smiles:
+        raise HTTPException(status_code=422, detail="A valid 'smiles' string is required.")
+    
+    clean_mol = Chem.MolFromSmiles(smiles)
+    if clean_mol is None:
+        raise HTTPException(status_code=422, detail="Invalid chemical SMILES structure.")
+
+    from app.docking_service import run_docking_sync
+    try:
+        result = run_docking_sync(
+            smiles=smiles,
+            target=request.target,
+            exhaustiveness=request.exhaustiveness
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Docking simulation failed: {str(e)}")
+
+
+@app.get("/docking/receptor/{target}")
+@app.get("/api/v1/docking/receptor/{target}")
+def get_docking_receptor_endpoint(target: str):
+    """Retrieve receptor PDB file for 3Dmol.js protein visualization."""
+    from fastapi.responses import PlainTextResponse
+    from app.docking_service import get_receptor_pdb_content
+    try:
+        pdb_content = get_receptor_pdb_content(target)
+        return PlainTextResponse(content=pdb_content, media_type="chemical/x-pdb")
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Receptor structure not found: {str(e)}")
 
 
 app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

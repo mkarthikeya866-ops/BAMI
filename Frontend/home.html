@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A beginner-friendly guide and dictionary for BAMI: computational bioactivity screening, biological targets (EGFR, COX-2), chemical fingerprints, scaffold analysis, and ADMET prediction.">
+    <title>BAMI | Bioactive Molecule Intelligence — Platform</title>
+    <link rel="stylesheet" href="style.css?v=50">
+    <link rel="stylesheet" href="sidebar.css?v=50">
+    <link rel="stylesheet" href="landing.css?v=1">
+    <link rel="stylesheet" href="ui-enhancements.css?v=1">
+</head>
+
+<body>
+
+    <div id="bami-layout" class="app-layout">
+        <div id="bami-sidebar-placeholder"></div>
+        <div class="app-main-content">
+            <div id="bami-topbar-placeholder"></div>
+
+    <main id="main-content">
+
+        <!-- =========================================================
+             1. MODERN SCIENTIFIC HERO SECTION
+             BAMI Branding, Molecular Animation Canvas & Direct Get Started CTA
+             ========================================================= -->
+        <section class="home-hero-section" aria-labelledby="hero-heading">
+            <div class="home-hero-container">
+
+                <div class="home-hero-content">
+                    <div class="home-hero-badge">
+                        <span class="home-hero-badge-dot" aria-hidden="true"></span>
+                        <span>Bioactive Molecule Intelligence Platform</span>
+                    </div>
+
+                    <h1 id="hero-heading" class="home-hero-title">
+                        Accelerate Preclinical Discovery with <span>Bioactive Intelligence.</span>
+                    </h1>
+
+                    <p class="home-hero-lead">
+                        High-precision computational screening for EGFR and COX-2 therapeutic targets, automated Bemis-Murcko scaffold SAR decomposition, and 10 validated ADMET pharmacokinetic models powered by calibrated XGBoost and RDKit cheminformatics.
+                    </p>
+
+                    <div class="home-hero-pill-strip" role="list" aria-label="Project core technologies">
+                        <span class="hero-pill-tag" role="listitem"><span class="hero-pill-dot" aria-hidden="true"></span><strong>Targets:</strong> EGFR (P00533) &amp; COX-2 (P35354)</span>
+                        <span class="hero-pill-tag" role="listitem"><span class="hero-pill-dot" aria-hidden="true"></span><strong>Bioactivity:</strong> Calibrated XGBoost</span>
+                        <span class="hero-pill-tag" role="listitem"><span class="hero-pill-dot" aria-hidden="true"></span><strong>Chemistry:</strong> Bemis-Murcko Scaffold SAR</span>
+                        <span class="hero-pill-tag" role="listitem"><span class="hero-pill-dot" aria-hidden="true"></span><strong>ADMET:</strong> 10 Validated ML Endpoints</span>
+                    </div>
+
+                    <div class="home-hero-actions">
+                        <a href="index.html#prediction" class="cta-btn-get-started" id="hero-cta-predict">
+                            <span>Get Started with Screening</span>
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                        <a href="scaffold-analysis.html" class="cta-btn-glass">
+                            <span>Scaffold SAR</span>
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                        <a href="admet.html" class="cta-btn-glass">
+                            <span>ADMET Profiling</span>
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                        <a href="#dictionary" class="cta-btn-glass">
+                            <span>Dictionary</span>
+                            <span aria-hidden="true">&darr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="home-hero-visual">
+                    <div class="hero-molecular-stage" role="region" aria-label="Interactive 3D Molecular Simulation">
+                        <canvas id="molecular-hero-canvas" class="hero-molecular-canvas"></canvas>
+                        
+                        <div class="hero-hud-chip hero-hud-chip-top">
+                            <span class="hud-chip-dot" aria-hidden="true"></span>
+                            <span>EGFR Kinase Lead • 93.6% Calibrated Active</span>
+                        </div>
+                        
+                        <div class="hero-hud-chip hero-hud-chip-bottom">
+                            <span class="hud-chip-dot hud-chip-dot-purple" aria-hidden="true"></span>
+                            <span>Murcko Core: 4-Anilinoquinazoline • Lipinski: 0 Violations</span>
+                        </div>
+
+                        <div class="hero-hud-hint">
+                            <span>✦ Hover or drag to interact with 3D molecular bonds</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================================
+             FEATURE HIGHLIGHTS BENTO GRID
+             Six Core Pillars of BAMI Preclinical Intelligence
+             ========================================================= -->
+        <section class="bento-features-section" id="platform-capabilities" aria-labelledby="features-heading">
+            <div class="home-section-container">
+                <div class="home-section-header">
+                    <div class="section-badge">Platform Architecture</div>
+                    <h2 id="features-heading">Six Integrated Pillars of <span>Preclinical Screening</span></h2>
+                    <p>
+                        From raw SMILES strings to target bioactivity, core scaffold SAR decomposition, and comprehensive oral pharmacokinetic profiling.
+                    </p>
+                </div>
+
+                <div class="bento-grid">
+                    <!-- Card 1: Bioactivity Prediction -->
+                    <a href="index.html#prediction" class="bento-card">
+                        <div>
+                            <div class="bento-card-header">
+                                <div class="bento-icon-box">⚡</div>
+                                <span class="bento-badge">Target ML</span>
+                            </div>
+                            <div class="bento-card-body">
+                                <h3>Target-Specific Bioactivity</h3>
+                                <p>
+                                    Calibrated XGBoost classifiers trained on ChEMBL bioassays for COX-2 and EGFR. Returns rigorous probability estimates with decision thresholding.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bento-card-footer">
+                            <span>Launch Single Predictor &rarr;</span>
+                        </div>
+                    </a>
+
+                    <!-- Card 2: Batch Screening -->
+                    <a href="index.html#batch-screening" class="bento-card">
+                        <div>
+                            <div class="bento-card-header">
+                                <div class="bento-icon-box">📊</div>
+                                <span class="bento-badge">High-Throughput</span>
+                            </div>
+                            <div class="bento-card-body">
+                                <h3>High-Throughput Batch Screening</h3>
+                                <p>
+                                    Screen compound libraries up to 500 molecules simultaneously via multiline SMILES or CSV upload. Instantaneous cohort statistics and exportable CSV reports.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bento-card-footer">
+                            <span>Open Batch Screener &rarr;</span>
+                        </div>
+                    </a>
+
+                    <!-- Card 3: Scaffold Analysis -->
+                    <a href="scaffold-analysis.html" class="bento-card">
+                        <div>
+                            <div class="bento-card-header">
+                                <div class="bento-icon-box">🧬</div>
+                                <span class="bento-badge">Cheminformatics</span>
+                            </div>
+                            <div class="bento-card-body">
+                                <h3>Bemis-Murcko Scaffold &amp; SAR</h3>
+                                <p>
+                                    Extract central ring-and-linker cores, isolate peripheral substituents with SVG visualization, cluster structural analogues, and generate 2048-bit Morgan fingerprint Tanimoto matrices.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bento-card-footer">
+                            <span>Analyze Molecular Scaffolds &rarr;</span>
+                        </div>
+                    </a>
+
+                    <!-- Card 4: ADMET Profiling -->
+                    <a href="admet.html" class="bento-card">
+                        <div>
+                            <div class="bento-card-header">
+                                <div class="bento-icon-box">🧪</div>
+                                <span class="bento-badge">Pharmacokinetics</span>
+                            </div>
+                            <div class="bento-card-body">
+                                <h3>10-Endpoint ADMET Profiling</h3>
+                                <p>
+                                    Predict ESOL solubility, Caco-2 &amp; HIA intestinal absorption, BBBP permeability, CYP3A4/2D6/2C9 inhibition, Ames mutagenicity, FDA DILIst hepatotoxicity, and hERG cardiac liability.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bento-card-footer">
+                            <span>Explore ADMET Profile &rarr;</span>
+                        </div>
+                    </a>
+
+                    <!-- Card 5: Molecular Docking (AutoDock Vina) -->
+                    <a href="docking.html" class="bento-card">
+                        <div>
+                            <div class="bento-card-header">
+                                <div class="bento-icon-box">🔬</div>
+                                <span class="bento-badge">AutoDock Vina</span>
+                            </div>
+                            <div class="bento-card-body">
+                                <h3>Molecular Docking &amp; 3D Pose</h3>
+                                <p>
+                                    Execute authentic AutoDock Vina physics-based docking against human COX-2 (6COX) and EGFR (1M17) active pockets with binding affinity (&Delta;G in kcal/mol) and interactive 3D WebGL visualization.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bento-card-footer">
+                            <span>Launch Docking Simulation &rarr;</span>
+                        </div>
+                    </a>
+
+                    <!-- Card 6: Drug-Likeness (Lipinski) -->
+                    <a href="drug-likeness.html" class="bento-card">
+                        <div>
+                            <div class="bento-card-header">
+                                <div class="bento-icon-box">💊</div>
+                                <span class="bento-badge">Ro5 Qualified</span>
+                            </div>
+                            <div class="bento-card-body">
+                                <h3>Lipinski Rule of Five</h3>
+                                <p>
+                                    Instant evaluation of molecular weight, partition coefficient (LogP), hydrogen bond donors/acceptors, and topological polar surface area (TPSA) for oral bioavailability.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bento-card-footer">
+                            <span>Check Drug-Likeness &rarr;</span>
+                        </div>
+                    </a>
+
+                    <!-- Card 6: Prediction History -->
+                    <a href="history.html" class="bento-card">
+                        <div>
+                            <div class="bento-card-header">
+                                <div class="bento-icon-box">🕒</div>
+                                <span class="bento-badge">Local Audit</span>
+                            </div>
+                            <div class="bento-card-body">
+                                <h3>50-Molecule Screening Audit</h3>
+                                <p>
+                                    Persistent local audit trail of your 50 most recent screening evaluations stored directly in your browser on-device with zero external data sharing.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bento-card-footer">
+                            <span>Review Screening History &rarr;</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             2. THE PROBLEM (WHY DRUG DISCOVERY NEEDS COMPUTATION)
+             ========================================================= -->
+        <section class="home-section" id="the-problem" aria-labelledby="problem-heading">
+            <div class="home-section-container">
+
+                <div class="home-section-header">
+                    <div class="section-badge">The Discovery Challenge</div>
+                    <h2 id="problem-heading">Why Discovering a Medicine <span>Takes So Long</span></h2>
+                    <p>
+                        Developing a new therapeutic drug is one of the most complex scientific endeavors in the world. 
+                        Before a treatment ever reaches patients, researchers must find a molecular starting point.
+                    </p>
+                </div>
+
+                <div class="problem-lead-box">
+                    <div class="problem-lead-text">
+                        <h3>The Needle in a Chemical Haystack</h3>
+                        <p>
+                            Traditional wet-lab synthesis and cellular assays take weeks per compound. Examining even 10,000 candidates can cost millions of dollars and require years of bench work.
+                        </p>
+                        <p>
+                            <strong>This is where computational screening helps:</strong> rather than testing molecules at random, machine-learning models estimate which molecules are most likely to interact with the target, allowing researchers to prioritize top candidates for lab validation.
+                        </p>
+                    </div>
+
+                    <div class="problem-lead-stats">
+                        <div class="problem-stat-card">
+                            <span class="stat-number">10<sup>60</sup></span>
+                            <div class="stat-label">
+                                <strong>Estimated Drug-Like Molecules</strong>
+                                <p style="margin: 4px 0 0; font-size: 0.95rem; color: #554475;">
+                                    Astronomically larger than all the atoms in our solar system. Testing all of them physically in a laboratory is impossible.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="problem-comparison-grid">
+                    <div class="comparison-card card-traditional">
+                        <div class="comp-badge badge-warn">Traditional Trial-and-Error</div>
+                        <h3>Without Computational Screening</h3>
+                        <ul class="comparison-list">
+                            <li class="comparison-item">
+                                <span class="item-icon icon-cross" aria-hidden="true">&times;</span>
+                                <span><strong>Exhaustive wet-lab testing:</strong> Months spent synthesizing compounds that turn out completely inactive.</span>
+                            </li>
+                            <li class="comparison-item">
+                                <span class="item-icon icon-cross" aria-hidden="true">&times;</span>
+                                <span><strong>High attrition rate:</strong> Over 99% of synthesized molecules fail early assays without initial guidance.</span>
+                            </li>
+                            <li class="comparison-item">
+                                <span class="item-icon icon-cross" aria-hidden="true">&times;</span>
+                                <span><strong>Massive expense:</strong> Enormous chemical consumable and assay testing costs before identifying a viable lead.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="comparison-card card-bami">
+                        <div class="comp-badge badge-accent">Computational Triage with BAMI</div>
+                        <h3>With Machine-Learning Screening</h3>
+                        <ul class="comparison-list">
+                            <li class="comparison-item">
+                                <span class="item-icon icon-check" aria-hidden="true">&check;</span>
+                                <span><strong>Instant virtual triage:</strong> Screen thousands of SMILES strings in seconds using trained XGBoost models.</span>
+                            </li>
+                            <li class="comparison-item">
+                                <span class="item-icon icon-check" aria-hidden="true">&check;</span>
+                                <span><strong>Prioritized leads:</strong> Wet-lab researchers focus their bench experiments on compounds with high estimated activity.</span>
+                            </li>
+                            <li class="comparison-item">
+                                <span class="item-icon icon-check" aria-hidden="true">&check;</span>
+                                <span><strong>Resource efficiency:</strong> Direct laboratory funding and time toward candidates with calibrated statistical backing.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================================
+             3. DRUG DISCOVERY & BIOACTIVITY DICTIONARY
+             A welcoming practical glossary explaining all 8 core terms
+             ========================================================= -->
+        <section class="home-section home-section-alt" id="dictionary" aria-labelledby="dictionary-heading">
+            <div class="home-section-container">
+
+                <div class="home-section-header">
+                    <div class="section-badge">Practical Glossary</div>
+                    <h2 id="dictionary-heading">Drug Discovery &amp; <span>Bioactivity Dictionary</span></h2>
+                    <p>
+                        A plain-language reference for researchers, students, and curious minds. 
+                        Every term is defined simply, with clear illustrations and zero assumed background in chemistry or machine learning.
+                    </p>
+                </div>
+
+                <div class="concepts-grid">
+
+                    <!-- Term 1: Biological Target -->
+                    <article class="concept-card" aria-labelledby="term-target-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 01</span>
+                        </div>
+                        <h3 id="term-target-title">Biological Target</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">🔒</span>
+                            <span>Analogy: A cellular lock or light switch</span>
+                        </div>
+
+                        <!-- Diagram 1: Target Protein and Binding Pocket -->
+                        <div class="concept-diagram-wrapper">
+                            <svg viewBox="0 0 360 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of a receptor protein with an active binding pocket, comparing it to a lock awaiting a matching molecular key.">
+                                <text x="180" y="20" fill="#1E1530" font-size="16" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Candidate Molecule (The "Key")</text>
+                                <circle cx="180" cy="42" r="13" fill="#651FFF" />
+                                <circle cx="158" cy="36" r="8" fill="#9E77ED" />
+                                <circle cx="202" cy="36" r="8" fill="#9E77ED" />
+                                <line x1="166" y1="38" x2="173" y2="40" stroke="#FFFFFF" stroke-width="2.5" />
+                                <line x1="194" y1="38" x2="187" y2="40" stroke="#FFFFFF" stroke-width="2.5" />
+                                <path d="M 180 57 L 180 68" stroke="#651FFF" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 3"/>
+
+                                <!-- Receptor Protein Body -->
+                                <path d="M 20 145 C 20 85, 60 72, 115 72 C 140 72, 150 102, 180 102 C 210 102, 220 72, 245 72 C 300 72, 340 85, 340 145 Z" 
+                                      fill="#EDE7F6" stroke="#6D28D9" stroke-width="2.5" />
+                                <path d="M 148 74 C 148 104, 212 104, 212 74" stroke="#4C1D95" stroke-width="3" stroke-linecap="round" fill="#FAF5FF"/>
+                                <text x="180" y="126" fill="#2E1065" font-size="17" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Target Receptor Protein</text>
+                                <text x="180" y="145" fill="#5B21B6" font-size="15" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">Active Binding Pocket (The "Lock")</text>
+                            </svg>
+                            <p class="diagram-caption"><strong>Figure 1:</strong> A biological target protein acts like a cellular lock. Candidate molecules are screened to estimate whether they fit into the active binding pocket.</p>
+                        </div>
+
+                        <p class="concept-body">
+                            A <strong>biological target</strong> is a specific protein, enzyme, or receptor in the body that researchers want to affect to modify a disease process. When an enzyme is overactive—like enzymes promoting tumor growth—blocking that target can slow down or treat the illness.
+                        </p>
+                        
+                        <div class="concept-takeaway">
+                            <strong>Our Project Focus (EGFR):</strong> BAMI specifically targets <strong>EGFR</strong> (Epidermal Growth Factor Receptor, UniProt P00533), a cell-surface protein that signals cells to divide. In non-small cell lung cancer, EGFR is often hyperactive; blocking its pocket halts tumor signals. BAMI also supports <strong>COX-2</strong>, the enzyme producing pain and inflammation.
+                        </div>
+                    </article>
+
+                    <!-- Term 2: Molecule -->
+                    <article class="concept-card" aria-labelledby="term-molecule-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 02</span>
+                        </div>
+                        <h3 id="term-molecule-title">Molecule</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">⚛️</span>
+                            <span>Analogy: A key sculpted from individual atoms</span>
+                        </div>
+
+                        <!-- Diagram 2: Molecular Structure Diagram -->
+                        <div class="concept-diagram-wrapper">
+                            <svg viewBox="0 0 360 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing a chemical molecule composed of carbon, hydrogen, and oxygen atoms joined in a specific spatial arrangement by chemical bonds.">
+                                <!-- Benzene ring atoms and bonds -->
+                                <g transform="translate(45, 18)">
+                                    <line x1="60" y1="20" x2="100" y2="40" stroke="#4C1D95" stroke-width="3"/>
+                                    <line x1="60" y1="24" x2="96" y2="42" stroke="#6D28D9" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                    <line x1="100" y1="40" x2="100" y2="80" stroke="#4C1D95" stroke-width="3"/>
+                                    <line x1="100" y1="80" x2="60" y2="100" stroke="#4C1D95" stroke-width="3"/>
+                                    <line x1="96" y1="78" x2="60" y2="96" stroke="#6D28D9" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                    <line x1="60" y1="100" x2="20" y2="80" stroke="#4C1D95" stroke-width="3"/>
+                                    <line x1="20" y1="80" x2="20" y2="40" stroke="#4C1D95" stroke-width="3"/>
+                                    <line x1="24" y1="78" x2="24" y2="42" stroke="#6D28D9" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                    <line x1="20" y1="40" x2="60" y2="20" stroke="#4C1D95" stroke-width="3"/>
+
+                                    <circle cx="60" cy="20" r="11" fill="#EDE9FE" stroke="#5B21B6" stroke-width="2"/>
+                                    <text x="60" y="25" fill="#3B1C72" font-size="13" font-weight="700" text-anchor="middle">C</text>
+
+                                    <circle cx="100" cy="40" r="11" fill="#EDE9FE" stroke="#5B21B6" stroke-width="2"/>
+                                    <text x="100" y="45" fill="#3B1C72" font-size="13" font-weight="700" text-anchor="middle">C</text>
+
+                                    <circle cx="100" cy="80" r="11" fill="#EDE9FE" stroke="#5B21B6" stroke-width="2"/>
+                                    <text x="100" y="85" fill="#3B1C72" font-size="13" font-weight="700" text-anchor="middle">C</text>
+
+                                    <circle cx="60" cy="100" r="11" fill="#EDE9FE" stroke="#5B21B6" stroke-width="2"/>
+                                    <text x="60" y="105" fill="#3B1C72" font-size="13" font-weight="700" text-anchor="middle">C</text>
+
+                                    <circle cx="20" cy="80" r="11" fill="#EDE9FE" stroke="#5B21B6" stroke-width="2"/>
+                                    <text x="20" y="85" fill="#3B1C72" font-size="13" font-weight="700" text-anchor="middle">C</text>
+
+                                    <circle cx="20" cy="40" r="11" fill="#EDE9FE" stroke="#5B21B6" stroke-width="2"/>
+                                    <text x="20" y="45" fill="#3B1C72" font-size="13" font-weight="700" text-anchor="middle">C</text>
+
+                                    <line x1="100" y1="40" x2="135" y2="25" stroke="#059669" stroke-width="3"/>
+                                    <circle cx="148" cy="20" r="13" fill="#D1FAE5" stroke="#059669" stroke-width="2"/>
+                                    <text x="148" y="25" fill="#065F46" font-size="13" font-weight="800" text-anchor="middle">OH</text>
+                                </g>
+
+                                <rect x="220" y="24" width="130" height="36" rx="6" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="1.5"/>
+                                <text x="228" y="40" fill="#4C1D95" font-size="13.5" font-weight="700">Atoms &amp; Bonds</text>
+                                <text x="228" y="53" fill="#6D28D9" font-size="12">Fixed 3D geometry</text>
+
+                                <rect x="220" y="70" width="130" height="36" rx="6" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1.5"/>
+                                <text x="228" y="86" fill="#065F46" font-size="13.5" font-weight="700">Functional Group</text>
+                                <text x="228" y="99" fill="#047857" font-size="12">-OH active binder</text>
+
+                                <rect x="15" y="128" width="330" height="26" rx="6" fill="#FAF5FF" stroke="#E9D5FF" stroke-width="1"/>
+                                <text x="180" y="145" fill="#581C87" font-size="13.5" font-weight="600" text-anchor="middle">Atoms connected in a specific arrangement that determine shape and binding.</text>
+                            </svg>
+                            <p class="diagram-caption"><strong>Figure 2:</strong> A molecule is a group of atoms joined in a particular arrangement. Its three-dimensional shape determines whether it can bind to target proteins.</p>
+                        </div>
+
+                        <p class="concept-body">
+                            A <strong>molecule</strong> is a distinct group of two or more atoms joined together in a specific, stable spatial arrangement by chemical bonds. Small molecules (like aspirin, ibuprofen, or gefitinib) have precise 3D architectures that allow them to slip into cellular binding pockets.
+                        </p>
+
+                        <div class="concept-takeaway">
+                            <strong>How BAMI represents it:</strong> Computers represent molecules using text strings called <strong>SMILES</strong>. BAMI converts SMILES into 2,048-bit numerical circular fingerprints (Morgan fingerprints) to feed into machine learning.
+                        </div>
+                    </article>
+
+                    <!-- Term 3: Drug -->
+                    <article class="concept-card" aria-labelledby="term-drug-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 03</span>
+                        </div>
+                        <h3 id="term-drug-title">Drug</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">💊</span>
+                            <span>Analogy: A published, certified textbook vs. an early rough draft</span>
+                        </div>
+
+                        <!-- Funnel Diagram -->
+                        <div class="concept-diagram-wrapper">
+                            <svg viewBox="0 0 360 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing virtual leads passing through laboratory testing and clinical trials to become an approved drug.">
+                                <rect x="10" y="24" width="94" height="52" rx="8" fill="#F3EEFA" stroke="#6D28D9" stroke-width="2"/>
+                                <text x="57" y="45" fill="#3B1C72" font-size="15" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Virtual Lead</text>
+                                <text x="57" y="63" fill="#5B21B6" font-size="13" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">BAMI Candidate</text>
+
+                                <path d="M 108 50 L 122 50" stroke="#6D28D9" stroke-width="2.5" stroke-linecap="round"/>
+
+                                <rect x="126" y="24" width="108" height="52" rx="8" fill="#EDE7F6" stroke="#4C1D95" stroke-width="2"/>
+                                <text x="180" y="45" fill="#2E1065" font-size="15" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Wet-Lab Testing</text>
+                                <text x="180" y="63" fill="#5B21B6" font-size="13" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">Assays &amp; Toxicity</text>
+
+                                <path d="M 238 50 L 252 50" stroke="#4C1D95" stroke-width="2.5" stroke-linecap="round"/>
+
+                                <rect x="256" y="20" width="94" height="60" rx="8" fill="#DCFCE7" stroke="#166534" stroke-width="2.5"/>
+                                <text x="303" y="43" fill="#14532D" font-size="15" font-weight="800" text-anchor="middle" font-family="'DM Sans', sans-serif">Approved Drug</text>
+                                <text x="303" y="58" fill="#15803D" font-size="13" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Clinical Trials</text>
+                                <text x="303" y="70" fill="#166534" font-size="11.5" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">Proven Safe</text>
+
+                                <rect x="15" y="98" width="330" height="38" rx="8" fill="#FAF5FF" stroke="#C4B5FD" stroke-width="1.5"/>
+                                <text x="180" y="122" fill="#4C1D95" font-size="14.5" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">A predicted molecule is NEVER automatically a drug.</text>
+                            </svg>
+                            <p class="diagram-caption"><strong>Figure 3:</strong> Machine learning identifies early candidate leads. Every lead must undergo rigorous wet-lab testing and human clinical trials before becoming a medicine.</p>
+                        </div>
+
+                        <p class="concept-body">
+                            A <strong>drug</strong> is an officially approved medicine tested extensively in laboratories, animal models, and three phases of human clinical trials to prove that it is both safe and effective for preventing, managing, or treating a medical condition.
+                        </p>
+
+                        <div class="concept-takeaway">
+                            <strong>Critical Reality:</strong> A molecule predicted active by BAMI is <strong>not automatically a drug</strong>. It is merely a computational starting lead. It has not been tested in living systems for metabolism, liver toxicity, blood-brain barrier transport, or therapeutic dosing.
+                        </div>
+                    </article>
+
+                    <!-- Term 4: Bioactive Molecule -->
+                    <article class="concept-card" aria-labelledby="term-bioactive-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 04</span>
+                        </div>
+                        <h3 id="term-bioactive-title">Bioactive Molecule</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">⚡</span>
+                            <span>Analogy: A key that physically turns a cellular tumbler</span>
+                        </div>
+
+                        <!-- Bioactivity Outcomes Diagram -->
+                        <div class="concept-diagram-wrapper">
+                            <svg viewBox="0 0 360 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing bioactivity branching into helpful, neutral, or harmful effects.">
+                                <rect x="110" y="24" width="140" height="52" rx="10" fill="#EDE9FE" stroke="#5B21B6" stroke-width="2.5"/>
+                                <text x="180" y="46" fill="#2E1065" font-size="16" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Bioactive Molecule</text>
+                                <text x="180" y="64" fill="#5B21B6" font-size="13.5" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">Interacts with System</text>
+
+                                <path d="M 110 50 L 80 50" stroke="#166534" stroke-width="2.5" stroke-linecap="round"/>
+                                <rect x="12" y="30" width="68" height="40" rx="8" fill="#DCFCE7" stroke="#166534" stroke-width="2"/>
+                                <text x="46" y="48" fill="#14532D" font-size="14.5" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Helpful</text>
+                                <text x="46" y="63" fill="#15803D" font-size="12" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">Therapeutic</text>
+
+                                <path d="M 250 50 L 280 50" stroke="#991B1B" stroke-width="2.5" stroke-linecap="round"/>
+                                <rect x="280" y="30" width="68" height="40" rx="8" fill="#FEE2E2" stroke="#991B1B" stroke-width="2"/>
+                                <text x="314" y="48" fill="#7F1D1D" font-size="14.5" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Harmful</text>
+                                <text x="314" y="63" fill="#B91C1C" font-size="12" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">Toxic / Side Effect</text>
+
+                                <rect x="20" y="104" width="320" height="36" rx="8" fill="#FAF5FF" stroke="#C4B5FD" stroke-width="1.5"/>
+                                <text x="180" y="127" fill="#4C1D95" font-size="14.5" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">"Bioactive" alone does NOT mean safe or therapeutic!</text>
+                            </svg>
+                            <p class="diagram-caption"><strong>Figure 4:</strong> Bioactive compounds cause measurable biological responses. They can be helpful, neutral, or harmful; bioactivity alone is not proof of safety.</p>
+                        </div>
+
+                        <p class="concept-body">
+                            A <strong>bioactive molecule</strong> is a molecule that interacts with a biological system and causes a measurable effect. It binds to a cellular target and modulates its behavior—for example, shutting down a kinase enzyme or triggering receptor signaling.
+                        </p>
+
+                        <div class="concept-takeaway">
+                            <strong>Essential Distinction:</strong> Bioactivity does <em>not</em> mean the molecule is safe or beneficial. Snake venom, bacterial toxins, and lethal poisons are bioactive. “Bioactive” simply means a biological interaction occurs.
+                        </div>
+                    </article>
+
+                    <!-- Term 5: Bioactivity -->
+                    <article class="concept-card" aria-labelledby="term-bioactivity-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 05</span>
+                        </div>
+                        <h3 id="term-bioactivity-title">Bioactivity</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">📊</span>
+                            <span>Analogy: The volume of sound produced when an instrument is struck</span>
+                        </div>
+
+                        <p class="concept-body">
+                            <strong>Bioactivity</strong> is the measurable effect or response that a molecule produces on a biological target, cell, or organism. In pharmaceutical science, it is quantified using standard laboratory metrics such as the half-maximal inhibitory concentration (IC<sub>50</sub>).
+                        </p>
+
+                        <div class="concept-takeaway">
+                            <strong>How this project defines it:</strong> In BAMI, bioactivity is treated as a binary classification: <strong>Active</strong> (compounds that bind strongly, typically with IC<sub>50</sub> &le; 10 &mu;M or pIC<sub>50</sub> &ge; 6.0) versus <strong>Inactive</strong> (compounds that fail to bind effectively).
+                        </div>
+                    </article>
+
+                    <!-- Term 6: Structural Similarity -->
+                    <article class="concept-card" aria-labelledby="term-similarity-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 06</span>
+                        </div>
+                        <h3 id="term-similarity-title">Structural Similarity</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">🧩</span>
+                            <span>Analogy: Two keys with matching teeth and grooves</span>
+                        </div>
+
+                        <!-- Diagram: Chemical similarity comparison -->
+                        <div class="concept-diagram-wrapper">
+                            <svg viewBox="0 0 360 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing two related molecular skeletons with shared core scaffolds highlighted and different side chains.">
+                                <g transform="translate(35, 16)">
+                                    <polygon points="40,15 70,30 70,60 40,75 10,60 10,30" fill="#EDE9FE" stroke="#6D28D9" stroke-width="2"/>
+                                    <circle cx="70" cy="30" r="4.5" fill="#6D28D9"/>
+                                    <line x1="70" y1="30" x2="94" y2="16" stroke="#6D28D9" stroke-width="2.5"/>
+                                    <text x="104" y="20" fill="#2E1065" font-size="14" font-weight="700" font-family="'DM Sans', sans-serif">OH</text>
+                                    <text x="40" y="96" fill="#2E1065" font-size="14.5" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Salicylic Acid</text>
+                                    <text x="40" y="112" fill="#6D28D9" font-size="13" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">(Willow Bark Lead)</text>
+                                </g>
+
+                                <g transform="translate(180, 56)">
+                                    <circle cx="0" cy="0" r="16" fill="#F3EEFA" stroke="#D8CEEE" stroke-width="1.5"/>
+                                    <text x="0" y="6" fill="#5B21B6" font-size="20" font-weight="800" text-anchor="middle" font-family="'DM Sans', sans-serif">&asymp;</text>
+                                    <text x="0" y="32" fill="#4C1D95" font-size="13.5" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Shared Core</text>
+                                </g>
+
+                                <g transform="translate(215, 16)">
+                                    <polygon points="40,15 70,30 70,60 40,75 10,60 10,30" fill="#EDE9FE" stroke="#6D28D9" stroke-width="2"/>
+                                    <circle cx="70" cy="30" r="4.5" fill="#6D28D9"/>
+                                    <line x1="70" y1="30" x2="94" y2="16" stroke="#6D28D9" stroke-width="2.5"/>
+                                    <text x="101" y="20" fill="#065F46" font-size="13.5" font-weight="700" font-family="'DM Sans', sans-serif">OCOCH₃</text>
+                                    <text x="40" y="96" fill="#2E1065" font-size="14.5" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">Aspirin (Acetyl)</text>
+                                    <text x="40" y="112" fill="#065F46" font-size="13" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">(Optimized Drug)</text>
+                                </g>
+
+                                <text x="180" y="146" fill="#433858" font-size="14" font-weight="600" text-anchor="middle" font-family="'DM Sans', sans-serif">Similar structures often bind alike, but activity cliffs exist!</text>
+                            </svg>
+                            <p class="diagram-caption"><strong>Figure 5:</strong> Molecules with similar core skeletons (like salicylic acid and aspirin) often share activity, but minor changes can alter effect.</p>
+                        </div>
+
+                        <p class="concept-body">
+                            <strong>Structural similarity</strong> measures how alike two molecules are in their chemical structures, atomic layouts, and functional groups. According to the <em>Similar Property Principle</em>, similar molecules frequently exhibit similar biological properties.
+                        </p>
+
+                        <div class="concept-takeaway">
+                            <strong>The "Activity Cliff" Caveat:</strong> Similarity is not proof. Changing just a single atom or bond angle can completely eliminate binding activity or introduce severe toxicity. BAMI computes mathematical fingerprints to detect these subtle differences.
+                        </div>
+                    </article>
+
+                    <!-- Term 7: Prediction / Model Score -->
+                    <article class="concept-card" aria-labelledby="term-prediction-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 07</span>
+                        </div>
+                        <h3 id="term-prediction-title">Prediction / Model Score</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">🎯</span>
+                            <span>Analogy: A calibrated weather forecast probability</span>
+                        </div>
+
+                        <p class="concept-body">
+                            In BAMI, a <strong>prediction</strong> is the computational classification generated by our trained machine-learning model, accompanied by specific numerical scores:
+                        </p>
+
+                        <ul class="comparison-list" style="margin-top: 8px;">
+                            <li class="comparison-item">
+                                <span class="item-icon icon-check" aria-hidden="true">&bull;</span>
+                                <span><strong>Predicted Class:</strong> Binary result indicating whether the molecule is classified as <strong>Active</strong> or <strong>Inactive</strong> against the target.</span>
+                            </li>
+                            <li class="comparison-item">
+                                <span class="item-icon icon-check" aria-hidden="true">&bull;</span>
+                                <span><strong>Calibrated Probability (EGFR):</strong> For EGFR, the raw model score is calibrated using Platt/isotonic scaling into an empirical probability percentage, evaluated against an optimal threshold (e.g., 44.0%).</span>
+                            </li>
+                            <li class="comparison-item">
+                                <span class="item-icon icon-check" aria-hidden="true">&bull;</span>
+                                <span><strong>Model Score (COX-2):</strong> For COX-2, the system reports the model probability score evaluated against a 50.0% classification decision threshold.</span>
+                            </li>
+                            <li class="comparison-item">
+                                <span class="item-icon icon-check" aria-hidden="true">&bull;</span>
+                                <span><strong>Molecular Descriptors:</strong> Calculated physical properties (Molecular Weight, LogP, TPSA, HBD, HBA, Rotatable Bonds) assessing Lipinski Rule-of-Five drug-likeness.</span>
+                            </li>
+                        </ul>
+
+                        <div class="concept-takeaway">
+                            <strong>Scientific Meaning:</strong> These scores are computational estimates, never guarantees of clinical or laboratory outcome.
+                        </div>
+                    </article>
+
+                    <!-- Term 8: XGBoost -->
+                    <article class="concept-card" aria-labelledby="term-xgboost-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 08</span>
+                        </div>
+                        <h3 id="term-xgboost-title">XGBoost</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">🌳</span>
+                            <span>Analogy: A committee of hundreds of specialized decision trees</span>
+                        </div>
+
+                        <p class="concept-body">
+                            <strong>XGBoost</strong> (Extreme Gradient Boosting) is an industry-standard machine-learning algorithm. Rather than relying on simple linear formulas or hard-coded rules, it builds an ensemble of sequential decision trees where each new tree specifically learns from and corrects the mistakes made by previous trees.
+                        </p>
+
+                        <div class="concept-takeaway">
+                            <strong>Why BAMI uses it:</strong> XGBoost excels at analyzing sparse, high-dimensional chemical data. It scans all 2,048 bits of a molecule's Morgan circular fingerprint, discovering subtle nonlinear patterns that separate active binders from inert compounds with high computational efficiency.
+                        </div>
+                    </article>
+
+                    <!-- Term 9: ADMET -->
+                    <article class="concept-card featured-concept" aria-labelledby="term-admet-title">
+                        <div class="concept-card-top">
+                            <span class="concept-index">Dictionary &bull; Term 09 &bull; Preclinical Safety</span>
+                        </div>
+                        <h3 id="term-admet-title">ADMET (Absorption, Distribution, Metabolism, Excretion &amp; Toxicity)</h3>
+                        
+                        <div class="concept-analogy-chip">
+                            <span aria-hidden="true">🛡️</span>
+                            <span>Analogy: A racing car needs safe brakes, steering, and fuel economy, not just top speed</span>
+                        </div>
+
+                        <!-- Diagram 9: ADMET Journey Diagram -->
+                        <div class="concept-diagram-wrapper">
+                            <svg viewBox="0 0 760 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing the 5 pillars of ADMET: Absorption, Distribution, Metabolism, Excretion, and Toxicity.">
+                                <!-- Pillar A: Absorption -->
+                                <g transform="translate(10, 20)">
+                                    <rect x="0" y="0" width="136" height="85" rx="10" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
+                                    <circle cx="28" cy="24" r="14" fill="#0284C7"/>
+                                    <text x="28" y="29" fill="#FFFFFF" font-size="14" font-weight="900" text-anchor="middle">A</text>
+                                    <text x="50" y="28" fill="#0369A1" font-size="15" font-weight="800">Absorption</text>
+                                    <text x="12" y="52" fill="#0284C7" font-size="12" font-weight="700">ESOL logS &bull; Caco-2</text>
+                                    <text x="12" y="70" fill="#075985" font-size="11.5">Intestinal Mucosal Flux</text>
+                                </g>
+
+                                <path d="M 152 62 L 164 62" stroke="#6D28D9" stroke-width="2.5" stroke-linecap="round"/>
+
+                                <!-- Pillar D: Distribution -->
+                                <g transform="translate(168, 20)">
+                                    <rect x="0" y="0" width="136" height="85" rx="10" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
+                                    <circle cx="28" cy="24" r="14" fill="#7C3AED"/>
+                                    <text x="28" y="29" fill="#FFFFFF" font-size="14" font-weight="900" text-anchor="middle">D</text>
+                                    <text x="50" y="28" fill="#5B21B6" font-size="15" font-weight="800">Distribution</text>
+                                    <text x="12" y="52" fill="#6D28D9" font-size="12" font-weight="700">BBBP &bull; PPB % fu</text>
+                                    <text x="12" y="70" fill="#4C1D95" font-size="11.5">Tissue Partitioning</text>
+                                </g>
+
+                                <path d="M 310 62 L 322 62" stroke="#6D28D9" stroke-width="2.5" stroke-linecap="round"/>
+
+                                <!-- Pillar M: Metabolism -->
+                                <g transform="translate(326, 20)">
+                                    <rect x="0" y="0" width="136" height="85" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+                                    <circle cx="28" cy="24" r="14" fill="#D97706"/>
+                                    <text x="28" y="29" fill="#FFFFFF" font-size="14" font-weight="900" text-anchor="middle">M</text>
+                                    <text x="50" y="28" fill="#92400E" font-size="15" font-weight="800">Metabolism</text>
+                                    <text x="12" y="52" fill="#B45309" font-size="12" font-weight="700">CYP3A4 / 2D6 / 2C9</text>
+                                    <text x="12" y="70" fill="#78350F" font-size="11.5">DDI Liability Shield</text>
+                                </g>
+
+                                <path d="M 468 62 L 480 62" stroke="#6D28D9" stroke-width="2.5" stroke-linecap="round"/>
+
+                                <!-- Pillar E: Excretion -->
+                                <g transform="translate(484, 20)">
+                                    <rect x="0" y="0" width="136" height="85" rx="10" fill="#DCFCE7" stroke="#059669" stroke-width="2"/>
+                                    <circle cx="28" cy="24" r="14" fill="#059669"/>
+                                    <text x="28" y="29" fill="#FFFFFF" font-size="14" font-weight="900" text-anchor="middle">E</text>
+                                    <text x="50" y="28" fill="#065F46" font-size="15" font-weight="800">Excretion</text>
+                                    <text x="12" y="52" fill="#047857" font-size="12" font-weight="700">QED Score (0 - 1)</text>
+                                    <text x="12" y="70" fill="#14532D" font-size="11.5">Renal vs Hepatic Route</text>
+                                </g>
+
+                                <path d="M 626 62 L 638 62" stroke="#6D28D9" stroke-width="2.5" stroke-linecap="round"/>
+
+                                <!-- Pillar T: Toxicity -->
+                                <g transform="translate(642, 20)">
+                                    <rect x="0" y="0" width="108" height="85" rx="10" fill="#FEE2E2" stroke="#DC2626" stroke-width="2"/>
+                                    <circle cx="24" cy="24" r="14" fill="#DC2626"/>
+                                    <text x="24" y="29" fill="#FFFFFF" font-size="14" font-weight="900" text-anchor="middle">T</text>
+                                    <text x="44" y="28" fill="#991B1B" font-size="15" font-weight="800">Toxicity</text>
+                                    <text x="10" y="52" fill="#B91C1C" font-size="12" font-weight="700">Ames, DILI, hERG</text>
+                                    <text x="10" y="70" fill="#7F1D1D" font-size="11.5">Safety Hazards</text>
+                                </g>
+
+                                <rect x="30" y="118" width="700" height="30" rx="8" fill="#FAF5FF" stroke="#DDD6FE" stroke-width="1.2"/>
+                                <text x="380" y="138" fill="#4C1D95" font-size="14" font-weight="700" text-anchor="middle" font-family="'DM Sans', sans-serif">BAMI runs 10 validated machine learning models in parallel to assess all 5 ADMET pillars before chemical synthesis.</text>
+                            </svg>
+                            <p class="diagram-caption"><strong>Figure 9:</strong> The five critical pharmacokinetic and safety pillars: Absorption, Distribution, Metabolism, Excretion, and Toxicity.</p>
+                        </div>
+
+                        <p class="concept-body">
+                            <strong>ADMET</strong> stands for <strong>Absorption</strong>, <strong>Distribution</strong>, <strong>Metabolism</strong>, <strong>Excretion</strong>, and <strong>Toxicity</strong>. A candidate molecule may be extremely active against EGFR or COX-2 in a test tube, yet fail completely as a therapeutic drug if it cannot dissolve, cross the gut, or causes toxic damage to organs like the liver or heart.
+                        </p>
+
+                        <div class="admet-pillars-grid">
+                            <div class="admet-pillar-card">
+                                <span class="pillar-letter pillar-a">A</span>
+                                <span class="pillar-name">Absorption</span>
+                                <span class="pillar-desc">Aqueous solubility (logS), Caco-2 cell permeability, and human intestinal absorption (HIA).</span>
+                            </div>
+                            <div class="admet-pillar-card">
+                                <span class="pillar-letter pillar-d">D</span>
+                                <span class="pillar-name">Distribution</span>
+                                <span class="pillar-desc">Blood-brain barrier permeability (BBBP) and plasma protein binding fraction unbound (fu).</span>
+                            </div>
+                            <div class="admet-pillar-card">
+                                <span class="pillar-letter pillar-m">M</span>
+                                <span class="pillar-name">Metabolism</span>
+                                <span class="pillar-desc">CYP450 enzyme inhibition (CYP3A4, CYP2D6, CYP2C9) to prevent polypharmacy interactions.</span>
+                            </div>
+                            <div class="admet-pillar-card">
+                                <span class="pillar-letter pillar-e">E</span>
+                                <span class="pillar-name">Excretion</span>
+                                <span class="pillar-desc">Quantitative estimate of drug-likeness (QED) and renal vs. hepatic elimination pathway drivers.</span>
+                            </div>
+                            <div class="admet-pillar-card">
+                                <span class="pillar-letter pillar-t">T</span>
+                                <span class="pillar-name">Toxicity</span>
+                                <span class="pillar-desc">Ames bacterial mutagenicity, FDA DILIst liver injury, and cardiac hERG channel blockade risk.</span>
+                            </div>
+                        </div>
+
+                        <div class="concept-takeaway" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                            <div>
+                                <strong>Dedicated Preclinical Profiling in BAMI:</strong> Screen your lead molecules against all 10 endpoint models with automated risk scorecards and medicinal chemistry recommendations.
+                            </div>
+                            <a href="admet.html" class="cta-btn-primary" style="padding: 10px 22px; font-size: 1rem; min-height: 44px; text-decoration: none;">
+                                <span>Launch ADMET Dashboard &rarr;</span>
+                            </a>
+                        </div>
+                    </article>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================================
+             4. HOW THIS PROJECT WORKS (5-STEP PIPELINE)
+             Accurate to the real codebase (XGBoost, Morgan Fingerprints, RDKit, COX-2 & EGFR)
+             ========================================================= -->
+        <section class="home-section" id="how-it-works" aria-labelledby="pipeline-heading">
+            <div class="home-section-container">
+
+                <div class="home-section-header">
+                    <div class="section-badge">The Technology Pipeline</div>
+                    <h2 id="pipeline-heading">How BAMI Screens Molecules <span>Step-by-Step</span></h2>
+                    <p>
+                        Here is the exact computational pipeline executed under the hood when you enter a compound into BAMI.
+                    </p>
+                </div>
+
+                <div class="pipeline-steps-wrapper">
+
+                    <!-- Step 1 -->
+                    <article class="pipeline-step-card">
+                        <div class="step-num-box">
+                            <span class="step-label">Step</span>
+                            <span class="step-digit">01</span>
+                        </div>
+                        <div class="step-details">
+                            <div class="step-details-header">
+                                <h3>User Provides Molecule &amp; Target</h3>
+                                <span class="step-tech-tag">User Input UI</span>
+                            </div>
+                            <p>
+                                You choose a biological target (such as <strong>EGFR</strong> or <strong>COX-2</strong>) and provide a molecule by typing its common name (e.g., <em>Aspirin</em>, <em>Gefitinib</em>) or pasting its chemical <strong>SMILES</strong> notation.
+                            </p>
+                        </div>
+                        <div class="step-visual-snippet" aria-hidden="true">
+                            <span class="snippet-content">Aspirin &rarr; COX-2</span>
+                        </div>
+                    </article>
+
+                    <!-- Step 2 -->
+                    <article class="pipeline-step-card">
+                        <div class="step-num-box">
+                            <span class="step-label">Step</span>
+                            <span class="step-digit">02</span>
+                        </div>
+                        <div class="step-details">
+                            <div class="step-details-header">
+                                <h3>Molecular Representation (Morgan Fingerprints)</h3>
+                                <span class="step-tech-tag">RDKit Cheminformatics</span>
+                            </div>
+                            <p>
+                                Machine-learning models cannot read chemical drawings directly. RDKit calculates a circular <strong>Morgan fingerprint</strong> (radius 2, 2,048 bits) that encodes atom neighborhoods and bonding patterns into a binary vector of 0s and 1s.
+                            </p>
+                        </div>
+                        <div class="step-visual-snippet" aria-hidden="true">
+                            <span class="snippet-content">[0, 1, 0, 0, 1 ... 2,048 bits]</span>
+                        </div>
+                    </article>
+
+                    <!-- Step 3 -->
+                    <article class="pipeline-step-card">
+                        <div class="step-num-box">
+                            <span class="step-label">Step</span>
+                            <span class="step-digit">03</span>
+                        </div>
+                        <div class="step-details">
+                            <div class="step-details-header">
+                                <h3>Trained XGBoost Model Estimates Activity</h3>
+                                <span class="step-tech-tag">Gradient Boosted Trees</span>
+                            </div>
+                            <p>
+                                The 2,048 numerical features pass through our trained XGBoost decision trees. For EGFR, Platt/isotonic calibration maps the raw tree outputs into true probabilities evaluated against calibrated decision thresholds.
+                            </p>
+                        </div>
+                        <div class="step-visual-snippet" aria-hidden="true">
+                            <span class="snippet-content">XGBoost &rarr; Score: 86.5%</span>
+                        </div>
+                    </article>
+
+                    <!-- Step 4 -->
+                    <article class="pipeline-step-card">
+                        <div class="step-num-box">
+                            <span class="step-label">Step</span>
+                            <span class="step-digit">04</span>
+                        </div>
+                        <div class="step-details">
+                            <div class="step-details-header">
+                                <h3>View Predictions &amp; Available Scores</h3>
+                                <span class="step-tech-tag">Real-Time Evaluation</span>
+                            </div>
+                            <p>
+                                The app displays the actual classification label (<strong>Active</strong> or <strong>Inactive</strong>), calibrated probability percentage or model score, decision threshold, and 6 Lipinski Rule-of-Five properties (MW, LogP, TPSA, HBD, HBA, Rotatable Bonds).
+                            </p>
+                        </div>
+                        <div class="step-visual-snippet" aria-hidden="true">
+                            <span class="snippet-content">Active &bull; Prob: 86.5% &bull; MW: 180.16</span>
+                        </div>
+                    </article>
+
+                    <!-- Step 5 -->
+                    <article class="pipeline-step-card">
+                        <div class="step-num-box">
+                            <span class="step-label">Step</span>
+                            <span class="step-digit">05</span>
+                        </div>
+                        <div class="step-details">
+                            <div class="step-details-header">
+                                <h3>Researchers Prioritize for Laboratory Testing</h3>
+                                <span class="step-tech-tag">Virtual Triage</span>
+                            </div>
+                            <p>
+                                Results allow researchers to prioritize virtual candidate leads, focusing laboratory synthesis and binding assays on molecules with high computational evidence rather than testing blindly.
+                            </p>
+                        </div>
+                        <div class="step-visual-snippet" aria-hidden="true">
+                            <span class="snippet-content">Lead Prioritized &rarr; Wet Lab Assay</span>
+                        </div>
+                    </article>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================================
+             5. SUPPORTED TARGET SPOTLIGHT: EGFR & COX-2
+             Accurate to the code (EGFR P00533, COX-2 P35354)
+             ========================================================= -->
+        <section class="home-section home-section-alt" id="supported-targets" aria-labelledby="targets-heading">
+            <div class="home-section-container">
+
+                <div class="home-section-header">
+                    <div class="section-badge">Supported Disease Targets</div>
+                    <h2 id="targets-heading">The Two Targets <span>Modeled in This Project</span></h2>
+                    <p>
+                        BAMI currently provides validated machine-learning models for two clinically vital human target proteins.
+                    </p>
+                </div>
+
+                <div class="targets-spotlight-grid">
+
+                    <!-- Target Card: EGFR -->
+                    <article class="target-spotlight-card target-egfr">
+                        <div class="target-card-header">
+                            <div class="target-title-wrap">
+                                <h3>EGFR</h3>
+                                <span class="target-full-name">Epidermal Growth Factor Receptor</span>
+                            </div>
+                            <span class="target-domain-badge badge-egfr">Oncology / Cancer</span>
+                        </div>
+
+                        <div class="target-info-item">
+                            <span class="target-info-label">Biological Role</span>
+                            <p class="target-info-value">
+                                A receptor tyrosine kinase (UniProt P00533) that spans the cell membrane. It transmits signals that drive cell growth, survival, and division. Hyperactivation or mutation is heavily implicated in non-small cell lung cancer (NSCLC) and glioblastoma.
+                            </p>
+                        </div>
+
+                        <div class="target-info-item">
+                            <span class="target-info-label">Therapeutic Goal</span>
+                            <p class="target-info-value">
+                                Discovering small molecules that occupy EGFR's intracellular ATP-binding pocket to block its signaling cascade and arrest tumor cell proliferation.
+                            </p>
+                        </div>
+
+                        <div class="target-info-item">
+                            <span class="target-info-label">Known Benchmark Inhibitors</span>
+                            <div class="target-examples-pill-row">
+                                <span class="example-drug-pill">Gefitinib</span>
+                                <span class="example-drug-pill">Erlotinib</span>
+                                <span class="example-drug-pill">Osimertinib</span>
+                            </div>
+                        </div>
+
+                        <a href="index.html?target=EGFR" class="target-cta-btn">
+                            <span>Screen Against EGFR in Predictor &rarr;</span>
+                        </a>
+                    </article>
+
+                    <!-- Target Card: COX-2 -->
+                    <article class="target-spotlight-card target-cox2">
+                        <div class="target-card-header">
+                            <div class="target-title-wrap">
+                                <h3>COX-2</h3>
+                                <span class="target-full-name">Cyclooxygenase-2 Enzyme</span>
+                            </div>
+                            <span class="target-domain-badge badge-cox2">Inflammation &amp; Pain</span>
+                        </div>
+
+                        <div class="target-info-item">
+                            <span class="target-info-label">Biological Role</span>
+                            <p class="target-info-value">
+                                An inducible enzyme (UniProt P35354) expressed in response to inflammatory stimuli. It synthesizes prostaglandins that mediate pain, fever, swelling, and tissue inflammation.
+                            </p>
+                        </div>
+
+                        <div class="target-info-item">
+                            <span class="target-info-label">Therapeutic Goal</span>
+                            <p class="target-info-value">
+                                Identifying compounds that selectively inhibit COX-2 to alleviate pain and arthritis while sparing COX-1 to protect gastric mucosal tissue.
+                            </p>
+                        </div>
+
+                        <div class="target-info-item">
+                            <span class="target-info-label">Known Benchmark Inhibitors</span>
+                            <div class="target-examples-pill-row">
+                                <span class="example-drug-pill">Celecoxib</span>
+                                <span class="example-drug-pill">Aspirin</span>
+                                <span class="example-drug-pill">Ibuprofen</span>
+                            </div>
+                        </div>
+
+                        <a href="index.html?target=COX-2" class="target-cta-btn">
+                            <span>Screen Against COX-2 in Predictor &rarr;</span>
+                        </a>
+                    </article>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================================
+             6. WHY COMPUTATIONAL SCREENING MATTERS & HONEST LIMITATIONS
+             ========================================================= -->
+        <section class="home-section" id="why-it-matters" aria-labelledby="why-heading">
+            <div class="home-section-container">
+
+                <div class="home-section-header">
+                    <div class="section-badge">Scientific Integrity</div>
+                    <h2 id="why-heading">Why Computation Matters &mdash; <span>And Its Honest Limits</span></h2>
+                    <p>
+                        Computational screening is a powerful accelerator for early-stage discovery, but it is one tool in a multi-stage scientific pipeline.
+                    </p>
+                </div>
+
+                <div class="limitations-wrapper">
+
+                    <div class="limitations-col can-do">
+                        <h3>
+                            <span aria-hidden="true">&check;</span>
+                            <span>What This Tool Can Do</span>
+                        </h3>
+                        <ul>
+                            <li>
+                                <strong>Fast Candidate Prioritization:</strong> Rank thousands of potential molecules rapidly against EGFR and COX-2, helping chemists choose which compounds to synthesize first.
+                            </li>
+                            <li>
+                                <strong>Chemical Substructure Recognition:</strong> Detect subtle circular sub-structure patterns (2,048-bit Morgan fingerprints) statistically correlated with target binding.
+                            </li>
+                            <li>
+                                <strong>Scaffold Extraction &amp; SAR Exploration:</strong> Isolate Bemis-Murcko core rings and decompose peripheral substituents across structural series.
+                            </li>
+                            <li>
+                                <strong>Comprehensive ADMET Profiling:</strong> Evaluate 10 endpoint-specific machine learning models for aqueous solubility, Caco-2 permeability, blood-brain barrier transport, CYP450 inhibition, and organ safety hazards (Ames, DILI, hERG).
+                            </li>
+                            <li>
+                                <strong>Calibrated Confidence:</strong> Provide statistical confidence percentages and optimal decision thresholds rather than uncalibrated heuristic scores.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="limitations-col cannot-do">
+                        <h3>
+                            <span aria-hidden="true">&times;</span>
+                            <span>What This Tool Cannot Do (Honest Limits)</span>
+                        </h3>
+                        <ul>
+                            <li>
+                                <strong>Not Biological Proof:</strong> A high model score is a computational hypothesis, not physical proof of in vitro or in vivo biological efficacy.
+                            </li>
+                            <li>
+                                <strong>Wet-Lab Assays Remain Mandatory:</strong> While our ADMET module identifies critical liabilities early, in vitro cellular assays and patch-clamp electrophysiology remain essential before clinical advancement.
+                            </li>
+                            <li>
+                                <strong>No Whole-Body Physiological Simulation:</strong> Does not simulate patient-specific genetics, idiosyncratic immune reactions, or multi-organ systemic pharmacodynamics.
+                            </li>
+                            <li>
+                                <strong>Research Triage Only, Never Medical Advice:</strong> Outputs are preclinical screening leads for laboratory scientists, never medical guidance or treatment advice for patients.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="limitation-alert-banner">
+                        <span class="alert-icon" aria-hidden="true">⚠️</span>
+                        <div class="alert-text">
+                            <strong>Mandatory Wet-Lab Validation:</strong> All computational predictions must be validated through experimental wet-lab assays (enzymatic IC<sub>50</sub> measurements, cell viability testing, and crystallographic binding studies) before any lead can advance.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================================
+             7. CLOSING CALL TO ACTION
+             Direct navigation to prediction workflow and history
+             ========================================================= -->
+        <section class="home-section" aria-labelledby="cta-heading">
+            <div class="home-section-container">
+
+                <div class="closing-cta-card">
+                    <h2 id="cta-heading">Ready to Explore Molecule Predictions?</h2>
+                    <p>
+                        Test real molecules against EGFR and COX-2, extract Bemis-Murcko scaffolds, 
+                        and profile comprehensive ADMET pharmacokinetics in our interactive workspace.
+                    </p>
+
+                    <div class="closing-cta-buttons">
+                        <a href="index.html#prediction" class="btn-cta-white">
+                            <span>Open Bioactivity Predictor</span>
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                        <a href="scaffold-analysis.html" class="btn-cta-trans">
+                            <span>Scaffold Analysis</span>
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                        <a href="admet.html" class="btn-cta-trans">
+                            <span>ADMET Profiling</span>
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                        <a href="drug-likeness.html" class="btn-cta-trans">
+                            <span>Drug-Likeness Tool</span>
+                        </a>
+                        <a href="history.html" class="btn-cta-trans">
+                            <span>View History</span>
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+
+                    <p class="closing-disclaimer-note">
+                        Remember: Treat all predictions as preliminary research hypotheses requiring experimental laboratory validation.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================================
+             GRAND GET STARTED CALL-TO-ACTION
+             ========================================================= -->
+        <section class="home-cta-banner-section" aria-labelledby="cta-banner-heading">
+            <div class="home-cta-card">
+                <div class="home-cta-content">
+                    <div class="home-hero-badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #E9D5FF; margin-bottom: 14px;">
+                        <span class="home-hero-badge-dot" style="background: #A855F7; box-shadow: 0 0 10px #A855F7;" aria-hidden="true"></span>
+                        <span>Start Your Screening Pipeline</span>
+                    </div>
+                    <h2 id="cta-banner-heading">Ready to Prioritize Your <span>Candidate Molecules?</span></h2>
+                    <p>
+                        Input a chemical name or SMILES string to obtain calibrated bioactivity estimations, core scaffold SAR decomposition, and comprehensive 10-endpoint ADMET profiling in seconds.
+                    </p>
+                </div>
+                <div class="home-cta-actions">
+                    <a href="index.html#prediction" class="cta-btn-get-started">
+                        <span>Get Started with Screening</span>
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =========================================================
+         HOME PAGE FOOTER
+         ========================================================= -->
+    <footer class="home-footer" role="contentinfo">
+        <div class="home-footer-container">
+            <div class="home-footer-top">
+                <div class="footer-brand">
+                    <span class="logo-icon" aria-hidden="true">✦</span>
+                    <span>BAMI &bull; Bioactive Molecule Intelligence</span>
+                </div>
+                <div class="footer-nav">
+                    <a href="home.html">Home</a>
+                    <a href="index.html#prediction">Predictor</a>
+                    <a href="index.html#batch-screening">Batch Screening</a>
+                    <a href="drug-likeness.html">Drug-Likeness</a>
+                    <a href="scaffold-analysis.html">Scaffold Analysis</a>
+                    <a href="admet.html">ADMET</a>
+                    <a href="history.html">History</a>
+                </div>
+            </div>
+
+            <div class="home-footer-bottom">
+                <p>&copy; 2026 BAMI Project. Built for scientific research and educational triage.</p>
+                <p>Focused on EGFR (UniProt P00533) and COX-2 (UniProt P35354) targets.</p>
+            </div>
+        </div>
+    </footer>
+
+        </div><!-- /.app-main-content -->
+    </div><!-- /.app-layout -->
+
+    <!-- Unified Workspace Sidebar -->
+    <script src="sidebar.js?v=50"></script>
+
+    <!-- Interactive 3D/2.5D Molecular Hero Canvas -->
+    <script src="molecular-hero.js?v=1"></script>
+
+    <!-- 3D WebGL Particle-Wave Visualization Background -->
+    <script type="module" src="particle-wave.js?v=8"></script>
+
+    <!-- Auth Module -->
+    <script type="module" src="auth.js?v=2"></script>
+
+</body>
+</html>

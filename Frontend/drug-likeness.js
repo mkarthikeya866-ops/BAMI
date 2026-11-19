@@ -78,17 +78,40 @@ function displayResults(data) {
 
     errorMessage.hidden = true;
     resultsSection.hidden = false;
+    resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 /* =========================================================
     BACKEND AND PUBCHEM REQUESTS
    ========================================================= */
 
+async function getAuthHeaders() {
+    if (typeof window.getFirebaseAuthHeaders === "function") {
+        try {
+            return await window.getFirebaseAuthHeaders();
+        } catch (e) {
+            console.warn("Auth header lookup:", e);
+        }
+    }
+    for (let i = 0; i < 25; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 80));
+        if (typeof window.getFirebaseAuthHeaders === "function") {
+            try {
+                return await window.getFirebaseAuthHeaders();
+            } catch (e) {
+                console.warn("Auth header lookup:", e);
+            }
+        }
+    }
+    return {};
+}
+
 async function requestAnalysis(smiles) {
+    const authHeaders = await getAuthHeaders();
     const response = await fetch(DRUG_LIKENESS_API_URL, {
         method: "POST",
         headers: {
-            ...(await window.getFirebaseAuthHeaders()),
+            ...authHeaders,
             "Content-Type": "application/json"
         },
         body: JSON.stringify({ smiles })
@@ -202,4 +225,55 @@ if (typeof initMoleculeAutocomplete === "function") {
             smilesInput.value = molecule.name;
         }
     });
+}
+
+/* =========================================================
+   AUTO-ANALYZE WHEN REDIRECTED FROM AN ACTIVE PREDICTION
+   ========================================================= */
+
+async function checkAndHandleAutoAnalysis() {
+    const params = new URLSearchParams(window.location.search);
+    let smilesParam = params.get("smiles") || params.get("compound") || params.get("q");
+    let nameParam = params.get("name");
+    const autoAnalyze = params.get("auto") === "1" || params.get("auto") === "true";
+    const fromActive = params.get("from") === "active_prediction";
+    const targetParam = params.get("target");
+
+    if (!smilesParam) {
+        try {
+            const raw = sessionStorage.getItem("bami_auto_drug_likeness");
+            if (raw) {
+                const stored = JSON.parse(raw);
+                if (stored && stored.smiles && (Date.now() - (stored.timestamp || 0) < 120000)) {
+                    smilesParam = stored.smiles;
+                    nameParam = stored.name || nameParam;
+                }
+            }
+        } catch (e) {}
+    }
+
+    if (smilesParam) {
+        smilesInput.value = smilesParam;
+
+        if (autoAnalyze || fromActive) {
+            try {
+                sessionStorage.removeItem("bami_auto_drug_likeness");
+            } catch (e) {}
+
+            const displayLabel = nameParam && nameParam !== smilesParam ? `${nameParam} (${smilesParam})` : smilesParam;
+            const targetNote = targetParam ? ` against ${targetParam}` : "";
+            statusMessage.textContent = `Active lead detected${targetNote}! Automatically analyzing Lipinski's Rule of Five…`;
+
+            // Give a brief moment for autocomplete and auth initialization, then trigger form submission
+            setTimeout(() => {
+                form.dispatchEvent(new Event("submit", { cancelable: true }));
+            }, 180);
+        }
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", checkAndHandleAutoAnalysis);
+} else {
+    checkAndHandleAutoAnalysis();
 }
