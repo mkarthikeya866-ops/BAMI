@@ -22,12 +22,30 @@ const statusMessage = document.getElementById("drug-status");
 const errorMessage = document.getElementById("drug-error");
 const resultsSection = document.getElementById("drug-results");
 
+let currentCompoundName = "";
+
 const ruleLabels = {
-    molecular_weight: "Molecular Weight ≤ 500 g/mol",
-    logp: "LogP ≤ 5",
+    molecular_weight: "Molecular Weight ≤ 500 Da",
+    logp: "LogP ≤ 5.0",
     hydrogen_bond_donors: "Hydrogen-bond donors ≤ 5",
     hydrogen_bond_acceptors: "Hydrogen-bond acceptors ≤ 10"
 };
+
+/* =========================================================
+    SAMPLE BENCHMARK PILLS HANDLER
+   ========================================================= */
+
+document.querySelectorAll(".sample-pill-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+        const smiles = this.dataset.smiles;
+        const name = this.dataset.name;
+        if (smiles) {
+            smilesInput.value = smiles;
+            currentCompoundName = name || "";
+            form.dispatchEvent(new Event("submit", { cancelable: true }));
+        }
+    });
+});
 
 /* =========================================================
     ERROR AND RESULT RENDERING
@@ -40,41 +58,239 @@ function showError(message) {
     resultsSection.hidden = true;
 }
 
-function displayResults(data) {
-    const descriptors = data.descriptors;
+function displayResults(data, compoundName) {
+    const descriptors = data.descriptors || {};
+    const lip = data.lipinski || {};
+    const isPass = Boolean(lip.passed);
+    const violations = lip.violations !== undefined ? lip.violations : 0;
+    const smiles = data.smiles || smilesInput.value.trim();
+    const resolvedName = compoundName || currentCompoundName || (window.BAMI?.findBioactiveMoleculeBySmiles?.(smiles)?.name) || "Candidate Molecule";
 
-    document.getElementById("drug-mw").textContent =
-        Number(descriptors.Molecular_Weight).toFixed(2);
-    document.getElementById("drug-logp").textContent =
-        Number(descriptors.LogP).toFixed(2);
-    document.getElementById("drug-hbd").textContent = descriptors.HBD;
-    document.getElementById("drug-hba").textContent = descriptors.HBA;
-    document.getElementById("drug-tpsa").textContent =
-        Number(descriptors.TPSA).toFixed(2);
-    document.getElementById("drug-rotatable").textContent =
-        descriptors.Rotatable_Bonds;
+    // 1. Analyzed chemical entity header
+    const nameEl = document.getElementById("drug-analyzed-name");
+    const smilesEl = document.getElementById("drug-analyzed-smiles");
+    const tagEl = document.getElementById("drug-lead-tag");
+    if (nameEl) nameEl.textContent = resolvedName;
+    if (smilesEl) smilesEl.textContent = smiles;
+    if (tagEl) {
+        tagEl.textContent = isPass ? "Oral Drug-Like Candidate" : "Physicochemical Review Required";
+        tagEl.className = isPass ? "lead-badge-entity badge-pass-pill" : "lead-badge-entity badge-review-pill";
+    }
 
-    const lipinski = data.lipinski;
+    // 2. Summary Status Banner
+    const banner = document.getElementById("lipinski-status-banner");
+    const statusBadge = document.getElementById("lipinski-status-badge");
+    const statusTitle = document.getElementById("lipinski-status-title");
+    const statusSubtitle = document.getElementById("lipinski-status-subtitle");
+
+    if (banner && statusBadge && statusTitle && statusSubtitle) {
+        if (isPass) {
+            banner.className = "lipinski-status-banner status-banner-pass";
+            statusBadge.textContent = "PASS";
+            statusBadge.className = "status-banner-badge badge-pass";
+            statusTitle.textContent = "5/5 criteria satisfied";
+            statusSubtitle.textContent = "Favorable drug-like physicochemical properties for potential oral drug development.";
+        } else {
+            banner.className = "lipinski-status-banner status-banner-review";
+            statusBadge.textContent = "REVIEW REQUIRED";
+            statusBadge.className = "status-banner-badge badge-review";
+            statusTitle.textContent = `${violations} Lipinski Rule Violation${violations === 1 ? "" : "s"} (${Math.max(0, 5 - violations)}/5 Criteria Satisfied)`;
+            statusSubtitle.textContent = "Parameter review required. Note: Lipinski violations do not automatically disqualify oral candidacy.";
+        }
+    }
+
+    // KPI Grid
+    const kpiStatus = document.getElementById("kpi-status");
+    const kpiScore = document.getElementById("kpi-score");
+    const kpiViolations = document.getElementById("kpi-violations");
+    const kpiOutlook = document.getElementById("kpi-outlook");
+
+    if (kpiStatus) {
+        kpiStatus.textContent = isPass ? "PASS" : "REVIEW REQUIRED";
+        kpiStatus.className = `kpi-value ${isPass ? "status-val-pass" : "status-val-review"}`;
+    }
+    if (kpiScore) {
+        kpiScore.textContent = isPass ? "5/5" : `${Math.max(0, 5 - violations)}/5`;
+    }
+    if (kpiViolations) {
+        kpiViolations.textContent = String(violations);
+        kpiViolations.className = `kpi-value ${violations === 0 ? "status-val-pass" : "status-val-review"}`;
+    }
+    if (kpiOutlook) {
+        kpiOutlook.textContent = isPass ? "Favorable" : "Review Needed";
+        kpiOutlook.className = `kpi-value ${isPass ? "status-val-pass" : "status-val-review"}`;
+    }
+
+    // 3. Exact Scientific Interpretation Box
+    const interpText = document.getElementById("lipinski-interpretation-text");
+    if (interpText) {
+        if (lip.interpretation) {
+            interpText.textContent = lip.interpretation;
+        } else if (isPass) {
+            interpText.textContent = "The molecule satisfies all five Lipinski thresholds, indicating favorable physicochemical properties for potential oral drug development. However, passing Lipinski's Rule of Five does not guarantee absorption, safety or therapeutic effectiveness. Further ADMET profiling and molecular docking analysis are required.";
+        } else {
+            interpText.textContent = "The molecule violates one or more Lipinski thresholds. This indicates potential challenges in oral drug development. However, Lipinski violations do not automatically disqualify a molecule. Further ADMET profiling and molecular docking analysis can provide additional information.";
+        }
+    }
+
+    // 4. All Five Lipinski Thresholds Table
+    const tableBody = document.getElementById("lipinski-table-body");
+    if (tableBody) {
+        tableBody.replaceChildren();
+
+        const paramDefinitions = [
+            {
+                key: "molecular_weight",
+                name: "Molecular Weight",
+                subdesc: "Total relative molecular mass",
+                val: `${Number(descriptors.Molecular_Weight).toFixed(2)} Da`,
+                threshold: "≤ 500.0 Da",
+                rule: lip.rules?.molecular_weight
+            },
+            {
+                key: "logp",
+                name: "LogP (Octanol/Water Partition)",
+                subdesc: "Estimated lipophilicity (MolLogP)",
+                val: `${Number(descriptors.LogP).toFixed(2)}`,
+                threshold: "≤ 5.00",
+                rule: lip.rules?.logp
+            },
+            {
+                key: "hydrogen_bond_donors",
+                name: "Hydrogen Bond Donors (HBD)",
+                subdesc: "Sum of OH and NH donor groups",
+                val: String(descriptors.HBD),
+                threshold: "≤ 5",
+                rule: lip.rules?.hydrogen_bond_donors
+            },
+            {
+                key: "hydrogen_bond_acceptors",
+                name: "Hydrogen Bond Acceptors (HBA)",
+                subdesc: "Sum of oxygen and nitrogen heteroatoms",
+                val: String(descriptors.HBA),
+                threshold: "≤ 10",
+                rule: lip.rules?.hydrogen_bond_acceptors
+            }
+        ];
+
+        paramDefinitions.forEach((p) => {
+            const tr = document.createElement("tr");
+            const passed = p.rule ? Boolean(p.rule.passed) : true;
+
+            tr.innerHTML = `
+                <td>
+                    <strong class="param-title">${p.name}</strong>
+                    <span class="param-subdesc">${p.subdesc}</span>
+                </td>
+                <td>
+                    <code class="val-code">${p.val}</code>
+                </td>
+                <td>
+                    <span class="threshold-pill">${p.threshold}</span>
+                </td>
+                <td>
+                    <span class="rule-status-badge ${passed ? "badge-pass" : "badge-fail"}">
+                        ${passed ? "✓ PASS" : "✕ FAIL"}
+                    </span>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    // 5. Violations & Mechanistic Rationale Box
+    const violationsCard = document.getElementById("lipinski-violations-card");
+    const violationsList = document.getElementById("lipinski-violations-list");
+
+    if (violationsCard && violationsList) {
+        if (!isPass && violations > 0) {
+            violationsCard.hidden = false;
+            violationsList.replaceChildren();
+
+            const failedList = lip.failed_parameters && lip.failed_parameters.length > 0
+                ? lip.failed_parameters
+                : Object.entries(lip.rules || {})
+                    .filter(([_, r]) => !r.passed)
+                    .map(([k, r]) => ({
+                        parameter: r.name || k,
+                        value: r.value,
+                        unit: r.unit || "",
+                        threshold: r.display_threshold || r.threshold,
+                        reason: r.failure_reason || "Value exceeds the recommended Lipinski threshold."
+                    }));
+
+            failedList.forEach((f) => {
+                const item = document.createElement("div");
+                item.className = "violation-item";
+                item.innerHTML = `
+                    <div class="violation-item-header">
+                        <span class="violation-bullet-badge">✕</span>
+                        <strong class="violation-item-title">${f.parameter} Exceeded:</strong>
+                        <span class="violation-measured-tag">${f.value} ${f.unit || ""} (Threshold: ${f.threshold})</span>
+                    </div>
+                    <p class="violation-mechanistic-reason">${f.reason}</p>
+                `;
+                violationsList.appendChild(item);
+            });
+        } else {
+            violationsCard.hidden = true;
+            violationsList.replaceChildren();
+        }
+    }
+
+    // 6. General Molecular Descriptors (6 features)
+    const mwEl = document.getElementById("drug-mw");
+    const logpEl = document.getElementById("drug-logp");
+    const hbdEl = document.getElementById("drug-hbd");
+    const hbaEl = document.getElementById("drug-hba");
+    const tpsaEl = document.getElementById("drug-tpsa");
+    const rotEl = document.getElementById("drug-rotatable");
+
+    if (mwEl) mwEl.textContent = Number(descriptors.Molecular_Weight).toFixed(2);
+    if (logpEl) logpEl.textContent = Number(descriptors.LogP).toFixed(2);
+    if (hbdEl) hbdEl.textContent = descriptors.HBD;
+    if (hbaEl) hbaEl.textContent = descriptors.HBA;
+    if (tpsaEl) tpsaEl.textContent = Number(descriptors.TPSA).toFixed(2);
+    if (rotEl) rotEl.textContent = descriptors.Rotatable_Bonds;
+
+    // 7. Workflow Integration Links (Connecting Lipinski with other BAMI enhancements)
+    const encodedSmiles = encodeURIComponent(smiles);
+    const encodedName = encodeURIComponent(resolvedName);
+    const queryStr = `smiles=${encodedSmiles}&name=${encodedName}&auto=1`;
+
+    const admetBtn = document.getElementById("action-btn-admet");
+    const dockingBtn = document.getElementById("action-btn-docking");
+    const scaffoldBtn = document.getElementById("action-btn-scaffold");
+    const predBtn = document.getElementById("action-btn-prediction");
+
+    if (admetBtn) admetBtn.href = `admet.html?${queryStr}`;
+    if (dockingBtn) dockingBtn.href = `docking.html?${queryStr}`;
+    if (scaffoldBtn) scaffoldBtn.href = `scaffold-analysis.html?${queryStr}`;
+    if (predBtn) predBtn.href = `single-prediction.html?${queryStr}`;
+
+    // 8. Legacy element fallback
     const overall = document.getElementById("lipinski-overall");
-    overall.textContent = lipinski.passed
-        ? `PASS · ${lipinski.violations} rule violations`
-        : `FAIL · ${lipinski.violations} rule violation${lipinski.violations === 1 ? "" : "s"}`;
-    overall.className = `lipinski-overall ${lipinski.passed ? "status-pass" : "status-fail"}`;
-
+    if (overall) {
+        overall.textContent = isPass
+            ? `PASS · ${violations} rule violations`
+            : `REVIEW REQUIRED · ${violations} rule violation${violations === 1 ? "" : "s"}`;
+        overall.className = `lipinski-overall ${isPass ? "status-pass" : "status-fail"}`;
+    }
     const rulesList = document.getElementById("lipinski-rules");
-    rulesList.replaceChildren();
-    Object.entries(lipinski.rules).forEach(([ruleName, rule]) => {
-        const item = document.createElement("li");
-        const label = document.createElement("span");
-        const result = document.createElement("strong");
-        const passed = Boolean(rule.passed);
-
-        label.textContent = ruleLabels[ruleName] || ruleName;
-        result.textContent = passed ? "PASS" : "FAIL";
-        result.className = passed ? "status-pass" : "status-fail";
-        item.append(label, result);
-        rulesList.append(item);
-    });
+    if (rulesList && lip.rules) {
+        rulesList.replaceChildren();
+        Object.entries(lip.rules).forEach(([ruleName, rule]) => {
+            const item = document.createElement("li");
+            const label = document.createElement("span");
+            const result = document.createElement("strong");
+            const passed = Boolean(rule.passed);
+            label.textContent = ruleLabels[ruleName] || ruleName;
+            result.textContent = passed ? "PASS" : "FAIL";
+            result.className = passed ? "status-pass" : "status-fail";
+            item.append(label, result);
+            rulesList.append(item);
+        });
+    }
 
     errorMessage.hidden = true;
     resultsSection.hidden = false;
@@ -181,12 +397,13 @@ form.addEventListener("submit", async function (event) {
 
     try {
         let { response, data } = await requestAnalysis(input);
-        let resolvedName = "";
+        let resolvedName = currentCompoundName || "";
 
         if (response.status === 422) {
             statusMessage.textContent = "Looking up molecule name through PubChem…";
             const resolvedSmiles = await resolveMoleculeName(input);
             resolvedName = input;
+            currentCompoundName = input;
             statusMessage.textContent = "Name found. Calculating molecular descriptors and Lipinski rules…";
             ({ response, data } = await requestAnalysis(resolvedSmiles));
         }
@@ -200,7 +417,7 @@ form.addEventListener("submit", async function (event) {
             );
         }
 
-        displayResults(data);
+        displayResults(data, resolvedName);
         statusMessage.textContent = resolvedName
             ? `Analysis complete for ${resolvedName}.`
             : "Analysis complete.";
@@ -222,6 +439,11 @@ if (typeof initMoleculeAutocomplete === "function") {
         container: document.getElementById("drug-search-container"),
         dropdown: document.getElementById("drug-suggestions-dropdown"),
         onSelect: (molecule) => {
+            smilesInput.value = molecule.smiles || molecule.name;
+            currentCompoundName = molecule.name || "";
+        }
+    });
+}
             smilesInput.value = molecule.name;
         }
     });

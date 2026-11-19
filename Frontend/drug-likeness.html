@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Analyze molecular descriptors and Lipinski Rule of Five properties from a SMILES string.">
     <title>BAMI | Drug-Likeness Analysis</title>
-    <link rel="stylesheet" href="style.css?v=67">
-    <link rel="stylesheet" href="sidebar.css?v=67">
-    <link rel="stylesheet" href="ui-enhancements.css?v=67">
+    <link rel="stylesheet" href="style.css?v=72">
+    <link rel="stylesheet" href="sidebar.css?v=72">
+    <link rel="stylesheet" href="ui-enhancements.css?v=72">
 </head>
 
 <body>
@@ -58,6 +58,22 @@
                         Enter a molecule name or paste a valid SMILES. Names are resolved through PubChem.
                     </p>
 
+                    <div class="sample-pills-bar">
+                        <span class="sample-label">Benchmark Leads:</span>
+                        <button type="button" class="sample-pill-btn" data-smiles="CC(=O)Oc1ccccc1C(=O)O" data-name="Aspirin">
+                            Aspirin (Pass · 0 Violations)
+                        </button>
+                        <button type="button" class="sample-pill-btn" data-smiles="COCCOC1=C(C=C2C(=C1)C(=NC=N2)NC3=CC=CC(=C3)C#C)OCCOC" data-name="Erlotinib">
+                            Erlotinib (Pass · 0 Violations)
+                        </button>
+                        <button type="button" class="sample-pill-btn" data-smiles="CC(=O)N1CCN(CC1)c2ccc(OCC3COC(Cn4cncn4)(c5ccc(Cl)cc5Cl)O3)cc2" data-name="Ketoconazole">
+                            Ketoconazole (Review · 1 Violation)
+                        </button>
+                        <button type="button" class="sample-pill-btn" data-smiles="CC(C)c1c(C(=O)Nc2ccccc2)c(-c2ccccc2)c(-c2ccc(F)cc2)n1CC[C@@H](O)C[C@@H](O)CC(=O)O" data-name="Atorvastatin">
+                            Atorvastatin (Review · 2 Violations)
+                        </button>
+                    </div>
+
                     <button class="primary-button drug-analyze-button" id="drug-analyze-button" type="submit">
                         <span id="drug-analyze-label">Analyze Drug-Likeness</span>
                         <span aria-hidden="true">→</span>
@@ -66,14 +82,130 @@
                     <div class="drug-error" id="drug-error" role="alert" hidden></div>
                 </form>
 
-                <!-- Calculated descriptors and individual Lipinski rules. -->
+                <!-- Calculated descriptors, enhanced Lipinski rules, and workflow integration. -->
                 <section class="drug-results" id="drug-results" aria-labelledby="drug-results-heading" hidden>
-                    <!-- Molecular descriptor results. -->
-                    <div class="descriptors-card">
+
+                    <!-- 1. Analyzed Molecule Lead Header -->
+                    <div class="drug-lead-header-card" id="drug-lead-header">
+                        <div class="lead-header-info">
+                            <span class="lead-kicker">Analyzed Chemical Entity</span>
+                            <h3 id="drug-analyzed-name" class="drug-compound-name">Target Molecule</h3>
+                            <p class="drug-compound-smiles-text" id="drug-analyzed-smiles">--</p>
+                        </div>
+                        <div class="lead-header-badges">
+                            <span class="lead-badge-entity" id="drug-lead-tag">Oral Candidate</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Primary Lipinski Assessment Dashboard -->
+                    <div class="descriptors-card lipinski-card" id="lipinski-card">
                         <div class="descriptor-heading">
                             <div>
-                                <h3 id="drug-results-heading">Molecular Descriptors</h3>
-                                <p>Calculated properties for the submitted molecule.</p>
+                                <span class="descriptor-tag lipinski-badge-tag">Oral Bioavailability Filter</span>
+                                <h3 id="drug-results-heading">Lipinski's Rule of Five Assessment</h3>
+                                <p>Physicochemical criteria for potential oral drug development based on Christopher Lipinski's landmark benchmark.</p>
+                            </div>
+                        </div>
+
+                        <!-- Summary Status Banner & KPI Grid -->
+                        <div class="lipinski-summary-wrapper" id="lipinski-summary-wrapper">
+                            <div class="lipinski-status-banner status-banner-pass" id="lipinski-status-banner">
+                                <div class="status-banner-badge" id="lipinski-status-badge">PASS</div>
+                                <div class="status-banner-desc">
+                                    <h4 id="lipinski-status-title">5/5 criteria satisfied</h4>
+                                    <p id="lipinski-status-subtitle">Favorable drug-like physicochemical properties for potential oral drug development.</p>
+                                </div>
+                            </div>
+
+                            <div class="lipinski-kpi-grid">
+                                <div class="lipinski-kpi-card">
+                                    <span class="kpi-label">Assessment Status</span>
+                                    <strong class="kpi-value status-val-pass" id="kpi-status">PASS</strong>
+                                    <span class="kpi-hint">Oral Bioavailability</span>
+                                </div>
+                                <div class="lipinski-kpi-card">
+                                    <span class="kpi-label">Criteria Score</span>
+                                    <strong class="kpi-value" id="kpi-score">5/5</strong>
+                                    <span class="kpi-hint">Criteria Satisfied</span>
+                                </div>
+                                <div class="lipinski-kpi-card">
+                                    <span class="kpi-label">Total Violations</span>
+                                    <strong class="kpi-value" id="kpi-violations">0</strong>
+                                    <span class="kpi-hint">Thresholds Exceeded</span>
+                                </div>
+                                <div class="lipinski-kpi-card">
+                                    <span class="kpi-label">Preclinical Outlook</span>
+                                    <strong class="kpi-value" id="kpi-outlook" style="font-size:1.1rem;">Favorable</strong>
+                                    <span class="kpi-hint">Lead Developability</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Exact Scientific Interpretation Box -->
+                        <div class="lipinski-interpretation-box" id="lipinski-interpretation-box">
+                            <div class="interpretation-icon">📖</div>
+                            <div class="interpretation-text-content">
+                                <h5>Scientific Interpretation &amp; Preclinical Guidance</h5>
+                                <p id="lipinski-interpretation-text">
+                                    The molecule satisfies all five Lipinski thresholds, indicating favorable physicochemical properties for potential oral drug development. However, passing Lipinski's Rule of Five does not guarantee absorption, safety or therapeutic effectiveness. Further ADMET profiling and molecular docking analysis are required.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- All Five Lipinski Thresholds Table -->
+                        <div class="lipinski-table-container">
+                            <div class="lipinski-table-header">
+                                <h4>Individual Parameter Threshold Evaluation</h4>
+                                <span class="table-legend-note">Calculated using RDKit cheminformatics</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="lipinski-table" id="lipinski-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter Name</th>
+                                            <th>Actual Calculated Value</th>
+                                            <th>Lipinski Threshold</th>
+                                            <th>Evaluation Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lipinski-table-body">
+                                        <!-- Dynamically generated rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="lipinski-clarification-note">
+                                <strong>💡 Scientific Note on Terminology:</strong> Christopher Lipinski formulated the "Rule of Five" because all 4 core physicochemical cutoff thresholds are multiples of 5: Molecular Weight ≤ 500 Da (5 × 10²), LogP ≤ 5 (5 × 1), Hydrogen Bond Donors ≤ 5 (5 × 1), and Hydrogen Bond Acceptors ≤ 10 (5 × 2). Rotatable bonds (≤ 10) and TPSA (≤ 140 Å²) are part of Veber's criteria and are reported under General Molecular Descriptors.
+                            </div>
+                        </div>
+
+                        <!-- Parameter Violations Breakdown (Only displayed when violations > 0) -->
+                        <div class="lipinski-violations-card" id="lipinski-violations-card" hidden>
+                            <div class="violations-header">
+                                <span class="violations-icon">⚠️</span>
+                                <div>
+                                    <h4>Parameter Violations &amp; Mechanistic Rationale</h4>
+                                    <p>Identified physicochemical bottlenecks affecting membrane permeability or solubility.</p>
+                                </div>
+                            </div>
+                            <div class="violations-list" id="lipinski-violations-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                            <div class="violations-guidance-box">
+                                <strong>⚖️ Preclinical Lead Qualification:</strong> Violating one or more Lipinski rules does not automatically disqualify a molecule. Over 16% of FDA-approved oral therapeutics (e.g., Atorvastatin [MW 558, LogP 6.3], Montelukast [LogP 7.2]) exceed standard boundaries through active carrier transport or elevated target affinity. Further ADMET profiling and molecular docking provide conclusive biological validation.
+                            </div>
+                        </div>
+
+                        <!-- Hidden elements for legacy script/test backwards compatibility -->
+                        <div class="lipinski-overall" id="lipinski-overall" aria-live="polite" style="display:none;"></div>
+                        <ul class="lipinski-rules" id="lipinski-rules" style="display:none;"></ul>
+                    </div>
+
+                    <!-- 3. General Molecular Descriptors Card -->
+                    <div class="descriptors-card" id="general-descriptors-card">
+                        <div class="descriptor-heading">
+                            <div>
+                                <h3>General Molecular Descriptors</h3>
+                                <p>Complete physicochemical descriptor set calculated by RDKit cheminformatics engine.</p>
                             </div>
                             <span class="descriptor-tag">6 Features</span>
                         </div>
@@ -83,7 +215,7 @@
                                 <span class="descriptor-icon">⚖</span>
                                 <p>Molecular Weight</p>
                                 <h4 id="drug-mw">--</h4>
-                                <span>g/mol</span>
+                                <span>Da (g/mol)</span>
                             </div>
                             <div class="descriptor-item">
                                 <span class="descriptor-icon">◈</span>
@@ -118,17 +250,95 @@
                         </div>
                     </div>
 
-                    <!-- Overall and per-rule Lipinski results. -->
-                    <div class="descriptors-card lipinski-card">
+                    <!-- 4. Drug Discovery Workflow Integration Card -->
+                    <div class="descriptors-card lipinski-workflow-card" id="workflow-integration-card">
                         <div class="descriptor-heading">
                             <div>
-                                <h3>Lipinski Rule of Five</h3>
-                                <p>Each rule is shown separately; zero violations is a pass.</p>
+                                <span class="descriptor-tag lipinski-badge-tag">End-to-End Pipeline</span>
+                                <h3>Lipinski in the BAMI Drug Discovery Process</h3>
+                                <p>How Lipinski's Rule of Five integrates into BAMI's 6-stage computational drug discovery architecture.</p>
                             </div>
                         </div>
-                        <div class="lipinski-overall" id="lipinski-overall" aria-live="polite"></div>
-                        <ul class="lipinski-rules" id="lipinski-rules"></ul>
+
+                        <div class="pipeline-flow-steps">
+                            <div class="pipeline-step-item step-completed">
+                                <div class="step-badge">1</div>
+                                <div class="step-content">
+                                    <h5>SMILES Input &amp; Molecular Processing</h5>
+                                    <p>SMILES validation, kekulization, and RDKit molecular graph conversion.</p>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step-item step-active">
+                                <div class="step-badge">2</div>
+                                <div class="step-content">
+                                    <div class="step-active-tag">Current Stage</div>
+                                    <h5>Lipinski Rule of Five – Drug-Likeness Screening</h5>
+                                    <p>Physicochemical rule filtering to prioritize orally bioavailable leads.</p>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step-item">
+                                <div class="step-badge">3</div>
+                                <div class="step-content">
+                                    <h5>ADMET Profiling – Pharmacokinetics &amp; Safety</h5>
+                                    <p>Absorption, distribution, CYP450 metabolism, and toxicity ML endpoints.</p>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step-item">
+                                <div class="step-badge">4</div>
+                                <div class="step-content">
+                                    <h5>Molecular Docking – Binding Affinity</h5>
+                                    <p>Physics-based AutoDock Vina conformational search against COX-2 &amp; EGFR.</p>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step-item">
+                                <div class="step-badge">5</div>
+                                <div class="step-content">
+                                    <h5>Scaffold Analysis – Structural Chemotypes</h5>
+                                    <p>Bemis-Murcko framework extraction and chemical ring network decomposition.</p>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step-item">
+                                <div class="step-badge">6</div>
+                                <div class="step-content">
+                                    <h5>Overall Candidate Assessment</h5>
+                                    <p>Multi-parameter decision synthesis balancing affinity, safety, and drug-likeness.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-notice-box">
+                            <strong>⚠️ Methodological Note:</strong> Passing Lipinski's Rule of Five does not guarantee that a molecule will pass subsequent stages (ADMET profiling, molecular docking, or bioactivity screening). Lipinski screening estimates passive membrane permeability; downstream modules evaluate target binding energetics and pharmacological safety.
+                        </div>
+
+                        <div class="pipeline-actions-row">
+                            <span class="pipeline-actions-label">Continue Screening This Molecule:</span>
+                            <div class="pipeline-btn-group">
+                                <a id="action-btn-admet" href="admet.html" class="pipeline-action-btn">
+                                    <span>🔬 Proceed to ADMET Profiling</span>
+                                    <span>→</span>
+                                </a>
+                                <a id="action-btn-docking" href="docking.html" class="pipeline-action-btn">
+                                    <span>⚡ Run Molecular Docking</span>
+                                    <span>→</span>
+                                </a>
+                                <a id="action-btn-scaffold" href="scaffold-analysis.html" class="pipeline-action-btn">
+                                    <span>🧩 Analyze Scaffolds</span>
+                                    <span>→</span>
+                                </a>
+                                <a id="action-btn-prediction" href="single-prediction.html" class="pipeline-action-btn">
+                                    <span>🎯 Target Bioactivity Prediction</span>
+                                    <span>→</span>
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
+
                 </section>
             </div>
         </section>
@@ -150,8 +360,8 @@
     <script src="sidebar.js?v=50"></script>
 
     <!-- Molecule Autocomplete & Suggestion Engine -->
-    <script src="molecule-suggestions.js?v=35"></script>
-    <script src="drug-likeness.js?v=35"></script>
+    <script src="molecule-suggestions.js?v=72"></script>
+    <script src="drug-likeness.js?v=72"></script>
     <script type="module" src="auth.js?v=2"></script>
     <script type="module" src="particle-wave.js?v=8"></script>
 </body>

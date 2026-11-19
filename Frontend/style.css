@@ -1530,6 +1530,583 @@ svg {
 }
 
 /* =========================================================
+   ENHANCED LIPINSKI RULE OF FIVE DASHBOARD STYLES
+   ========================================================= */
+
+.drug-lead-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 28px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(247, 245, 252, 0.98) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.lead-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lead-kicker {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6D28D9;
+}
+
+.drug-compound-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--brown-dark);
+}
+
+.drug-compound-smiles-text {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.95rem;
+    color: #6B7280;
+    word-break: break-all;
+}
+
+.lead-badge-entity {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.badge-pass-pill {
+    background: #ECFDF5;
+    color: #047857;
+    border: 1px solid #A7F3D0;
+}
+
+.badge-review-pill {
+    background: #FFFBEB;
+    color: #B45309;
+    border: 1px solid #FDE68A;
+}
+
+.lipinski-badge-tag {
+    background: #EDE7F6 !important;
+    color: #5B21B6 !important;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 4px 12px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+/* Status Banner */
+.lipinski-status-banner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    border-radius: 16px;
+    margin: 20px 0 22px;
+}
+
+.status-banner-pass {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.09) 0%, rgba(5, 150, 105, 0.14) 100%);
+    border: 1.5px solid rgba(16, 185, 129, 0.35);
+}
+
+.status-banner-review {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.09) 0%, rgba(217, 119, 6, 0.14) 100%);
+    border: 1.5px solid rgba(245, 158, 11, 0.35);
+}
+
+.status-banner-badge {
+    padding: 8px 18px;
+    border-radius: 12px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.status-banner-badge.badge-pass {
+    background: #10B981;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.status-banner-badge.badge-review {
+    background: #F59E0B;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.status-banner-desc h4 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--brown-dark);
+    margin-bottom: 4px;
+}
+
+.status-banner-desc p {
+    font-size: 0.98rem;
+    color: var(--text-light);
+    line-height: 1.45;
+}
+
+/* KPI Grid */
+.lipinski-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.lipinski-kpi-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 14px rgba(48, 35, 71, 0.04);
+}
+
+.kpi-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: #7C6E96;
+}
+
+.kpi-value {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.status-val-pass {
+    color: #059669 !important;
+}
+
+.status-val-review {
+    color: #D97706 !important;
+}
+
+.kpi-hint {
+    font-size: 0.8rem;
+    color: #9CA3AF;
+}
+
+/* Scientific Interpretation Box */
+.lipinski-interpretation-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 22px;
+    border-radius: 14px;
+    background: rgba(245, 243, 255, 0.9);
+    border: 1.5px solid #DDD6FE;
+    border-left: 5px solid #7C3AED;
+    margin-bottom: 26px;
+}
+
+.interpretation-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.interpretation-text-content h5 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #4C1D95;
+    margin-bottom: 6px;
+}
+
+.interpretation-text-content p {
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Threshold Table */
+.lipinski-table-container {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 26px;
+    box-shadow: 0 4px 14px rgba(48, 35, 71, 0.04);
+}
+
+.lipinski-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.lipinski-table-header h4 {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: var(--brown-dark);
+}
+
+.table-legend-note {
+    font-size: 0.85rem;
+    color: #7C6E96;
+}
+
+.lipinski-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.lipinski-table th {
+    background: #F8F6FC;
+    color: var(--brown);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border);
+    text-align: left;
+}
+
+.lipinski-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #F0EAF8;
+    vertical-align: middle;
+}
+
+.param-title {
+    font-size: 1.02rem;
+    color: var(--brown-dark);
+    display: block;
+}
+
+.param-subdesc {
+    font-size: 0.82rem;
+    color: #7C6E96;
+}
+
+.val-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--brown-dark);
+    background: #F5F3FF;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.threshold-pill {
+    background: #F3F4F6;
+    color: #4B5563;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.rule-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.rule-status-badge.badge-pass {
+    background: #ECFDF5;
+    color: #047857;
+    border: 1px solid #A7F3D0;
+}
+
+.rule-status-badge.badge-fail {
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+}
+
+.lipinski-clarification-note {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #F8F5FE;
+    border: 1px solid #EDE4FB;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: #5B21B6;
+}
+
+/* Violations Breakdown Card */
+.lipinski-violations-card {
+    background: #FFFDFB;
+    border: 1.5px solid #FDE68A;
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 26px;
+}
+
+.violations-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.violations-icon {
+    font-size: 1.6rem;
+}
+
+.violations-header h4 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #92400E;
+}
+
+.violations-header p {
+    font-size: 0.88rem;
+    color: #B45309;
+}
+
+.violations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.violation-item {
+    background: #FFFFFF;
+    border: 1px solid #FCD34D;
+    border-left: 4px solid #F59E0B;
+    border-radius: 10px;
+    padding: 14px 18px;
+}
+
+.violation-item-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.violation-bullet-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FEE2E2;
+    color: #DC2626;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.violation-item-title {
+    font-size: 1.02rem;
+    color: #78350F;
+}
+
+.violation-measured-tag {
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #FEF3C7;
+    color: #92400E;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.violation-mechanistic-reason {
+    font-size: 0.94rem;
+    color: #4B5563;
+    line-height: 1.55;
+}
+
+.violations-guidance-box {
+    padding: 12px 16px;
+    background: #FEF3C7;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    color: #78350F;
+    line-height: 1.5;
+}
+
+/* Workflow Integration Card */
+.pipeline-flow-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+}
+
+.pipeline-step-item {
+    display: flex;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.step-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #EDE7F6;
+    color: #6D28D9;
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.step-content h5 {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--brown-dark);
+    margin-bottom: 4px;
+}
+
+.step-content p {
+    font-size: 0.84rem;
+    color: #6B7280;
+    line-height: 1.45;
+}
+
+.pipeline-step-item.step-active {
+    background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%);
+    border: 1.5px solid #A855F7;
+    box-shadow: 0 4px 14px rgba(168, 85, 247, 0.12);
+}
+
+.pipeline-step-item.step-active .step-badge {
+    background: #7C3AED;
+    color: #FFFFFF;
+}
+
+.step-active-tag {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #7C3AED;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+
+.pipeline-step-item.step-completed {
+    border-color: #D1D5DB;
+}
+
+.pipeline-step-item.step-completed .step-badge {
+    background: #E5E7EB;
+    color: #4B5563;
+}
+
+.pipeline-notice-box {
+    padding: 12px 16px;
+    background: #F8F6FC;
+    border: 1px solid #E5DBF5;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    color: #4E4564;
+    line-height: 1.55;
+    margin-bottom: 20px;
+}
+
+.pipeline-actions-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pipeline-actions-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6D28D9;
+}
+
+.pipeline-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pipeline-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    background: #FFFFFF;
+    border: 1.5px solid #D8B4FE;
+    color: #5B21B6;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.pipeline-action-btn:hover {
+    background: #7C3AED;
+    color: #FFFFFF;
+    border-color: #7C3AED;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.2);
+}
+
+@media (max-width: 900px) {
+    .lipinski-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .drug-lead-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .lipinski-status-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .lipinski-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+}
+
+/* =========================================================
    RESPONSIVE — TABLETS
    ========================================================= */
 

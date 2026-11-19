@@ -450,26 +450,48 @@ def analyze_drug_likeness(
 
     try:
         descriptors = calculate_molecular_descriptors(molecule)
+        
+        mw_val = float(Descriptors.MolWt(molecule))
+        logp_val = float(Crippen.MolLogP(molecule))
+        hbd_val = int(Lipinski.NumHDonors(molecule))
+        hba_val = int(Lipinski.NumHAcceptors(molecule))
+
         rule_results = {
             "molecular_weight": {
-                "value": float(Descriptors.MolWt(molecule)),
+                "name": "Molecular Weight",
+                "value": round(mw_val, 2),
                 "threshold": "<= 500",
-                "passed": Descriptors.MolWt(molecule) <= 500,
+                "display_threshold": "≤ 500 Da",
+                "unit": "Da",
+                "passed": mw_val <= 500.0,
+                "failure_reason": f"Molecular weight ({mw_val:.2f} Da) exceeds 500 Da, which can reduce passive membrane permeability and intestinal absorption.",
             },
             "logp": {
-                "value": float(Crippen.MolLogP(molecule)),
+                "name": "LogP",
+                "value": round(logp_val, 2),
                 "threshold": "<= 5",
-                "passed": Crippen.MolLogP(molecule) <= 5,
+                "display_threshold": "≤ 5.0",
+                "unit": "",
+                "passed": logp_val <= 5.0,
+                "failure_reason": f"Lipophilicity (LogP {logp_val:.2f}) exceeds 5.0, which can lead to poor aqueous solubility, excessive plasma protein binding, and rapid metabolic clearance.",
             },
             "hydrogen_bond_donors": {
-                "value": int(Lipinski.NumHDonors(molecule)),
+                "name": "Hydrogen Bond Donors",
+                "value": hbd_val,
                 "threshold": "<= 5",
-                "passed": Lipinski.NumHDonors(molecule) <= 5,
+                "display_threshold": "≤ 5",
+                "unit": "",
+                "passed": hbd_val <= 5,
+                "failure_reason": f"Hydrogen bond donor count ({hbd_val}) exceeds 5, imposing a high desolvation energy penalty required to cross hydrophobic lipid bilayers.",
             },
             "hydrogen_bond_acceptors": {
-                "value": int(Lipinski.NumHAcceptors(molecule)),
+                "name": "Hydrogen Bond Acceptors",
+                "value": hba_val,
                 "threshold": "<= 10",
-                "passed": Lipinski.NumHAcceptors(molecule) <= 10,
+                "display_threshold": "≤ 10",
+                "unit": "",
+                "passed": hba_val <= 10,
+                "failure_reason": f"Hydrogen bond acceptor count ({hba_val}) exceeds 10, enlarging the polar hydration shell and impeding passive membrane permeability.",
             },
         }
     except Exception as error:
@@ -479,13 +501,50 @@ def analyze_drug_likeness(
         ) from error
 
     violations = sum(not rule["passed"] for rule in rule_results.values())
+    passed = violations == 0
+    status = "PASS" if passed else "REVIEW REQUIRED"
+    score = "5/5 criteria satisfied" if passed else f"{max(0, 5 - violations)}/5 criteria satisfied"
+
+    if passed:
+        interpretation = (
+            "The molecule satisfies all five Lipinski thresholds, indicating favorable "
+            "physicochemical properties for potential oral drug development. However, "
+            "passing Lipinski's Rule of Five does not guarantee absorption, safety or "
+            "therapeutic effectiveness. Further ADMET profiling and molecular docking "
+            "analysis are required."
+        )
+    else:
+        interpretation = (
+            "The molecule violates one or more Lipinski thresholds. This indicates potential "
+            "challenges in oral drug development. However, Lipinski violations do not "
+            "automatically disqualify a molecule. Further ADMET profiling and molecular "
+            "docking analysis can provide additional information."
+        )
+
+    failed_parameters = [
+        {
+            "parameter": rule["name"],
+            "key": key,
+            "value": rule["value"],
+            "unit": rule["unit"],
+            "threshold": rule["display_threshold"],
+            "reason": rule["failure_reason"],
+        }
+        for key, rule in rule_results.items()
+        if not rule["passed"]
+    ]
+
     return {
         "smiles": smiles,
         "descriptors": descriptors,
         "lipinski": {
             "rules": rule_results,
             "violations": violations,
-            "passed": violations == 0,
+            "passed": passed,
+            "status": status,
+            "score": score,
+            "interpretation": interpretation,
+            "failed_parameters": failed_parameters,
         },
     }
 
