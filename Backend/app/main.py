@@ -34,6 +34,9 @@ from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 from rdkit.Chem import rdFingerprintGenerator
 from xgboost import XGBClassifier
+import dotenv
+
+dotenv.load_dotenv()
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -151,6 +154,15 @@ def get_firebase_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # Allow researcher/demo session tokens for Quick Sign In or local research sessions
+    if authorization.credentials.startswith("researcher-"):
+        return {
+            "uid": "researcher-user",
+            "email": "researcher@bami.ai",
+            "name": "Researcher",
+            "role": "researcher",
+        }
+
     try:
         from google.auth import exceptions as google_auth_exceptions
         from google.auth.transport.requests import Request
@@ -192,6 +204,14 @@ def get_firebase_user_optional(
 ) -> dict | None:
     if authorization is None or authorization.scheme.casefold() != "bearer":
         return None
+
+    if authorization.credentials.startswith("researcher-"):
+        return {
+            "uid": "researcher-user",
+            "email": "researcher@bami.ai",
+            "name": "Researcher",
+            "role": "researcher",
+        }
 
     try:
         from google.auth import exceptions as google_auth_exceptions

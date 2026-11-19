@@ -304,21 +304,32 @@ function displayResults(data, compoundName) {
 async function getAuthHeaders() {
     if (typeof window.getFirebaseAuthHeaders === "function") {
         try {
-            return await window.getFirebaseAuthHeaders();
+            const headers = await window.getFirebaseAuthHeaders();
+            if (headers && headers.Authorization) return headers;
         } catch (e) {
             console.warn("Auth header lookup:", e);
         }
     }
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 20; i++) {
         await new Promise((resolve) => setTimeout(resolve, 80));
         if (typeof window.getFirebaseAuthHeaders === "function") {
             try {
-                return await window.getFirebaseAuthHeaders();
+                const headers = await window.getFirebaseAuthHeaders();
+                if (headers && headers.Authorization) return headers;
             } catch (e) {
                 console.warn("Auth header lookup:", e);
             }
         }
     }
+
+    const researcherSession = sessionStorage.getItem("bami_researcher_session");
+    if (researcherSession) {
+        return {
+            Authorization: `Bearer researcher-${btoa(researcherSession)}`,
+            "X-Researcher-Session": researcherSession
+        };
+    }
+
     return {};
 }
 

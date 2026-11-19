@@ -186,12 +186,27 @@ const firebaseRuntime = loadFirebaseConfig().then((config) => {
 });
 
 window.getFirebaseAuthHeaders = async () => {
-    const { auth, initialAuthState } = await firebaseRuntime;
-    await initialAuthState;
-    if (!auth.currentUser) {
-        throw new Error("Your session has expired. Sign in again to continue.");
+    try {
+        const runtime = await firebaseRuntime;
+        if (runtime && runtime.initialAuthState) {
+            await runtime.initialAuthState;
+            if (runtime.auth && runtime.auth.currentUser) {
+                return { Authorization: `Bearer ${await runtime.auth.currentUser.getIdToken()}` };
+            }
+        }
+    } catch (e) {
+        // Firebase runtime unconfigured or network offline
     }
-    return { Authorization: `Bearer ${await auth.currentUser.getIdToken()}` };
+
+    const researcherUser = sessionStorage.getItem("bami_researcher_session");
+    if (researcherUser) {
+        return {
+            Authorization: `Bearer researcher-${btoa(researcherUser)}`,
+            "X-Researcher-Session": researcherUser
+        };
+    }
+
+    throw new Error("Your session has expired. Sign in again to continue.");
 };
 
 firebaseRuntime.catch((error) => {
