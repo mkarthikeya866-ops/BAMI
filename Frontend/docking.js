@@ -569,7 +569,7 @@
             return;
         }
 
-        const exhaustiveness = exhaustivenessSelect ? parseInt(exhaustivenessSelect.value, 10) : 4;
+        const exhaustiveness = exhaustivenessSelect ? parseInt(exhaustivenessSelect.value, 10) : 1;
 
         if (runDockingBtn) {
             runDockingBtn.disabled = true;

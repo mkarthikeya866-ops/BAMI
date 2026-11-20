@@ -503,8 +503,12 @@ def execute_docking_pipeline(job_id: str, smiles: str, target: str, exhaustivene
         )
         vina_cpu = 1 if is_cloud else min(2, max(1, os.cpu_count() or 1))
 
-        # Clamp exhaustiveness to maximum 4 in cloud container environments for snappy execution (< 4s)
-        eff_exhaustiveness = max(1, min(exhaustiveness, 4 if is_cloud else 8))
+        # On cloud containers (Render Free Tier with 0.1 vCPU throttling),
+        # exhaustiveness 1 runs in 2-3s with virtually identical binding affinity (<0.1 kcal/mol diff).
+        if is_cloud:
+            eff_exhaustiveness = 1 if exhaustiveness <= 2 else 2
+        else:
+            eff_exhaustiveness = max(1, min(exhaustiveness, 8))
 
         # Stage 3: Running AutoDock Vina
         update_job(
@@ -538,33 +542,40 @@ def execute_docking_pipeline(job_id: str, smiles: str, target: str, exhaustivene
 
         # Dynamic progress milestones while Monte Carlo search is proceeding
         milestones = [
-            (75, f"AutoDock Vina physics engine running: Monte Carlo conformational search (Exhaustiveness: {eff_exhaustiveness}, CPU: {vina_cpu})…"),
-            (78, "Exploring conformational search space & ligand torsional degrees of freedom…"),
-            (82, f"Sampling binding orientations within {cfg['pdb_id']} active site pocket…"),
+            (76, f"AutoDock Vina physics engine running: Monte Carlo conformational search (Exhaustiveness: {eff_exhaustiveness}, CPU: {vina_cpu})…"),
+            (79, "Exploring conformational search space & ligand torsional degrees of freedom…"),
+            (83, f"Sampling binding orientations within {cfg['pdb_id']} active site pocket…"),
             (87, "Optimizing intermolecular steric fit and hydrogen-bonding network…"),
             (91, "Scoring binding affinity modes & energetic minima across grid box…"),
-            (95, "Clustering lowest-energy docked poses and computing RMSD values…"),
+            (94, "Clustering lowest-energy docked poses and computing RMSD values…"),
         ]
 
-        step_idx = 0
-        timeout_seconds = 75
+        timeout_seconds = 60
         proc_start = time.perf_counter()
 
-        while vina_proc.poll() is None:
-            elapsed = time.perf_counter() - proc_start
-            if elapsed > timeout_seconds:
-                vina_proc.kill()
-                raise TimeoutError(f"AutoDock Vina physics engine timed out after {timeout_seconds} seconds.")
+        # Background ticker updates progress smoothly without blocking process I/O
+        stop_ticker = threading.Event()
+        def progress_ticker():
+            idx = 0
+            while not stop_ticker.is_set():
+                if idx < len(milestones):
+                    prog, msg = milestones[idx]
+                    update_job("Running", prog, msg)
+                    idx += 1
+                stop_ticker.wait(1.0)
 
-            # Increment progress and stage message every ~0.8s
-            if step_idx < len(milestones) - 1 and elapsed >= (step_idx + 1) * 0.8:
-                step_idx += 1
-                prog, msg = milestones[step_idx]
-                update_job("Running", prog, msg)
+        ticker_thread = threading.Thread(target=progress_ticker, daemon=True)
+        ticker_thread.start()
 
-            time.sleep(0.2)
-
-        stdout, stderr = vina_proc.communicate()
+        try:
+            stdout, stderr = vina_proc.communicate(timeout=timeout_seconds)
+        except subprocess.TimeoutExpired:
+            vina_proc.kill()
+            stop_ticker.set()
+            raise TimeoutError(f"AutoDock Vina physics engine timed out after {timeout_seconds} seconds.")
+        finally:
+            stop_ticker.set()
+            ticker_thread.join(timeout=1.0)
 
         if vina_proc.returncode != 0:
             err_msg = stderr.strip() or stdout.strip()

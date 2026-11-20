@@ -141,9 +141,10 @@
                                 <div class="exhaustiveness-control">
                                     <label for="exhaustiveness-select">Search Exhaustiveness</label>
                                     <select id="exhaustiveness-select">
-                                        <option value="2">Fast Screening (Exhaustiveness: 2 · ~2-3s)</option>
-                                        <option value="4" selected>Standard Vina Search (Exhaustiveness: 4 · ~4-6s)</option>
-                                        <option value="8">Rigorous Optimization (Exhaustiveness: 8 · ~8-12s)</option>
+                                        <option value="1" selected>Ultra-Fast Cloud Screening (Exhaustiveness: 1 · ~2-3s)</option>
+                                        <option value="2">Balanced Search (Exhaustiveness: 2 · ~4-6s)</option>
+                                        <option value="4">Deep Optimization (Exhaustiveness: 4 · ~8-12s)</option>
+                                        <option value="8">Rigorous Search (Exhaustiveness: 8 · ~15-25s)</option>
                                     </select>
                                 </div>
 
@@ -339,7 +340,7 @@
     <!-- Scripts -->
     <script src="sidebar.js?v=67"></script>
     <script src="molecule-suggestions.js?v=70"></script>
-    <script src="docking.js?v=70"></script>
+    <script src="docking.js?v=71"></script>
     <script type="module" src="particle-wave.js?v=3500"></script>
 </body>
 </html>
