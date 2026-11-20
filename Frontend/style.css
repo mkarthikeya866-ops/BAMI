@@ -1398,7 +1398,7 @@ svg {
 
 .drug-likeness-section {
     min-height: calc(100vh - 160px);
-    background: #F5EEE7;
+    background: transparent;
 }
 
 .drug-likeness-layout {
@@ -2744,9 +2744,7 @@ body > :not(#particle-wave-background) {
 .prediction-section,
 .drug-likeness-section {
     position: relative;
-    background:
-        radial-gradient(ellipse at 80% 5%, rgba(200, 168, 233, 0.16), transparent 30rem),
-        linear-gradient(145deg, rgba(251, 250, 254, 0.62) 0%, rgba(246, 244, 252, 0.68) 46%, rgba(249, 241, 247, 0.62) 100%);
+    background: transparent;
 }
 
 .prediction-section::before,
@@ -3116,9 +3114,7 @@ input:focus-visible {
 }
 
 .batch-screening-section {
-    background:
-        radial-gradient(ellipse at 94% 8%, rgba(249, 220, 220, 0.36), transparent 28rem),
-        linear-gradient(145deg, rgba(243, 240, 251, 0.68), rgba(248, 244, 250, 0.72) 55%, rgba(244, 242, 252, 0.66));
+    background: transparent;
 }
 
 .batch-screening-card {
