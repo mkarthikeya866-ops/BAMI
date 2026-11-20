@@ -99,7 +99,13 @@ DOCKING_LOCK = threading.Lock()
 
 def is_binary_compatible(path: str) -> bool:
     """Check if the binary executable format matches the current host OS."""
-    if not os.path.isfile(path) or not os.access(path, os.X_OK):
+    if not os.path.isfile(path):
+        return False
+    try:
+        os.chmod(path, 0o755)
+    except Exception:
+        pass
+    if not os.access(path, os.X_OK):
         return False
     try:
         with open(path, "rb") as f:
@@ -483,15 +489,29 @@ def execute_docking_pipeline(job_id: str, smiles: str, target: str, exhaustivene
         if not os.path.isfile(receptor_pdbqt):
             raise FileNotFoundError(f"Receptor PDBQT file not found: {receptor_pdbqt}")
 
+        vina_bin = get_vina_binary()
+        output_pdbqt = os.path.join(job_dir, "docked_poses.pdbqt")
+
+        # Determine optimal CPU threads and search exhaustiveness:
+        # On Linux cloud containers (Render, Docker, AWS), host CPU detection defaults to 64+ cores,
+        # causing extreme thread starvation under container CPU quota limits (0.1 - 0.5 vCPU).
+        # Forcing --cpu 1 (or 2 on local multicore machines) eliminates context switching.
+        is_cloud = (
+            sys.platform.startswith("linux") or
+            bool(os.environ.get("RENDER")) or
+            bool(os.environ.get("PORT"))
+        )
+        vina_cpu = 1 if is_cloud else min(2, max(1, os.cpu_count() or 1))
+
+        # Clamp exhaustiveness to maximum 4 in cloud container environments for snappy execution (< 4s)
+        eff_exhaustiveness = max(1, min(exhaustiveness, 4 if is_cloud else 8))
+
         # Stage 3: Running AutoDock Vina
         update_job(
             "Running",
             75,
-            f"AutoDock Vina physics engine running: Monte Carlo conformational search (Exhaustiveness: {exhaustiveness})…"
+            f"AutoDock Vina physics engine running: Monte Carlo conformational search (Exhaustiveness: {eff_exhaustiveness}, CPU: {vina_cpu})…"
         )
-
-        vina_bin = get_vina_binary()
-        output_pdbqt = os.path.join(job_dir, "docked_poses.pdbqt")
 
         cmd = [
             vina_bin,
@@ -503,26 +523,56 @@ def execute_docking_pipeline(job_id: str, smiles: str, target: str, exhaustivene
             "--size_x", str(cfg["size_x"]),
             "--size_y", str(cfg["size_y"]),
             "--size_z", str(cfg["size_z"]),
-            "--exhaustiveness", str(max(1, min(exhaustiveness, 16))),
+            "--cpu", str(vina_cpu),
+            "--exhaustiveness", str(eff_exhaustiveness),
             "--num_modes", "9",
             "--out", output_pdbqt
         ]
 
-        vina_proc = subprocess.run(
+        vina_proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
-            timeout=120
+            text=True
         )
 
+        # Dynamic progress milestones while Monte Carlo search is proceeding
+        milestones = [
+            (75, f"AutoDock Vina physics engine running: Monte Carlo conformational search (Exhaustiveness: {eff_exhaustiveness}, CPU: {vina_cpu})…"),
+            (78, "Exploring conformational search space & ligand torsional degrees of freedom…"),
+            (82, f"Sampling binding orientations within {cfg['pdb_id']} active site pocket…"),
+            (87, "Optimizing intermolecular steric fit and hydrogen-bonding network…"),
+            (91, "Scoring binding affinity modes & energetic minima across grid box…"),
+            (95, "Clustering lowest-energy docked poses and computing RMSD values…"),
+        ]
+
+        step_idx = 0
+        timeout_seconds = 75
+        proc_start = time.perf_counter()
+
+        while vina_proc.poll() is None:
+            elapsed = time.perf_counter() - proc_start
+            if elapsed > timeout_seconds:
+                vina_proc.kill()
+                raise TimeoutError(f"AutoDock Vina physics engine timed out after {timeout_seconds} seconds.")
+
+            # Increment progress and stage message every ~0.8s
+            if step_idx < len(milestones) - 1 and elapsed >= (step_idx + 1) * 0.8:
+                step_idx += 1
+                prog, msg = milestones[step_idx]
+                update_job("Running", prog, msg)
+
+            time.sleep(0.2)
+
+        stdout, stderr = vina_proc.communicate()
+
         if vina_proc.returncode != 0:
-            err_msg = vina_proc.stderr.strip() or vina_proc.stdout.strip()
+            err_msg = stderr.strip() or stdout.strip()
             raise RuntimeError(f"AutoDock Vina execution error: {err_msg}")
 
         # Stage 4: Parse & Complete
         duration = round(time.perf_counter() - start_time, 2)
-        parsed = parse_vina_output(vina_proc.stdout, output_pdbqt)
+        parsed = parse_vina_output(stdout, output_pdbqt)
 
         # Detect active site contact residues
         contacts = find_contact_residues(cfg["pdb_file"], output_pdbqt, distance_cutoff=4.5)
