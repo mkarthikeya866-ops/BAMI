@@ -4,9 +4,10 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.m
  * BAMI Molecular Intelligence - Responsive 3D Particle Wave Field
  * ===============================================================
  * Clean, lightweight, cursor-responsive Three.js particle field.
- * - Minimalist bio-computational color palette (Violet / Royal Blue / Cyan)
+ * - Minimalist bio-computational color palette (Deep Violet / Royal Azure / Cyan)
+ * - NormalBlending with custom GLSL shader for crisp visibility on both light & dark themes
  * - Real-time 3D camera parallax & cursor-driven wave distortion
- * - Touch & pointer support with smooth dampening (lerp)
+ * - Window-wide pointer & touch tracking with smooth spring lerp
  * - Hardware accelerated 60fps with low power consumption
  */
 
@@ -30,31 +31,32 @@ try {
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
     // Clean, breathable particle grid (lightweight & minimal)
-    const columns = isMobile ? 48 : 72;
-    const rows = isMobile ? 28 : 42;
+    const columns = isMobile ? 50 : 75;
+    const rows = isMobile ? 30 : 44;
     const count = columns * rows;
 
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
 
-    // BAMI Sophisticated Bio-Tech Palette: Electric Violet -> Cobalt -> Clean Cyan
+    // BAMI Sophisticated Bio-Tech Palette (Vibrant, high-contrast against light lilac and dark backgrounds)
     const colorStops = [
-        new THREE.Color('#7c3aed'), // Electric Violet
-        new THREE.Color('#3b82f6'), // Electric Blue
-        new THREE.Color('#06b6d4'), // Cyan Teal
-        new THREE.Color('#a855f7')  // Soft Lavender
+        new THREE.Color('#6d28d9'), // Deep Electric Violet
+        new THREE.Color('#2563eb'), // Royal Azure
+        new THREE.Color('#0284c7'), // Electric Cyan
+        new THREE.Color('#9333ea'), // Vibrant Purple
+        new THREE.Color('#059669')  // Emerald Pharmacophore
     ];
     const tempColor = new THREE.Color();
 
-    let seed = 4219;
+    let seed = 9182;
     const random = () => {
         seed = (seed * 1664525 + 1013904223) >>> 0;
         return seed / 4294967296;
     };
 
-    const gridWidth = 34;
-    const gridDepth = 22;
+    const gridWidth = 36;
+    const gridDepth = 24;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
@@ -73,18 +75,19 @@ try {
             const cIdx = Math.min(Math.floor(colorPos), colorStops.length - 2);
             tempColor.copy(colorStops[cIdx]).lerp(colorStops[cIdx + 1], colorPos - cIdx);
 
-            const brightness = 0.85 + random() * 0.25;
+            const brightness = 0.90 + random() * 0.20;
 
-            // Small jitter for natural, organic look
-            positions[offset] = x + (random() - 0.5) * 0.15;
+            // Subtle organic offset
+            positions[offset] = x + (random() - 0.5) * 0.18;
             positions[offset + 1] = 0;
-            positions[offset + 2] = z + (random() - 0.5) * 0.15;
+            positions[offset + 2] = z + (random() - 0.5) * 0.18;
 
             colors[offset] = tempColor.r * brightness;
             colors[offset + 1] = tempColor.g * brightness;
             colors[offset + 2] = tempColor.b * brightness;
 
-            sizes[index] = 2.4 + random() * 1.8;
+            // Distinct, crisp particle size
+            sizes[index] = 3.6 + random() * 2.2;
         }
     }
 
@@ -93,11 +96,11 @@ try {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
 
-    // Custom Shader for silky smooth 60fps cursor responsiveness
+    // Custom Shader with NormalBlending for rich visibility on light theme
     const material = new THREE.ShaderMaterial({
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        blending: THREE.NormalBlending,
         uniforms: {
             uTime: { value: 0 },
             uPixelRatio: { value: 1 },
@@ -118,26 +121,26 @@ try {
                 vec3 pos = position;
 
                 // Simple, calming ambient wave motion
-                float wave = sin(pos.x * 0.22 + uTime * 0.45) * cos(pos.z * 0.25 + uTime * 0.35) * 0.95;
-                wave += sin(pos.x * 0.45 - pos.z * 0.35 + uTime * 0.25) * 0.35;
+                float wave = sin(pos.x * 0.22 + uTime * 0.5) * cos(pos.z * 0.24 + uTime * 0.4) * 1.15;
+                wave += sin(pos.x * 0.42 - pos.z * 0.32 + uTime * 0.28) * 0.4;
                 pos.y += wave;
 
                 // Interactive cursor ripple / elevation
                 float distToMouse = length(pos.xz - uMouseWorld);
-                float ripple = sin(distToMouse * 0.9 - uTime * 2.2) * exp(-distToMouse * 0.28) * 1.8;
+                float ripple = sin(distToMouse * 0.85 - uTime * 2.6) * exp(-distToMouse * 0.22) * 2.2;
                 pos.y += ripple * uMouseIntensity;
 
                 vec4 viewPos = modelViewMatrix * vec4(pos, 1.0);
                 gl_Position = projectionMatrix * viewPos;
 
                 // Interactive point sizing
-                float hoverBoost = (1.0 - smoothstep(0.0, 5.0, distToMouse)) * uMouseIntensity;
-                gl_PointSize = aSize * uPixelRatio * (1.0 + hoverBoost * 0.5) * (50.0 / -viewPos.z);
+                float hoverBoost = (1.0 - smoothstep(0.0, 5.5, distToMouse)) * uMouseIntensity;
+                gl_PointSize = aSize * uPixelRatio * (1.0 + hoverBoost * 0.7) * (68.0 / -viewPos.z);
 
                 vColor = color;
-                // Soft alpha falloff + cursor proximity glow
-                float baseAlpha = 0.55 + (pos.y + 1.2) * 0.12;
-                vAlpha = clamp(baseAlpha + hoverBoost * 0.4, 0.2, 0.95);
+                // High-clarity alpha so particles remain crisp & distinct
+                float baseAlpha = 0.68 + (pos.y + 1.2) * 0.12;
+                vAlpha = clamp(baseAlpha + hoverBoost * 0.32, 0.35, 1.0);
             }
         `,
         fragmentShader: `
@@ -148,7 +151,8 @@ try {
                 // Soft circular glowing particle
                 float dist = length(gl_PointCoord - vec2(0.5));
                 if (dist > 0.5) discard;
-                float glow = pow(1.0 - smoothstep(0.0, 0.48, dist), 1.6);
+                float core = 1.0 - smoothstep(0.0, 0.48, dist);
+                float glow = pow(core, 1.35);
                 gl_FragColor = vec4(vColor, glow * vAlpha);
             }
         `
@@ -233,18 +237,18 @@ try {
             const timeSeconds = reducedMotion ? 0 : now * 0.001;
 
             // Smooth mouse interpolation (spring lerp)
-            currentMouseX += (targetMouseX - currentMouseX) * 0.055;
-            currentMouseY += (targetMouseY - currentMouseY) * 0.055;
-            currentMouseActive += (mouseActiveTarget - currentMouseActive) * 0.04;
+            currentMouseX += (targetMouseX - currentMouseX) * 0.06;
+            currentMouseY += (targetMouseY - currentMouseY) * 0.06;
+            currentMouseActive += (mouseActiveTarget - currentMouseActive) * 0.05;
 
             // Responsive 3D Camera Parallax
-            camera.position.x = currentMouseX * 3.8;
-            camera.position.y = 7.5 + currentMouseY * 2.0;
+            camera.position.x = currentMouseX * 4.5;
+            camera.position.y = 7.5 + currentMouseY * 2.5;
             camera.lookAt(0, 0, 0);
 
             // Project cursor into world grid coordinates for the ripple effect
-            const mouseWorldX = currentMouseX * 15.0;
-            const mouseWorldZ = -currentMouseY * 10.0;
+            const mouseWorldX = currentMouseX * 16.0;
+            const mouseWorldZ = -currentMouseY * 11.0;
 
             material.uniforms.uTime.value = timeSeconds;
             material.uniforms.uMouseWorld.value.set(mouseWorldX, mouseWorldZ);
