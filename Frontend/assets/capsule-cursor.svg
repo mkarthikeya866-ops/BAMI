@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <!-- Soft Drop Shadow Filter -->
+    <filter id="cursor-shadow" x="-30%" y="-30%" width="170%" height="170%">
+      <feDropShadow dx="1" dy="1.5" stdDeviation="1.2" flood-color="#1E142F" flood-opacity="0.45" />
+    </filter>
+
+    <!-- Top Cap (Deep Lavender/Purple) Gradient -->
+    <linearGradient id="purple-half" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#937DC2" />
+      <stop offset="45%" stop-color="#7562A2" />
+      <stop offset="100%" stop-color="#55427D" />
+    </linearGradient>
+
+    <!-- Bottom Cap (Soft Lilac / White) Gradient -->
+    <linearGradient id="white-half" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="55%" stop-color="#EDE7F7" />
+      <stop offset="100%" stop-color="#D4C8EB" />
+    </linearGradient>
+
+    <!-- 3D Specular Sheen Gradient -->
+    <linearGradient id="capsule-sheen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.75" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Capsule Clip Path for 2 Halves -->
+    <clipPath id="capsule-shape">
+      <rect x="-4.1" y="-11.0" width="8.2" height="22.0" rx="4.1" ry="4.1" />
+    </clipPath>
+  </defs>
+
+  <!-- Transform to angle -45 deg, centered at (12.5, 12.5) -->
+  <g transform="translate(12.5, 12.5) rotate(-45)" filter="url(#cursor-shadow)">
+    <!-- Main Capsule Container clipped to rounded pill -->
+    <g clip-path="url(#capsule-shape)">
+      <!-- Top Half (Purple) -->
+      <rect x="-4.1" y="-11.0" width="8.2" height="11.2" fill="url(#purple-half)" />
+
+      <!-- Bottom Half (Soft White/Lilac) -->
+      <rect x="-4.1" y="0" width="8.2" height="11.2" fill="url(#white-half)" />
+
+      <!-- Center Joint Band -->
+      <line x1="-4.1" y1="0" x2="4.1" y2="0" stroke="#37264F" stroke-width="0.85" />
+      <line x1="-4.1" y1="0.85" x2="4.1" y2="0.85" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="0.4" />
+
+      <!-- Specular Highlight Strip along left edge -->
+      <path d="M -3.3 -8.0 Q -3.3 0 -3.3 8.0"
+            stroke="url(#capsule-sheen)" stroke-width="1.2" stroke-linecap="round" fill="none" />
+    </g>
+
+    <!-- Crisp Pill Border -->
+    <rect x="-4.1" y="-11.0" width="8.2" height="22.0" rx="4.1" ry="4.1"
+          fill="none" stroke="#251B35" stroke-width="0.9" />
+
+    <!-- Tiny Pinpoint Pointer Indicator at Top Tip -->
+    <circle cx="0" cy="-10.6" r="0.6" fill="#FFFFFF" opacity="0.9" />
+  </g>
+</svg>
