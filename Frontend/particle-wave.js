@@ -12,6 +12,10 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.m
  * - Highly optimized 60fps WebGL
  */
 
+const existingCanvas = document.getElementById('particle-wave-background');
+if (existingCanvas) {
+    existingCanvas.remove();
+}
 const canvas = document.createElement('canvas');
 canvas.id = 'particle-wave-background';
 canvas.setAttribute('aria-hidden', 'true');

@@ -377,7 +377,7 @@ svg {
    ========================================================= */
 
 .prediction-section {
-    background: #F5EEE7;
+    background: transparent;
 }
 
 .prediction-layout {
@@ -2385,7 +2385,7 @@ button:disabled {
    ========================================================= */
 
 .batch-screening-section {
-    background: var(--cream-dark);
+    background: transparent;
 }
 
 .batch-screening-card {
