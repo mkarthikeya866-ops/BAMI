@@ -1,14 +1,15 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
 
 /**
- * BAMI Molecular Intelligence - Responsive 3D Particle Wave Field
+ * BAMI Molecular Intelligence - Responsive 3D Micro-Particle Wave
  * ===============================================================
- * Clean, lightweight, cursor-responsive Three.js particle field.
- * - Minimalist bio-computational color palette (Deep Violet / Royal Azure / Cyan)
- * - NormalBlending with custom GLSL shader for crisp visibility on both light & dark themes
- * - Real-time 3D camera parallax & cursor-driven wave distortion
- * - Window-wide pointer & touch tracking with smooth spring lerp
- * - Hardware accelerated 60fps with low power consumption
+ * Minimalist, delicate micro-particle wave field with real-time
+ * cursor parallax and kinetic ripple elevation.
+ * - Tiny, crisp stardust particles (1.2px - 2.5px)
+ * - Clean bio-computational gradient (Violet / Cobalt / Cyan / Emerald)
+ * - Full-screen cursor & touch parallax
+ * - NormalBlending for crystal-clear visibility on light & dark pages
+ * - Highly optimized 60fps WebGL
  */
 
 const canvas = document.createElement('canvas');
@@ -25,31 +26,31 @@ try {
     });
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-    // Clean, breathable particle grid (lightweight & minimal)
-    const columns = isMobile ? 50 : 75;
-    const rows = isMobile ? 30 : 44;
+    // Breathable micro-particle grid (delicate, sleek, minimal)
+    const columns = isMobile ? 60 : 92;
+    const rows = isMobile ? 36 : 52;
     const count = columns * rows;
 
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
 
-    // BAMI Sophisticated Bio-Tech Palette (Vibrant, high-contrast against light lilac and dark backgrounds)
+    // Refined BAMI Bio-Computational Palette
     const colorStops = [
         new THREE.Color('#6d28d9'), // Deep Electric Violet
         new THREE.Color('#2563eb'), // Royal Azure
-        new THREE.Color('#0284c7'), // Electric Cyan
-        new THREE.Color('#9333ea'), // Vibrant Purple
-        new THREE.Color('#059669')  // Emerald Pharmacophore
+        new THREE.Color('#0284c7'), // Clean Sky Blue
+        new THREE.Color('#0d9488'), // Teal Bio-Core
+        new THREE.Color('#8b5cf6')  // Vibrant Violet
     ];
     const tempColor = new THREE.Color();
 
-    let seed = 9182;
+    let seed = 5123;
     const random = () => {
         seed = (seed * 1664525 + 1013904223) >>> 0;
         return seed / 4294967296;
@@ -63,31 +64,29 @@ try {
             const index = r * columns + c;
             const offset = index * 3;
 
-            // Normalized coordinates (-0.5 to 0.5)
             const u = c / (columns - 1);
             const v = r / (rows - 1);
 
             const x = (u - 0.5) * gridWidth;
             const z = (v - 0.5) * gridDepth;
 
-            // Smooth color gradient across the grid
+            // Gradient across width
             const colorPos = u * (colorStops.length - 1);
             const cIdx = Math.min(Math.floor(colorPos), colorStops.length - 2);
             tempColor.copy(colorStops[cIdx]).lerp(colorStops[cIdx + 1], colorPos - cIdx);
 
-            const brightness = 0.90 + random() * 0.20;
+            const brightness = 0.92 + random() * 0.18;
 
-            // Subtle organic offset
-            positions[offset] = x + (random() - 0.5) * 0.18;
+            positions[offset] = x + (random() - 0.5) * 0.12;
             positions[offset + 1] = 0;
-            positions[offset + 2] = z + (random() - 0.5) * 0.18;
+            positions[offset + 2] = z + (random() - 0.5) * 0.12;
 
             colors[offset] = tempColor.r * brightness;
             colors[offset + 1] = tempColor.g * brightness;
             colors[offset + 2] = tempColor.b * brightness;
 
-            // Distinct, crisp particle size
-            sizes[index] = 3.6 + random() * 2.2;
+            // TINY micro-particle size (delicate & sleek)
+            sizes[index] = 1.1 + random() * 0.9;
         }
     }
 
@@ -96,7 +95,7 @@ try {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
 
-    // Custom Shader with NormalBlending for rich visibility on light theme
+    // Custom Shader for delicate micro-particles & cursor reactivity
     const material = new THREE.ShaderMaterial({
         transparent: true,
         depthWrite: false,
@@ -120,27 +119,27 @@ try {
             void main() {
                 vec3 pos = position;
 
-                // Simple, calming ambient wave motion
-                float wave = sin(pos.x * 0.22 + uTime * 0.5) * cos(pos.z * 0.24 + uTime * 0.4) * 1.15;
-                wave += sin(pos.x * 0.42 - pos.z * 0.32 + uTime * 0.28) * 0.4;
+                // Calming ambient wave motion
+                float wave = sin(pos.x * 0.22 + uTime * 0.45) * cos(pos.z * 0.24 + uTime * 0.38) * 1.1;
+                wave += sin(pos.x * 0.4 - pos.z * 0.3 + uTime * 0.26) * 0.35;
                 pos.y += wave;
 
-                // Interactive cursor ripple / elevation
+                // Cursor interactive ripple & elevation
                 float distToMouse = length(pos.xz - uMouseWorld);
-                float ripple = sin(distToMouse * 0.85 - uTime * 2.6) * exp(-distToMouse * 0.22) * 2.2;
+                float ripple = sin(distToMouse * 0.85 - uTime * 2.8) * exp(-distToMouse * 0.24) * 1.8;
                 pos.y += ripple * uMouseIntensity;
 
                 vec4 viewPos = modelViewMatrix * vec4(pos, 1.0);
                 gl_Position = projectionMatrix * viewPos;
 
-                // Interactive point sizing
+                // Delicate point sizing - small micro-dots
                 float hoverBoost = (1.0 - smoothstep(0.0, 5.5, distToMouse)) * uMouseIntensity;
-                gl_PointSize = aSize * uPixelRatio * (1.0 + hoverBoost * 0.7) * (68.0 / -viewPos.z);
+                gl_PointSize = aSize * uPixelRatio * (1.0 + hoverBoost * 0.6) * (18.0 / -viewPos.z);
 
                 vColor = color;
-                // High-clarity alpha so particles remain crisp & distinct
+                // Crisp alpha
                 float baseAlpha = 0.68 + (pos.y + 1.2) * 0.12;
-                vAlpha = clamp(baseAlpha + hoverBoost * 0.32, 0.35, 1.0);
+                vAlpha = clamp(baseAlpha + hoverBoost * 0.32, 0.3, 1.0);
             }
         `,
         fragmentShader: `
@@ -148,12 +147,11 @@ try {
             varying float vAlpha;
 
             void main() {
-                // Soft circular glowing particle
+                // Crisp circular micro-dot with soft anti-aliased edge
                 float dist = length(gl_PointCoord - vec2(0.5));
                 if (dist > 0.5) discard;
-                float core = 1.0 - smoothstep(0.0, 0.48, dist);
-                float glow = pow(core, 1.35);
-                gl_FragColor = vec4(vColor, glow * vAlpha);
+                float core = 1.0 - smoothstep(0.1, 0.48, dist);
+                gl_FragColor = vec4(vColor, core * vAlpha);
             }
         `
     });
@@ -173,7 +171,6 @@ try {
 
     const onPointerMove = (e) => {
         mouseActiveTarget = 1.0;
-        // Normalized coordinates (-1 to 1)
         targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
         targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
@@ -204,7 +201,7 @@ try {
     const resize = () => {
         const width = window.innerWidth;
         const height = window.innerHeight;
-        const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
 
         renderer.setPixelRatio(pixelRatio);
         renderer.setSize(width, height, false);
@@ -236,17 +233,17 @@ try {
             previousFrame = now;
             const timeSeconds = reducedMotion ? 0 : now * 0.001;
 
-            // Smooth mouse interpolation (spring lerp)
+            // Smooth mouse spring lerp
             currentMouseX += (targetMouseX - currentMouseX) * 0.06;
             currentMouseY += (targetMouseY - currentMouseY) * 0.06;
             currentMouseActive += (mouseActiveTarget - currentMouseActive) * 0.05;
 
-            // Responsive 3D Camera Parallax
-            camera.position.x = currentMouseX * 4.5;
-            camera.position.y = 7.5 + currentMouseY * 2.5;
+            // Responsive 3D Parallax Camera
+            camera.position.x = currentMouseX * 4.2;
+            camera.position.y = 7.5 + currentMouseY * 2.2;
             camera.lookAt(0, 0, 0);
 
-            // Project cursor into world grid coordinates for the ripple effect
+            // Project cursor into world plane
             const mouseWorldX = currentMouseX * 16.0;
             const mouseWorldZ = -currentMouseY * 11.0;
 
@@ -286,5 +283,5 @@ try {
 
 } catch (error) {
     canvas.remove();
-    console.error('Unable to initialize the responsive particle wave background:', error);
+    console.error('Unable to initialize the responsive micro-particle wave background:', error);
 }

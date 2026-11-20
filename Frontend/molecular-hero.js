@@ -1,6 +1,6 @@
 /* =========================================================
    BAMI INTERACTIVE 3D MOLECULAR HERO CANVAS
-   Clean, elegant bioactive pharmacophore core with smooth
+   Sleek, compact bioactive pharmacophore core with smooth
    cursor-responsive 3D rotation, depth projection, and drag physics.
    ========================================================= */
 
@@ -18,7 +18,7 @@
     let animationFrameId = null;
 
     // Smooth rotational state & target damping
-    let rotX = 0.25;
+    let rotX = 0.22;
     let rotY = 0.35;
     let rotZ = 0.08;
     let targetTiltX = 0;
@@ -32,31 +32,31 @@
     let dragVelocityX = 0;
     let dragVelocityY = 0;
 
-    // Clean, elegant Bioactive Lead Model (14 atoms: Quinazoline core + Linker + Substituted Ring)
+    // Compact, refined Bioactive Lead Model (sleek atom nodes)
     const rawNodes = [
         // Core Ring A (Aromatic benzene)
-        { x: -1.2, y: -0.7, z: 0.1, element: 'C', radius: 10, color: '#8B5CF6' },
-        { x: -0.6, y: -1.4, z: 0.2, element: 'C', radius: 10, color: '#8B5CF6' },
-        { x: 0.8, y: -1.4, z: 0.1, element: 'C', radius: 10, color: '#8B5CF6' },
-        { x: 1.5, y: -0.7, z: -0.1, element: 'C', radius: 10, color: '#8B5CF6' },
-        { x: 0.8, y: 0.0, z: -0.2, element: 'C', radius: 10, color: '#8B5CF6' },
-        { x: -0.6, y: 0.0, z: -0.1, element: 'C', radius: 10, color: '#8B5CF6' },
+        { x: -1.2, y: -0.7, z: 0.1, element: 'C', radius: 6.5, color: '#8B5CF6' },
+        { x: -0.6, y: -1.4, z: 0.2, element: 'C', radius: 6.5, color: '#8B5CF6' },
+        { x: 0.8, y: -1.4, z: 0.1, element: 'C', radius: 6.5, color: '#8B5CF6' },
+        { x: 1.5, y: -0.7, z: -0.1, element: 'C', radius: 6.5, color: '#8B5CF6' },
+        { x: 0.8, y: 0.0, z: -0.2, element: 'C', radius: 6.5, color: '#8B5CF6' },
+        { x: -0.6, y: 0.0, z: -0.1, element: 'C', radius: 6.5, color: '#8B5CF6' },
 
         // Core Ring B (Pyrimidine heteroatoms)
-        { x: 1.5, y: 0.7, z: -0.3, element: 'N', radius: 11, color: '#38BDF8' },
-        { x: 0.8, y: 1.4, z: -0.4, element: 'C', radius: 10, color: '#8B5CF6' },
-        { x: -0.6, y: 1.4, z: -0.3, element: 'N', radius: 11, color: '#38BDF8' },
+        { x: 1.5, y: 0.7, z: -0.3, element: 'N', radius: 7.5, color: '#38BDF8' },
+        { x: 0.8, y: 1.4, z: -0.4, element: 'C', radius: 6.5, color: '#8B5CF6' },
+        { x: -0.6, y: 1.4, z: -0.3, element: 'N', radius: 7.5, color: '#38BDF8' },
 
         // Pharmacophore Linker
-        { x: 1.5, y: 2.2, z: -0.5, element: 'NH', radius: 11, color: '#06B6D4' },
+        { x: 1.5, y: 2.2, z: -0.5, element: 'NH', radius: 7.0, color: '#06B6D4' },
 
         // Target Phenyl Ring
-        { x: 2.7, y: 2.2, z: -0.6, element: 'C', radius: 10, color: '#A855F7' },
-        { x: 3.4, y: 3.1, z: -0.7, element: 'C', radius: 10, color: '#A855F7' },
-        { x: 4.6, y: 3.1, z: -0.8, element: 'C', radius: 10, color: '#A855F7' },
-        { x: 5.3, y: 2.2, z: -0.8, element: 'F', radius: 11, color: '#EC4899' },
-        { x: 4.6, y: 1.3, z: -0.7, element: 'C', radius: 10, color: '#A855F7' },
-        { x: 3.4, y: 1.3, z: -0.6, element: 'C', radius: 10, color: '#A855F7' }
+        { x: 2.7, y: 2.2, z: -0.6, element: 'C', radius: 6.5, color: '#A855F7' },
+        { x: 3.4, y: 3.1, z: -0.7, element: 'C', radius: 6.5, color: '#A855F7' },
+        { x: 4.6, y: 3.1, z: -0.8, element: 'C', radius: 6.5, color: '#A855F7' },
+        { x: 5.3, y: 2.2, z: -0.8, element: 'F', radius: 7.5, color: '#EC4899' },
+        { x: 4.6, y: 1.3, z: -0.7, element: 'C', radius: 6.5, color: '#A855F7' },
+        { x: 3.4, y: 1.3, z: -0.6, element: 'C', radius: 6.5, color: '#A855F7' }
     ];
 
     // Covalent bonds connecting the pharmacophore
@@ -86,7 +86,6 @@
     // =========================================================
     // CURSOR & TOUCH RESPONSIVE PARALLAX
     // =========================================================
-    // 1. Window-wide pointer tracking for subtle ambient tilt
     window.addEventListener('pointermove', function (e) {
         if (isDragging) return;
         const normX = (e.clientX / window.innerWidth) - 0.5;
@@ -95,7 +94,6 @@
         targetTiltX = -normY * 0.7;
     }, { passive: true });
 
-    // 2. Direct drag to interactively inspect 3D molecule
     const stage = canvas.parentElement;
     if (stage) {
         stage.style.cursor = 'grab';
@@ -142,28 +140,24 @@
 
     // 3D rotation projection helper
     function rotateAndProject(point, rX, rY, rZ, scale, cx, cy) {
-        // Rotate Y
         const cosY = Math.cos(rY);
         const sinY = Math.sin(rY);
         const x1 = point.x * cosY + point.z * sinY;
         const y1 = point.y;
         const z1 = -point.x * sinY + point.z * cosY;
 
-        // Rotate X
         const cosX = Math.cos(rX);
         const sinX = Math.sin(rX);
         const x2 = x1;
         const y2 = y1 * cosX - z1 * sinX;
         const z2 = y1 * sinX + z1 * cosX;
 
-        // Rotate Z
         const cosZ = Math.cos(rZ);
         const sinZ = Math.sin(rZ);
         const x3 = x2 * cosZ - y2 * sinZ;
         const y3 = x2 * sinZ + y2 * cosZ;
         const z3 = z2;
 
-        // Perspective projection
         const fov = 420;
         const depth = fov / (fov + z3 * 36);
         const projX = cx + x3 * scale * depth;
@@ -189,11 +183,10 @@
             return;
         }
 
-        // Apply drag inertia or gentle idle rotation
         if (isDragging) {
-            // Handled in pointermove
+            // Drag rotation active
         } else {
-            rotY += 0.009 + dragVelocityX;
+            rotY += 0.008 + dragVelocityX;
             rotX += dragVelocityY;
             dragVelocityX *= 0.94;
             dragVelocityY *= 0.94;
@@ -210,26 +203,26 @@
 
         const cx = width / 2;
         const cy = height / 2;
-        const scale = Math.min(width, height) * 0.145;
+        const scale = Math.min(width, height) * 0.108; // Sleek, compact scale
 
         // Project all nodes
         const projectedNodes = rawNodes.map(node =>
             rotateAndProject(node, effectiveRotX, effectiveRotY, rotZ, scale, cx, cy)
         );
 
-        // 1. Draw Covalent Bonds
+        // 1. Draw Covalent Bonds (Fine, elegant lines)
         rawBonds.forEach(bond => {
             const n1 = projectedNodes[bond[0]];
             const n2 = projectedNodes[bond[1]];
             if (!n1 || !n2) return;
 
             const avgZ = (n1.z + n2.z) / 2;
-            const alpha = Math.max(0.3, Math.min(0.95, 0.7 + avgZ * 0.15));
+            const alpha = Math.max(0.28, Math.min(0.9, 0.65 + avgZ * 0.15));
 
             ctx.beginPath();
             ctx.moveTo(n1.x, n1.y);
             ctx.lineTo(n2.x, n2.y);
-            ctx.lineWidth = Math.max(1.8, 3.5 * ((n1.depth + n2.depth) / 2));
+            ctx.lineWidth = Math.max(1.2, 2.4 * ((n1.depth + n2.depth) / 2));
 
             const grad = ctx.createLinearGradient(n1.x, n1.y, n2.x, n2.y);
             grad.addColorStop(0, n1.color);
@@ -247,15 +240,15 @@
             .sort((a, b) => a.node.z - b.node.z);
 
         sortedIndices.forEach(({ node }) => {
-            const rad = Math.max(5, node.radius);
+            const rad = Math.max(3.5, node.radius);
 
             // Subtle glow aura
-            const aura = ctx.createRadialGradient(node.x, node.y, rad * 0.2, node.x, node.y, rad * 2.2);
+            const aura = ctx.createRadialGradient(node.x, node.y, rad * 0.2, node.x, node.y, rad * 1.8);
             aura.addColorStop(0, node.color);
             aura.addColorStop(1, 'transparent');
-            ctx.globalAlpha = 0.35;
+            ctx.globalAlpha = 0.28;
             ctx.beginPath();
-            ctx.arc(node.x, node.y, rad * 2.2, 0, Math.PI * 2);
+            ctx.arc(node.x, node.y, rad * 1.8, 0, Math.PI * 2);
             ctx.fillStyle = aura;
             ctx.fill();
             ctx.globalAlpha = 1.0;
@@ -279,12 +272,12 @@
             ctx.fill();
 
             // Element chemical symbol
-            ctx.font = `bold ${Math.max(8, Math.round(rad * 0.82))}px 'Space Grotesk', -apple-system, sans-serif`;
+            ctx.font = `bold ${Math.max(7, Math.round(rad * 0.82))}px 'Space Grotesk', -apple-system, sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = '#FFFFFF';
             ctx.shadowColor = 'rgba(0,0,0,0.6)';
-            ctx.shadowBlur = 4;
+            ctx.shadowBlur = 3;
             ctx.fillText(node.element, node.x, node.y + 0.5);
             ctx.shadowBlur = 0;
         });
